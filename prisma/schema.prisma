@@ -1,0 +1,134 @@
+// Prisma Schema - Sistem Rekomendasi Laptop (TOPSIS + ROC)
+// Database: PostgreSQL via Supabase
+// Auth: Supabase Auth (user UUID from auth.users)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid()) // matches Supabase auth.users.id
+  name      String
+  email     String   @unique
+  role      String   @default("mahasiswa") // mahasiswa | admin
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  kuisionerJawaban KuisionerJawaban[]
+
+  @@map("users")
+}
+
+model Laptop {
+  id               Int     @id @default(autoincrement())
+  name             String
+  brand            String
+  price            BigInt
+  performaKomposit Int?    @map("performa_komposit")
+  processorScore   Int?    @map("processor_score")
+  vgaScore         Int?    @map("vga_score")
+  ramGb            Int?    @map("ram_gb")
+  storageGb        Int?    @map("storage_gb")
+  displaySize      Float?  @map("display_size")
+  batteryHours     Float?  @map("battery_hours")
+  weightKg         Float?  @map("weight_kg")
+  mobilityScore    Int?    @map("mobility_score")
+  category         String?
+  image            String?
+  imageUrl         String? @map("image_url")
+  condition        String  @default("baru") // baru | second
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  hasilTopsis  HasilTopsis[]
+  penjelasanAi PenjelasanAi[]
+
+  @@map("laptops")
+}
+
+model Kriteria {
+  id        Int      @id @default(autoincrement())
+  kode      String   @unique @db.VarChar(10)
+  nama      String   @db.VarChar(100)
+  tipe      String   @default("benefit") // benefit | cost
+  deskripsi String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bobotHasil BobotKriteriaHasil[]
+
+  @@map("kriteria")
+}
+
+model KuisionerJawaban {
+  id               Int      @id @default(autoincrement())
+  userId           String   @map("user_id") // UUID from Supabase auth
+  budgetMin        BigInt   @default(0) @map("budget_min")
+  budgetMax        BigInt   @default(50000000) @map("budget_max")
+  peruntukan       String   @default("Kuliah")
+  rankingKriteria  Json     @map("ranking_kriteria")
+  merekPilihan     Json     @map("merek_pilihan")
+  kondisiPilihan   String   @default("keduanya") @map("kondisi_pilihan") // baru | second | keduanya
+  frekuensiMembawa String?  @map("frekuensi_membawa")
+  judul            String?
+  tanggalPengisian DateTime @default(now()) @map("tanggal_pengisian")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user       User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bobotHasil BobotKriteriaHasil[]
+  hasilTopsis HasilTopsis[]
+  penjelasanAi PenjelasanAi[]
+
+  @@map("kuisioner_jawaban")
+}
+
+model BobotKriteriaHasil {
+  id                 Int   @id @default(autoincrement())
+  kuisionerJawabanId Int   @map("kuisioner_jawaban_id")
+  kriteriaId         Int   @map("kriteria_id")
+  prioritas          Int
+  bobot              Float @db.DoublePrecision
+
+  kuisionerJawaban KuisionerJawaban @relation(fields: [kuisionerJawabanId], references: [id], onDelete: Cascade)
+  kriteria         Kriteria         @relation(fields: [kriteriaId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("bobot_kriteria_hasil")
+}
+
+model HasilTopsis {
+  id                 Int    @id @default(autoincrement())
+  kuisionerJawabanId Int    @map("kuisioner_jawaban_id")
+  laptopId           Int    @map("laptop_id")
+  kondisi            String // baru | second
+  nilaiV             Float  @map("nilai_v") @db.DoublePrecision
+  peringkat          Int
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  kuisionerJawaban KuisionerJawaban @relation(fields: [kuisionerJawabanId], references: [id], onDelete: Cascade)
+  laptop           Laptop           @relation(fields: [laptopId], references: [id], onDelete: Cascade)
+
+  @@map("hasil_topsis")
+}
+
+model PenjelasanAi {
+  id                 Int    @id @default(autoincrement())
+  kuisionerJawabanId Int    @map("kuisioner_jawaban_id")
+  laptopId           Int    @map("laptop_id")
+  penjelasan         String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  kuisionerJawaban KuisionerJawaban @relation(fields: [kuisionerJawabanId], references: [id], onDelete: Cascade)
+  laptop           Laptop           @relation(fields: [laptopId], references: [id], onDelete: Cascade)
+
+  @@map("penjelasan_ai")
+}
