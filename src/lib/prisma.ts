@@ -4,10 +4,8 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 const connectionString =
-  process.env.DATABASE_URL ??
-  (() => {
-    throw new Error('DATABASE_URL environment variable is not set');
-  })();
+  process.env.DATABASE_URL ||
+  'postgresql://postgres.njnvkjhnefmawskhcbdy:Chairull003_@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true';
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
