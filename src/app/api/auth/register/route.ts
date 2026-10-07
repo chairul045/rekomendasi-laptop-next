@@ -4,10 +4,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 import prisma from '@/lib/prisma';
 
+import { createClient as createServerClient } from '@/lib/supabase/server';
+
 function getServiceClient() {
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!serviceKey) return null;
   return createServiceClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://njnvkjhnefmawskhcbdy.supabase.co',
+    serviceKey,
     { auth: { autoRefreshToken: false, persistSession: false } }
   );
 }
@@ -40,43 +44,84 @@ export async function POST(request: NextRequest) {
     }
 
     const serviceClient = getServiceClient();
+    let authUserId: string;
 
-    // 2. Buat user langsung di Supabase Auth dengan email_confirm: true
-    // Cara ini TIDAK mengirimkan email verifikasi sehingga tidak terkena rate limit email Supabase
-    const { data: authData, error: authError } = await serviceClient.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-      user_metadata: { name },
-    });
+    if (serviceClient) {
+      // 2a. Buat user via Supabase Admin API (email_confirm: true, bebas rate limit email)
+      const { data: authData, error: authError } = await serviceClient.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: { name },
+      });
 
-    if (authError) {
-      if (
-        authError.message.toLowerCase().includes('already registered') ||
-        authError.message.toLowerCase().includes('already exists')
-      ) {
+      if (authError) {
+        if (
+          authError.message.toLowerCase().includes('already registered') ||
+          authError.message.toLowerCase().includes('already exists')
+        ) {
+          return NextResponse.json(
+            { error: 'Email sudah terdaftar di sistem. Silakan langsung masuk.' },
+            { status: 409 }
+          );
+        }
         return NextResponse.json(
-          { error: 'Email sudah terdaftar di sistem. Silakan langsung masuk.' },
-          { status: 409 }
+          { error: authError.message || 'Gagal membuat akun di auth service.' },
+          { status: 400 }
         );
       }
-      return NextResponse.json(
-        { error: authError.message || 'Gagal membuat akun di auth service.' },
-        { status: 400 }
-      );
-    }
 
-    if (!authData.user) {
-      return NextResponse.json(
-        { error: 'Gagal membuat akun pengguna.' },
-        { status: 500 }
-      );
+      if (!authData.user) {
+        return NextResponse.json(
+          { error: 'Gagal membuat akun pengguna.' },
+          { status: 500 }
+        );
+      }
+
+      authUserId = authData.user.id;
+    } else {
+      // 2b. Fallback via standard Supabase auth signUp jika SERVICE_ROLE_KEY belum diisi di hosting
+      const serverClient = await createServerClient();
+      const { data: authData, error: authError } = await serverClient.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { name },
+        },
+      });
+
+      if (authError) {
+        if (
+          authError.message.toLowerCase().includes('already registered') ||
+          authError.message.toLowerCase().includes('already exists')
+        ) {
+          return NextResponse.json(
+            { error: 'Email sudah terdaftar di sistem. Silakan langsung masuk.' },
+            { status: 409 }
+          );
+        }
+        return NextResponse.json(
+          { error: authError.message || 'Gagal membuat akun di auth service.' },
+          { status: 400 }
+        );
+      }
+
+      if (!authData.user) {
+        return NextResponse.json(
+          { error: 'Gagal membuat akun pengguna.' },
+          { status: 500 }
+        );
+      }
+
+      authUserId = authData.user.id;
     }
 
     // 3. Simpan ke database PostgreSQL (Prisma)
-    const newUser = await prisma.user.create({
-      data: {
-        id: authData.user.id,
+    const newUser = await prisma.user.upsert({
+      where: { email },
+      update: { name },
+      create: {
+        id: authUserId,
         name,
         email,
         role: 'mahasiswa',
@@ -90,10 +135,10 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('Register API error:', error);
     return NextResponse.json(
-      { error: 'Terjadi kesalahan pada server saat mendaftar.' },
+      { error: error?.message || 'Terjadi kesalahan pada server saat mendaftar.' },
       { status: 500 }
     );
   }
