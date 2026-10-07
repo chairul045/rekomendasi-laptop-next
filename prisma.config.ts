@@ -9,15 +9,8 @@ const directUrl =
   'postgresql://postgres.njnvkjhnefmawskhcbdy:Chairull003_@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres';
 
 export default defineConfig({
-  earlyAccess: true,
   schema: path.join('prisma', 'schema.prisma'),
   datasource: {
     url: directUrl,
-  },
-  migrate: {
-    async adapter() {
-      const { PrismaPg } = await import('@prisma/adapter-pg');
-      return new PrismaPg({ connectionString: directUrl });
-    },
   },
 });
