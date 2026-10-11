@@ -18,8 +18,28 @@ export default async function HomePage() {
     redirect('/login');
   }
 
-  // Fetch / auto-create user profile
-  let profile = await prisma.user.findUnique({ where: { id: user.id } });
+  // Fetch profile, riwayat konsultasi, dan katalog laptop secara paralel
+  const [profileExisting, consultations, laptopsRaw] = await Promise.all([
+    prisma.user.findUnique({ where: { id: user.id } }),
+    prisma.kuisionerJawaban.findMany({
+      where: { userId: user.id },
+      include: {
+        hasilTopsis: {
+          include: { laptop: true },
+          orderBy: { peringkat: 'asc' },
+          take: 3,
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+    }),
+    prisma.laptop.findMany({
+      orderBy: [{ performaKomposit: 'desc' }, { price: 'asc' }],
+      take: 24,
+    }),
+  ]);
+
+  let profile = profileExisting;
   if (!profile) {
     profile = await prisma.user.create({
       data: {
@@ -30,26 +50,6 @@ export default async function HomePage() {
       },
     });
   }
-
-  // Fetch consultations for this user
-  const consultations = await prisma.kuisionerJawaban.findMany({
-    where: { userId: user.id },
-    include: {
-      hasilTopsis: {
-        include: { laptop: true },
-        orderBy: { peringkat: 'asc' },
-        take: 3,
-      },
-    },
-    orderBy: { createdAt: 'desc' },
-    take: 10,
-  });
-
-  // Fetch featured laptops for catalog
-  const laptopsRaw = await prisma.laptop.findMany({
-    orderBy: [{ performaKomposit: 'desc' }, { price: 'asc' }],
-    take: 24,
-  });
 
   const laptops = laptopsRaw.map((l) => ({
     id: l.id,

@@ -61,7 +61,7 @@ export async function generateAiExplanation(
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-          signal: AbortSignal.timeout(8000),
+          signal: AbortSignal.timeout(3500),
         }
       );
 

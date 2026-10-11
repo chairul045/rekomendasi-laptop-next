@@ -12,12 +12,13 @@ import {
   Edit3,
   Check,
   X,
-  Clock,
   Trophy,
   LogOut,
   Calendar,
-  Laptop,
+  Lock,
+  KeyRound,
   ArrowRight,
+  Sparkles,
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -45,9 +46,17 @@ export default function ProfilePage() {
   const router = useRouter();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Edit Name State
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState('');
   const [savingName, setSavingName] = useState(false);
+
+  // Change Password State
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
 
   useEffect(() => {
     fetchProfile();
@@ -93,9 +102,9 @@ export default function ProfilePage() {
       const updated = await res.json();
       setProfile((prev) => (prev ? { ...prev, name: updated.name } : prev));
       setEditingName(false);
-      toast.success('Nama berhasil diperbarui!');
+      toast.success('Nama akun berhasil diperbarui! 🎉');
     } catch {
-      toast.error('Terjadi kesalahan.');
+      toast.error('Terjadi kesalahan saat menyimpan nama.');
     } finally {
       setSavingName(false);
     }
@@ -104,6 +113,42 @@ export default function ProfilePage() {
   const handleCancelEdit = () => {
     setNameInput(profile?.name ?? '');
     setEditingName(false);
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPassword || newPassword.length < 6) {
+      toast.error('Password baru minimal harus 6 karakter.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('Konfirmasi password tidak cocok.');
+      return;
+    }
+
+    setChangingPassword(true);
+    try {
+      const res = await fetch('/api/auth/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: newPassword }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || 'Gagal mengubah password.');
+        return;
+      }
+
+      toast.success('Password berhasil diperbarui! Silakan gunakan password baru untuk login berikutnya.');
+      setNewPassword('');
+      setConfirmPassword('');
+      setShowPasswordForm(false);
+    } catch {
+      toast.error('Terjadi kesalahan koneksi.');
+    } finally {
+      setChangingPassword(false);
+    }
   };
 
   const handleSignOut = async () => {
@@ -132,9 +177,9 @@ export default function ProfilePage() {
         <Navbar />
         <main className="flex-grow flex items-center justify-center py-20">
           <div className="text-center space-y-2">
-            <p className="text-zinc-400">Profil tidak ditemukan.</p>
-            <Link href="/" className="text-cyan-400 text-xs hover:underline">
-              Kembali ke dashboard
+            <p className="text-zinc-400">Profil tidak ditemukan atau sesi telah berakhir.</p>
+            <Link href="/login" className="text-cyan-400 text-xs hover:underline">
+              Masuk ke akun Anda
             </Link>
           </div>
         </main>
@@ -154,11 +199,16 @@ export default function ProfilePage() {
       <Navbar user={profile} historyCount={profile.stats.totalKonsultasi} />
 
       <main className="flex-grow max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        {/* Profile Card */}
+        {/* Profile Card Banner */}
         <div className="rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-xl overflow-hidden shadow-2xl">
           {/* Header Banner Accent */}
           <div className="h-28 bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 relative">
             <div className="absolute inset-0 bg-black/20" />
+            <div className="absolute top-4 right-4 flex items-center gap-2">
+              <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-black/40 text-white backdrop-blur-md border border-white/20 capitalize">
+                {profile.role === 'admin' ? '🛡️ Administrator' : '🎓 Mahasiswa'}
+              </span>
+            </div>
           </div>
 
           <div className="px-6 pb-6 relative">
@@ -169,7 +219,7 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Name + Edit */}
+            {/* Name + Edit Name */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="space-y-1">
                 {editingName ? (
@@ -188,13 +238,15 @@ export default function ProfilePage() {
                     <button
                       onClick={handleSaveName}
                       disabled={savingName}
-                      className="p-1.5 rounded-lg text-emerald-400 hover:bg-emerald-950/40"
+                      className="p-1.5 rounded-lg text-emerald-400 hover:bg-emerald-950/40 cursor-pointer"
+                      title="Simpan nama"
                     >
                       <Check className="w-4 h-4" />
                     </button>
                     <button
                       onClick={handleCancelEdit}
-                      className="p-1.5 rounded-lg text-zinc-400 hover:bg-zinc-800"
+                      className="p-1.5 rounded-lg text-zinc-400 hover:bg-zinc-800 cursor-pointer"
+                      title="Batal"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -204,8 +256,8 @@ export default function ProfilePage() {
                     <h1 className="text-xl sm:text-2xl font-black text-white">{profile.name}</h1>
                     <button
                       onClick={() => setEditingName(true)}
-                      className="p-1 rounded-lg text-zinc-400 hover:text-cyan-300 transition"
-                      title="Ubah nama"
+                      className="p-1 rounded-lg text-zinc-400 hover:text-cyan-300 transition cursor-pointer"
+                      title="Ubah nama tampilan"
                     >
                       <Edit3 className="w-4 h-4" />
                     </button>
@@ -227,7 +279,9 @@ export default function ProfilePage() {
                     />
                     {profile.role.toUpperCase()}
                   </span>
-                  <span className="text-xs text-zinc-400 font-mono">ID: {profile.id.substring(0, 8)}...</span>
+                  <span className="text-xs text-zinc-400 font-mono">
+                    ID: {profile.id.substring(0, 8)}...
+                  </span>
                 </div>
               </div>
 
@@ -240,18 +294,80 @@ export default function ProfilePage() {
               </button>
             </div>
 
-            {/* Email & Join Date */}
+            {/* Email & Info Grid */}
             <div className="mt-5 pt-4 border-t border-white/10 grid sm:grid-cols-2 gap-3 text-xs text-zinc-300">
               <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-zinc-500" />
-                <span>{profile.email}</span>
+                <Mail className="w-4 h-4 text-violet-400" />
+                <span>Email: <strong className="text-white">{profile.email}</strong></span>
               </div>
               <div className="flex items-center gap-2 font-mono">
-                <Calendar className="w-4 h-4 text-zinc-500" />
-                <span>Terdaftar sejak {joinDate}</span>
+                <Calendar className="w-4 h-4 text-cyan-400" />
+                <span>Bergabung: <strong className="text-white">{joinDate}</strong></span>
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Change Password Card */}
+        <div className="rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-violet-600/20 border border-violet-500/30 flex items-center justify-center text-violet-300">
+                <KeyRound className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="font-bold text-sm text-white">Keamanan & Password Akun</h3>
+                <p className="text-xs text-zinc-400">Perbarui kata sandi login Supabase Auth Anda</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowPasswordForm(!showPasswordForm)}
+              className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 transition cursor-pointer px-3 py-1.5 rounded-xl border border-cyan-500/30 bg-cyan-950/30"
+            >
+              {showPasswordForm ? 'Tutup Form' : 'Ganti Password'}
+            </button>
+          </div>
+
+          {showPasswordForm && (
+            <form onSubmit={handleChangePassword} className="pt-3 border-t border-white/10 space-y-4">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-zinc-300">Password Baru</label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Minimal 6 karakter"
+                    required
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950/90 border border-zinc-800 text-zinc-100 placeholder-zinc-500 text-xs focus:outline-none focus:border-cyan-400 transition"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-zinc-300">Konfirmasi Password Baru</label>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Ulangi password baru"
+                    required
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950/90 border border-zinc-800 text-zinc-100 placeholder-zinc-500 text-xs focus:outline-none focus:border-cyan-400 transition"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  disabled={changingPassword}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs transition disabled:opacity-50 cursor-pointer shadow-lg shadow-violet-600/20"
+                >
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>{changingPassword ? 'Memperbarui...' : 'Simpan Password Baru'}</span>
+                </button>
+              </div>
+            </form>
+          )}
         </div>
 
         {/* Stats Grid */}
@@ -264,7 +380,7 @@ export default function ProfilePage() {
             <div className="text-3xl font-black text-white font-mono">
               {profile.stats.totalKonsultasi}
             </div>
-            <p className="text-[11px] text-zinc-500 mt-1 font-mono">Riwayat evaluasi TOPSIS</p>
+            <p className="text-[11px] text-zinc-500 mt-1 font-mono">Riwayat evaluasi TOPSIS Anda</p>
           </div>
 
           <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md">
@@ -278,6 +394,42 @@ export default function ProfilePage() {
             <p className="text-[11px] text-zinc-500 mt-1 font-mono">Laptop peringkat 1 yang didapat</p>
           </div>
         </div>
+
+        {/* Last Consultation */}
+        {profile.lastConsultation && (
+          <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-mono uppercase text-zinc-400">Konsultasi Terakhir</span>
+              <span className="text-[11px] font-mono text-cyan-400">
+                {new Date(profile.lastConsultation.createdAt).toLocaleDateString('id-ID')}
+              </span>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-zinc-950/70 border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h4 className="font-bold text-sm text-white">
+                  {profile.lastConsultation.judul || `Konsultasi ${profile.lastConsultation.peruntukan}`}
+                </h4>
+                {profile.lastConsultation.topLaptop && (
+                  <p className="text-xs text-zinc-400 mt-0.5">
+                    Peringkat 1:{' '}
+                    <strong className="text-amber-300 font-medium">
+                      {profile.lastConsultation.topLaptop.brand} {profile.lastConsultation.topLaptop.name}
+                    </strong>
+                  </p>
+                )}
+              </div>
+
+              <Link
+                href={`/recommendation/${profile.lastConsultation.id}`}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-cyan-300 bg-cyan-950/40 border border-cyan-800/40 hover:bg-cyan-900/40 transition shrink-0"
+              >
+                <span>Lihat Hasil</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
+        )}
 
         {/* Quick Actions */}
         <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md space-y-3">

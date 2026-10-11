@@ -17,10 +17,12 @@ import {
   Save,
   BarChart3,
   Filter,
+  FileSpreadsheet,
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { getLaptopImageUrl, formatRupiah } from '@/lib/laptop-utils';
+import ImportLaptopModal from './ImportLaptopModal';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -415,6 +417,7 @@ export default function AdminLaptopManager({
   const [filterCondition, setFilterCondition] = useState('');
   const [modalMode, setModalMode] = useState<'create' | 'edit' | null>(null);
   const [editTarget, setEditTarget] = useState<LaptopItem | undefined>(undefined);
+  const [showImportModal, setShowImportModal] = useState(false);
 
   const filtered = useMemo(() => {
     return laptops.filter((laptop) => {
@@ -469,16 +472,25 @@ export default function AdminLaptopManager({
             </p>
           </div>
 
-          <button
-            onClick={() => {
-              setEditTarget(undefined);
-              setModalMode('create');
-            }}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm transition shadow-lg shadow-violet-600/25 active:scale-[0.98] cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Tambah Laptop Baru</span>
-          </button>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <button
+              onClick={() => setShowImportModal(true)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm transition shadow-lg shadow-emerald-600/25 active:scale-[0.98] cursor-pointer"
+            >
+              <FileSpreadsheet className="w-4 h-4" />
+              <span>Import Excel / CSV</span>
+            </button>
+            <button
+              onClick={() => {
+                setEditTarget(undefined);
+                setModalMode('create');
+              }}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm transition shadow-lg shadow-violet-600/25 active:scale-[0.98] cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Tambah Laptop Baru</span>
+            </button>
+          </div>
         </div>
 
         {/* Stats */}
@@ -659,7 +671,7 @@ export default function AdminLaptopManager({
 
       <Footer />
 
-      {/* Modal */}
+      {/* Modal Tambah/Edit Manual */}
       {modalMode && (
         <LaptopFormModal
           mode={modalMode}
@@ -668,6 +680,16 @@ export default function AdminLaptopManager({
           onSaved={handleSaved}
         />
       )}
+
+      {/* Modal Import Bulk Excel/CSV */}
+      <ImportLaptopModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onImportSuccess={(latestLaptops) => {
+          setLaptops(latestLaptops);
+          router.refresh();
+        }}
+      />
     </div>
   );
 }

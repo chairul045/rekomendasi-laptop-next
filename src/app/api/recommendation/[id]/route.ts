@@ -39,13 +39,11 @@ export async function GET(
 
     // Cek akses: hanya pemilik atau admin
     const userId = user.id;
-
-    // Check user role from DB
-    const userProfile = await prisma.user.findUnique({ where: { id: userId } });
-    const isAdmin = userProfile?.role === 'admin';
-
-    if (jawaban.userId !== userId && !isAdmin) {
-      return NextResponse.json({ error: 'Akses ditolak.' }, { status: 403 });
+    if (jawaban.userId !== userId) {
+      const userProfile = await prisma.user.findUnique({ where: { id: userId } });
+      if (userProfile?.role !== 'admin') {
+        return NextResponse.json({ error: 'Akses ditolak.' }, { status: 403 });
+      }
     }
 
     // Pisahkan hasil baru dan second, top 5 masing-masing

@@ -100,6 +100,21 @@ const BUDGET_PRESETS = [
   { label: 'Rp 15 - 30 Juta', min: 15000000, max: 30000000 },
 ];
 
+const PERUNTUKAN_CRITERIA_PRESETS: Record<string, string[]> = {
+  Kuliah: ['C1', 'C5', 'C6', 'C3', 'C4', 'C2'],
+  Gaming: ['C2', 'C3', 'C4', 'C1', 'C5', 'C6'],
+  Programming: ['C3', 'C2', 'C4', 'C5', 'C6', 'C1'],
+  'Desain Grafis': ['C2', 'C3', 'C4', 'C5', 'C1', 'C6'],
+  Bisnis: ['C6', 'C5', 'C2', 'C3', 'C4', 'C1'],
+};
+
+const FREKUENSI_OPTIONS = [
+  { value: 'Jarang', label: 'Jarang (Banyak di Meja)', desc: 'Stasioner di kos/rumah, tidak masalah bodi besar', emoji: '🏠' },
+  { value: 'Kadang-kadang', label: 'Kadang-kadang (2-3x / minggu)', desc: 'Dibawa saat ada presentasi kelas atau kerja kelompok', emoji: '🎒' },
+  { value: 'Rutin', label: 'Rutin (Hampir Setiap Hari)', desc: 'Wajib nyaman di ransel & baterai tahan kelas perkuliahan', emoji: '🚶' },
+  { value: 'Sangat Sering', label: 'Sangat Sering (Mobilitas Tinggi)', desc: 'Ultra-ringan, dibawa ke kafe, kampus, dan kegiatan luar', emoji: '✈️' },
+];
+
 // ── Sortable Item ─────────────────────────────────────────────────────────────
 
 function SortableItem({ id, index }: { id: string; index: number }) {
@@ -160,6 +175,26 @@ export default function QuestionnairePage() {
   const [rankingKriteria, setRankingKriteria] = useState(ALL_CRITERIA.map((c) => c.code));
 
   const sensors = useSensors(useSensor(PointerSensor));
+
+  const handleSelectPeruntukan = (val: string) => {
+    setPeruntukan(val);
+    if (PERUNTUKAN_CRITERIA_PRESETS[val]) {
+      setRankingKriteria(PERUNTUKAN_CRITERIA_PRESETS[val]);
+      toast.success(`Prioritas kriteria disesuaikan otomatis untuk kebutuhan ${val}!`, {
+        icon: '🎯',
+      });
+    }
+  };
+
+  const handleSelectFrekuensi = (val: string) => {
+    setFrekuensiMembawa(val);
+    // Jika mobilitas tinggi atau rutin, pastikan Baterai (C5) atau Portabilitas (C6) diperhatikan
+    if (val === 'Sangat Sering' || val === 'Rutin') {
+      toast('Mobilitas tinggi: pastikan kriteria Baterai & Portabilitas berada di posisi atas.', {
+        icon: '🎒',
+      });
+    }
+  };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -372,7 +407,7 @@ export default function QuestionnairePage() {
                 <button
                   key={opt.value}
                   type="button"
-                  onClick={() => setPeruntukan(opt.value)}
+                  onClick={() => handleSelectPeruntukan(opt.value)}
                   className={`p-4 rounded-2xl border text-left transition cursor-pointer flex items-start gap-3 ${
                     peruntukan === opt.value
                       ? 'bg-gradient-to-br from-violet-950/60 to-indigo-950/40 border-violet-500/50 text-white shadow-[0_0_20px_rgba(124,58,237,0.2)]'
@@ -472,12 +507,56 @@ export default function QuestionnairePage() {
             </div>
           </div>
 
-          {/* 5. Urutan Prioritas Kriteria (ROC Weighting) */}
+          {/* 5. Frekuensi Membawa Laptop */}
           <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md space-y-4 shadow-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="w-6 h-6 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-mono font-bold text-zinc-300">
                   5
+                </span>
+                <label className="text-sm font-semibold text-white">Frekuensi Membawa Laptop (Mobilitas)</label>
+              </div>
+              <span className="text-[11px] font-mono text-amber-400 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/40">
+                Fungsi: Portabilitas & Baterai
+              </span>
+            </div>
+            <p className="text-xs text-zinc-400">
+              Menyesuaikan rekomendasi berdasarkan seberapa sering Anda bepergian bersama laptop.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {FREKUENSI_OPTIONS.map((f) => (
+                <button
+                  key={f.value}
+                  type="button"
+                  onClick={() => handleSelectFrekuensi(f.value)}
+                  className={`p-3.5 rounded-2xl border text-left transition cursor-pointer flex items-start gap-3 ${
+                    frekuensiMembawa === f.value
+                      ? 'bg-gradient-to-br from-amber-950/60 to-orange-950/40 border-amber-500/50 text-white shadow-[0_0_20px_rgba(245,158,11,0.2)]'
+                      : 'border-zinc-800 bg-zinc-950/50 hover:border-zinc-700 text-zinc-400'
+                  }`}
+                >
+                  <span className="text-xl shrink-0 mt-0.5">{f.emoji}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs sm:text-sm font-bold text-white">{f.label}</div>
+                    <div className="text-[11px] text-zinc-400 mt-0.5">{f.desc}</div>
+                  </div>
+                  {frekuensiMembawa === f.value && (
+                    <div className="w-5 h-5 rounded-full bg-amber-400 text-zinc-950 flex items-center justify-center shrink-0">
+                      <Check className="w-3 h-3 stroke-[3]" />
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 6. Urutan Prioritas Kriteria (ROC Weighting) */}
+          <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md space-y-4 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="w-6 h-6 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-mono font-bold text-zinc-300">
+                  6
                 </span>
                 <label className="text-sm font-semibold text-white">
                   Prioritas Kriteria Keputusan (Metode ROC)

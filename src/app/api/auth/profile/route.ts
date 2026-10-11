@@ -91,25 +91,45 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name } = body;
+    const { name, password } = body;
 
-    if (!name || typeof name !== 'string' || name.trim().length < 2) {
-      return NextResponse.json(
-        { error: 'Nama harus minimal 2 karakter.' },
-        { status: 400 }
-      );
+    if (!name && !password) {
+      return NextResponse.json({ error: 'Tidak ada data yang diubah.' }, { status: 400 });
     }
 
-    const updated = await prisma.user.update({
-      where: { id: user.id },
-      data: { name: name.trim() },
-    });
+    if (name) {
+      if (typeof name !== 'string' || name.trim().length < 2) {
+        return NextResponse.json(
+          { error: 'Nama harus minimal 2 karakter.' },
+          { status: 400 }
+        );
+      }
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { name: name.trim() },
+      });
+    }
+
+    if (password) {
+      if (typeof password !== 'string' || password.length < 6) {
+        return NextResponse.json(
+          { error: 'Password baru minimal 6 karakter.' },
+          { status: 400 }
+        );
+      }
+      const { error: pwdErr } = await supabase.auth.updateUser({ password });
+      if (pwdErr) {
+        return NextResponse.json({ error: pwdErr.message || 'Gagal mengubah password.' }, { status: 400 });
+      }
+    }
+
+    const updated = await prisma.user.findUnique({ where: { id: user.id } });
 
     return NextResponse.json({
-      id: updated.id,
-      name: updated.name,
-      email: updated.email,
-      role: updated.role,
+      id: updated?.id,
+      name: updated?.name,
+      email: updated?.email,
+      role: updated?.role,
     });
   } catch (error) {
     console.error('Profile PATCH error:', error);

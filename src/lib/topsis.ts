@@ -7,10 +7,15 @@ export interface LaptopData {
   brand: string;
   price: bigint | number;
   performaKomposit: number | null;
+  processorScore?: number | null;
+  vgaScore?: number | null;
   ramGb: number | null;
   storageGb: number | null;
+  displaySize?: number | null;
   batteryHours: number | null;
   weightKg: number | null;
+  mobilityScore?: number | null;
+  category?: string | null;
   condition: string;
   imageUrl?: string | null;
 }
@@ -54,11 +59,13 @@ interface CriteriaConfig {
  * @param laptops Array laptop yang akan dievaluasi
  * @param rocWeights Bobot ROC per kode kriteria { 'C1': 0.4490, ... }
  * @param criteriaTypes Tipe tiap kriteria dari database { 'C1': 'cost', 'C2': 'benefit', ... }
+ * @param peruntukan Peruntukan pemakaian user (Gaming, Kuliah, Programming, Desain Grafis, Bisnis)
  */
 export function calculateTopsis(
   laptops: LaptopData[],
   rocWeights: Record<string, number>,
-  criteriaTypes: Record<string, string> = {}
+  criteriaTypes: Record<string, string> = {},
+  peruntukan?: string
 ): TopsisResult {
   const emptyResult: TopsisResult = {
     ranked: [],
@@ -71,7 +78,7 @@ export function calculateTopsis(
 
   if (laptops.length === 0) return emptyResult;
 
-  // Pemetaan 6 kriteria
+  // Pemetaan 6 kriteria disesuaikan dengan kebutuhan komputasi
   const criteriaMap: Record<string, CriteriaConfig> = {
     C1: {
       name: 'Harga',
@@ -80,7 +87,21 @@ export function calculateTopsis(
     },
     C2: {
       name: 'Performa',
-      attribute: (l) => l.performaKomposit || 50,
+      attribute: (l) => {
+        // Jika kebutuhan Gaming, bobot GPU (VGA) diutamakan
+        if (peruntukan === 'Gaming' && (l.vgaScore || l.processorScore)) {
+          const vga = l.vgaScore ?? 45;
+          const proc = l.processorScore ?? l.performaKomposit ?? 50;
+          return Math.round(vga * 0.65 + proc * 0.35);
+        }
+        // Jika kebutuhan Desain Grafis / Rendering
+        if (peruntukan === 'Desain Grafis' && (l.vgaScore || l.processorScore)) {
+          const vga = l.vgaScore ?? 45;
+          const proc = l.processorScore ?? l.performaKomposit ?? 50;
+          return Math.round(vga * 0.45 + proc * 0.55);
+        }
+        return l.performaKomposit || 50;
+      },
       type: (criteriaTypes['C2'] as 'benefit' | 'cost') || 'benefit',
     },
     C3: {
@@ -176,7 +197,23 @@ export function calculateTopsis(
     const dPos = Math.sqrt(sumDPos);
     const dNeg = Math.sqrt(sumDNeg);
     const sumDist = dPos + dNeg;
-    const nilaiV = sumDist > 0 ? dNeg / sumDist : 0;
+    let nilaiV = sumDist > 0 ? dNeg / sumDist : 0;
+
+    // Keselarasan kategori laptop dengan peruntukan yang diinput user
+    if (peruntukan && laptop.category) {
+      const catLower = laptop.category.toLowerCase();
+      const peruntukanLower = peruntukan.toLowerCase();
+      if (catLower === peruntukanLower) {
+        // Bonus kecocokan kategori langsung (+6%)
+        nilaiV = Math.min(0.9999, nilaiV * 1.06);
+      } else if (
+        (peruntukanLower === 'gaming' && catLower === 'kuliah' && (laptop.vgaScore ?? 0) < 55) ||
+        (peruntukanLower === 'desain grafis' && catLower === 'kuliah' && (laptop.vgaScore ?? 0) < 45)
+      ) {
+        // Penyesuaian jika laptop spek kuliah biasa tanpa GPU untuk gaming berat (-12%)
+        nilaiV = Math.max(0.01, nilaiV * 0.88);
+      }
+    }
 
     return {
       laptop,
