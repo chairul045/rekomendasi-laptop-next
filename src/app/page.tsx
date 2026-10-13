@@ -141,7 +141,7 @@ export default async function HomePage() {
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-zinc-400 max-w-xl leading-relaxed">
-                Pusat rekomendasi laptop mahasiswa berbasis sistem pendukung keputusan multi-kriteria TOPSIS & preferensi bobot Rank Order Centroid (ROC).
+                Platform pencocokan dan rekomendasi laptop mahasiswa presisi berbasis Smart Decision Matching & AI Analysis.
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -172,7 +172,7 @@ export default async function HomePage() {
             </div>
             <p className="text-[11px] text-zinc-500 mt-2 font-mono flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-violet-400" />
-              <span>Riwayat evaluasi TOPSIS tersimpan</span>
+              <span>Riwayat pencocokan Lapmatch tersimpan</span>
             </p>
           </div>
 
@@ -216,12 +216,12 @@ export default async function HomePage() {
           <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md relative overflow-hidden group hover:border-emerald-500/40 transition duration-300">
             <div className="flex items-center justify-between text-xs text-zinc-400 mb-3">
               <span className="font-mono uppercase text-[11px] tracking-wider text-zinc-400">
-                Metode Pembobotan
+                Algoritma Pencocokan
               </span>
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
             </div>
             <div className="text-xl sm:text-2xl font-black text-emerald-400 font-mono">
-              ROC & TOPSIS
+              Lapmatch AI
             </div>
             <p className="text-[11px] text-zinc-400 mt-2 flex items-center gap-2">
               <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-[10px] text-zinc-300 font-mono">

@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from 'react-hot-toast';
 
 export const metadata: Metadata = {
-  title: 'Sistem Rekomendasi Laptop - SPK TOPSIS',
-  description: 'Sistem Pendukung Keputusan Pemilihan Laptop Mahasiswa Berbasis AI & Algoritme TOPSIS - ROC',
+  title: 'Lapmatch - Smart Laptop Matching & Recommendation',
+  description: 'Lapmatch: Platform Rekomendasi Laptop Cerdas Mahasiswa Berbasis AI & Algoritma Multi-Kriteria Presisi',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

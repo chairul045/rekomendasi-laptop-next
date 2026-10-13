@@ -126,7 +126,7 @@ function LaptopCard({
       {rank === 1 && (
         <div className="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-zinc-950 text-xs font-extrabold text-center py-1.5 flex items-center justify-center gap-1.5 tracking-wider font-mono">
           <Trophy className="w-3.5 h-3.5" />
-          <span>REKOMENDASI TERBAIK BERDASARKAN TOPSIS</span>
+          <span>REKOMENDASI TERBAIK LAPMATCH</span>
         </div>
       )}
 
@@ -184,7 +184,7 @@ function LaptopCard({
         {/* Score Progress Bar */}
         <div>
           <div className="flex justify-between text-[11px] font-mono text-zinc-400 mb-1">
-            <span>Tingkat Kedekatan Solusi Ideal (TOPSIS)</span>
+            <span>Tingkat Kecocokan Laptop (Lapmatch Score)</span>
             <span className="text-cyan-300 font-bold">{scorePct}%</span>
           </div>
           <div className="h-2 bg-zinc-950 rounded-full overflow-hidden border border-white/5">
@@ -324,7 +324,7 @@ export default function RecommendationPage() {
         <main className="flex-grow flex items-center justify-center py-20">
           <div className="text-center space-y-3">
             <div className="w-12 h-12 border-4 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto shadow-[0_0_25px_rgba(124,58,237,0.5)]" />
-            <p className="text-sm font-semibold text-white">Memuat hasil rekomendasi TOPSIS...</p>
+            <p className="text-sm font-semibold text-white">Menganalisis rekomendasi Lapmatch...</p>
             <p className="text-xs text-zinc-400">Harap tunggu sebentar</p>
           </div>
         </main>
@@ -370,7 +370,7 @@ export default function RecommendationPage() {
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-emerald-950/50 text-emerald-400 border border-emerald-800/50 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                Analisis TOPSIS & Narasi AI Selesai
+                Pencocokan Lapmatch & Analisis AI Selesai
               </span>
               <span className="text-xs text-cyan-300 font-mono flex items-center gap-1 px-2.5 py-1 rounded-full bg-cyan-950/40 border border-cyan-800/40">
                 <Clock className="w-3.5 h-3.5 text-cyan-400" />

@@ -212,7 +212,7 @@ function LaptopFormModal({
               {mode === 'create' ? 'Tambah Data Laptop Baru' : `Edit: ${initial?.name}`}
             </h2>
             <p className="text-xs text-zinc-400">
-              Masukkan spesifikasi lengkap laptop untuk evaluasi SPK TOPSIS.
+              Masukkan spesifikasi lengkap laptop untuk basis data rekomendasi Lapmatch.
             </p>
           </div>
           <button
@@ -466,7 +466,7 @@ export default function AdminLaptopManager({
               Manajemen Data Laptop Alternatif
             </h1>
             <p className="text-xs sm:text-sm text-zinc-400">
-              Kelola katalog laptop untuk komputasi algoritme TOPSIS & ROC.
+              Kelola katalog data laptop untuk algoritma pencocokan cerdas Lapmatch.
             </p>
           </div>
 

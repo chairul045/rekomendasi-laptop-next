@@ -380,7 +380,7 @@ export default function ProfilePage() {
             <div className="text-3xl font-black text-white font-mono">
               {profile.stats.totalKonsultasi}
             </div>
-            <p className="text-[11px] text-zinc-500 mt-1 font-mono">Riwayat evaluasi TOPSIS Anda</p>
+            <p className="text-[11px] text-zinc-500 mt-1 font-mono">Riwayat sesi Lapmatch Anda</p>
           </div>
 
           <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md">

@@ -8,12 +8,12 @@ export default function Footer() {
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 animate-pulse" />
             <span className="code-font text-xs font-semibold text-zinc-200">
-              LaptopSPK &bull; Algoritme TOPSIS & ROC
+              Lapmatch &bull; Smart Laptop Matching Engine
             </span>
           </div>
           <span className="hidden sm:inline text-zinc-600">|</span>
           <span className="text-zinc-400">
-            Sistem Pendukung Keputusan Pemilihan Laptop Mahasiswa Berbasis AI
+            Platform Pencari & Rekomendasi Laptop Ideal Mahasiswa Berbasis Analisis Cerdas
           </span>
         </div>
 

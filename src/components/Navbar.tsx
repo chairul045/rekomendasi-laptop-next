@@ -90,14 +90,14 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
                 <span className="font-bold text-sm tracking-tight text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:via-violet-200 group-hover:to-cyan-300 transition">
-                  LaptopSPK
+                  Lapmatch
                 </span>
                 <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-mono font-medium bg-gradient-to-r from-violet-500/20 to-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-                  TOPSIS
+                  AI Match
                 </span>
               </div>
               <span className="text-[10px] text-zinc-400 hidden sm:inline">
-                Smart Decision & AI System
+                Smart Laptop Matcher & Recommender
               </span>
             </div>
           </Link>

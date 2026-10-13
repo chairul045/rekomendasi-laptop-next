@@ -47,11 +47,11 @@ export async function generateAiExplanation(
   if (apiKey) {
     try {
       const prompt =
-        `Hasil dari Sistem Rekomendasi Laptop Mahasiswa (SPK TOPSIS), buat penjelasan ringkas (2-3 kalimat lugas) mengapa laptop berikut cocok untuk mahasiswa:\n` +
+        `Sebagai konsultan cerdas dari Lapmatch (Platform Pencocokan Laptop Mahasiswa), buat penjelasan ringkas (2-3 kalimat lugas) mengapa laptop berikut sangat cocok untuk kebutuhan mahasiswa:\n` +
         `- Nama Laptop: ${laptop.name} (${laptop.condition})\n` +
         `- Harga: Rp ${Number(laptop.price).toLocaleString('id-ID')}\n` +
         `- Spesifikasi: RAM ${laptop.ramGb}GB, SSD ${laptop.storageGb}GB, Baterai ${laptop.batteryHours} jam, Berat ${laptop.weightKg} kg, Skor Performa: ${laptop.performaKomposit}\n` +
-        `- Peringkat Rekomendasi: Peringkat ${peringkat} (Skor TOPSIS: ${scorePct}%)\n` +
+        `- Peringkat Rekomendasi: Peringkat ${peringkat} (Skor Kecocokan Lapmatch: ${scorePct}%)\n` +
         `- Kebutuhan Mahasiswa: Peruntukan ${jawaban.peruntukan}, Frekuensi bawa: ${jawaban.frekuensiMembawa}, Prioritas Utama: ${topCriteriaName}\n` +
         `Gunakan bahasa Indonesia yang profesional, ramah, dan solutif.`;
 
@@ -111,7 +111,7 @@ function generateFallbackNarrative(
   const highlightText = highlights.join(', didukung ');
 
   if (peringkat === 1) {
-    return `Laptop ini merupakan pilihan terbaik (Peringkat 1) dengan skor preferensi TOPSIS tertinggi sebesar ${scorePct}%. Ditenagai ${highlightText}, laptop ${kondisiLabel} seharga ${hargaFormatted} ini sangat optimal dalam mengakomodasi prioritas utama Anda pada ${topCriteriaName} untuk kebutuhan ${peruntukan}.`;
+    return `Laptop ini merupakan pilihan terbaik (Peringkat 1) dengan skor kecocokan Lapmatch tertinggi sebesar ${scorePct}%. Ditenagai ${highlightText}, laptop ${kondisiLabel} seharga ${hargaFormatted} ini sangat optimal dalam mengakomodasi prioritas utama Anda pada ${topCriteriaName} untuk kebutuhan ${peruntukan}.`;
   }
   return `Direkomendasikan pada Peringkat ${peringkat} dengan skor kecocokan ${scorePct}%. Menawarkan kombinasi seimbang antara ${highlightText}, menjadikannya alternatif yang sangat layak dipertimbangkan untuk kebutuhan ${peruntukan} dengan banderol ${hargaFormatted}.`;
 }

@@ -128,7 +128,7 @@ export default function HistoryPage() {
               Riwayat Kuisioner & Rekomendasi
             </h1>
             <p className="text-xs sm:text-sm text-zinc-400">
-              Setiap kali Anda mengirimkan kuisioner, sistem TOPSIS dan perhitungan bobot ROC dicatat secara mandiri untuk transparansi penelusuran hasil.
+              Setiap kali Anda mengirimkan kuisioner, hasil analisis Lapmatch dicatat secara mandiri untuk transparansi penelusuran hasil rekomendasi.
             </p>
           </div>
           <div className="flex items-center gap-2.5">
@@ -234,7 +234,7 @@ export default function HistoryPage() {
             <p className="text-xs text-zinc-400 max-w-sm mx-auto mt-1 mb-5">
               {hasFilter
                 ? 'Coba ganti kata kunci pencarian atau reset filter kondisi.'
-                : 'Anda belum pernah mengisi kuisioner kebutuhan. Silakan isi kuisioner pertama Anda untuk mendapatkan rekomendasi berbasis TOPSIS & ROC.'}
+                : 'Anda belum pernah mengisi kuisioner kebutuhan. Silakan isi kuisioner pertama Anda untuk mendapatkan rekomendasi cerdas dari Lapmatch.'}
             </p>
             {!hasFilter && (
               <Link

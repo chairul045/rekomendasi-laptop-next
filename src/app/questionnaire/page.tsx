@@ -254,7 +254,7 @@ export default function QuestionnairePage() {
         return;
       }
 
-      toast.success('Perhitungan TOPSIS & analisis AI selesai!');
+      toast.success('Pencocokan Lapmatch & analisis AI selesai!');
       router.push(`/recommendation/${data.jawabanId}`);
     } catch {
       toast.error('Terjadi kesalahan jaringan.');
@@ -272,7 +272,7 @@ export default function QuestionnairePage() {
         <div className="text-center sm:text-left">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono bg-gradient-to-r from-violet-950/60 to-cyan-950/60 border border-violet-500/30 text-cyan-300 mb-3 shadow-[0_0_15px_rgba(124,58,237,0.2)]">
             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-            <span>Kuisioner Preferensi & SPK TOPSIS</span>
+            <span>Kuisioner Kebutuhan & Preferensi Lapmatch</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
             Kuisioner Kebutuhan{' '}
@@ -338,7 +338,7 @@ export default function QuestionnairePage() {
               </span>
             </div>
             <p className="text-xs text-zinc-400">
-              Tentukan batas minimal dan maksimal harga laptop yang akan diikutsertakan dalam pemeringkatan TOPSIS.
+              Tentukan batas minimal dan maksimal harga laptop yang akan diikutsertakan dalam sistem pencocokan Lapmatch.
             </p>
 
             {/* Presets */}
@@ -615,11 +615,11 @@ export default function QuestionnairePage() {
               {loading ? (
                 <>
                   <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Menghitung TOPSIS & Narasi AI...</span>
+                  <span>Menganalisis Kecocokan Lapmatch & AI...</span>
                 </>
               ) : (
                 <>
-                  <span>Proses Rekomendasi TOPSIS & AI</span>
+                  <span>Temukan Rekomendasi Laptop Terbaik</span>
                   <Send className="w-4 h-4" />
                 </>
               )}

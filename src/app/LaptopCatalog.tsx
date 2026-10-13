@@ -60,7 +60,7 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopItem[] }) {
             Rekomendasi Laptop Terbaru & Terbaik
           </h2>
           <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-            Koleksi laptop dengan nilai performa komposit unggulan yang siap dihitung kecocokannya dengan TOPSIS.
+            Koleksi laptop pilihan dengan spesifikasi komparatif unggulan yang siap dicocokkan otomatis oleh Lapmatch.
           </p>
         </div>
 
