@@ -108,47 +108,57 @@ export async function POST(request: NextRequest) {
 
     // Fungsi pencari laptop kandidat yang ketat menghormati budget & preferensi merek user
     const fetchCandidates = async (condition: 'baru' | 'second') => {
-      // Step A: Cari laptop dengan budget DAN merek pilihan (filter ketat)
+      // KASUS 1: Pengguna memilih merek tertentu (misal: hanya ASUS, atau ASUS & Lenovo)
+      // MEREK TIDAK BOLEH PERNAH DILEPAS. Semua hasil WAJIB dari merek pilihan pengguna.
+      if (!isAllBrand) {
+        // Step 1: Cari laptop dengan merek pilihan dan dalam rentang budget
+        let laptops = await prisma.laptop.findMany({
+          where: {
+            condition,
+            price: { gte: minPrice, lte: maxPrice },
+            brand: { in: merekArr },
+          },
+        });
+
+        // Step 2: Jika dalam rentang budget belum ada, perlebar rentang harga TETAP DENGAN MEREK PILIHAN
+        if (laptops.length === 0) {
+          const expandedMin = BigInt(Math.max(0, Math.round(Number(minPrice) * 0.7)));
+          const expandedMax = BigInt(Math.round(Number(maxPrice) * 1.4));
+          laptops = await prisma.laptop.findMany({
+            where: {
+              condition,
+              price: { gte: expandedMin, lte: expandedMax },
+              brand: { in: merekArr },
+            },
+            take: 30,
+            orderBy: { price: 'asc' },
+          });
+        }
+
+        // Step 3: Jika masih kosong, ambil SEMUA laptop dari merek pilihan tersebut tanpa batas harga
+        // Menjamin tidak ada merek asing yang keluar
+        if (laptops.length === 0) {
+          laptops = await prisma.laptop.findMany({
+            where: {
+              condition,
+              brand: { in: merekArr },
+            },
+            take: 30,
+            orderBy: { price: 'asc' },
+          });
+        }
+
+        return laptops;
+      }
+
+      // KASUS 2: Pengguna memilih 'Semua Merek'
       let laptops = await prisma.laptop.findMany({
         where: {
           condition,
           price: { gte: minPrice, lte: maxPrice },
-          ...(!isAllBrand ? { brand: { in: merekArr } } : {}),
         },
       });
 
-      // Step B: Jika merek pilihan tidak ada di budget tersebut,
-      // TETAP pertahankan merek pilihan, tapi perlebar sedikit rentang harga (+-20%).
-      // Ini memastikan user yang memilih "ASUS" hanya mendapat laptop ASUS.
-      if (laptops.length === 0 && !isAllBrand) {
-        const expandedMin = BigInt(Math.max(0, Math.round(Number(minPrice) * 0.8)));
-        const expandedMax = BigInt(Math.round(Number(maxPrice) * 1.2));
-        laptops = await prisma.laptop.findMany({
-          where: {
-            condition,
-            price: { gte: expandedMin, lte: expandedMax },
-            brand: { in: merekArr },
-          },
-          take: 30,
-          orderBy: { price: 'asc' },
-        });
-      }
-
-      // Step C: Masih kosong dengan merek tertentu - cari dari semua merek TETAPI
-      // masih dalam range budget asli atau budget diperlebar (±30%).
-      // Ini hanya terjadi jika merek yang dipilih benar-benar tidak ada sama sekali di DB.
-      if (laptops.length === 0 && !isAllBrand) {
-        laptops = await prisma.laptop.findMany({
-          where: {
-            condition,
-            price: { gte: minPrice, lte: maxPrice },
-          },
-          take: 30,
-          orderBy: { price: 'asc' },
-        });
-      }
-
-      // Step D: Cari semua merek dengan budget diperlebar (±35%) jika masih kosong
       if (laptops.length === 0) {
         const expandedMin = BigInt(Math.max(0, Math.round(Number(minPrice) * 0.7)));
         const expandedMax = BigInt(Math.round(Number(maxPrice) * 1.35));
@@ -162,7 +172,6 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // Step E: Fallback darurat - ambil laptop terdekat harga dengan kondisi yang diminta
       if (laptops.length === 0) {
         laptops = await prisma.laptop.findMany({
           where: { condition },
