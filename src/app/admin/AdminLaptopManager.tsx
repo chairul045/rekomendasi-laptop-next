@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import {
@@ -410,7 +409,6 @@ export default function AdminLaptopManager({
   stats: Stats;
   adminName: string;
 }) {
-  const router = useRouter();
   const [laptops, setLaptops] = useState<LaptopItem[]>(initialLaptops);
   const [search, setSearch] = useState('');
   const [filterBrand, setFilterBrand] = useState('');
@@ -436,8 +434,8 @@ export default function AdminLaptopManager({
       const res = await fetch(`/api/admin/laptops/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Gagal menghapus');
       toast.success(`"${name}" berhasil dihapus.`);
+      // Update state lokal - tidak perlu router.refresh() yang mahal
       setLaptops((prev) => prev.filter((l) => l.id !== id));
-      router.refresh();
     } catch {
       toast.error('Gagal menghapus laptop.');
     }
@@ -449,7 +447,7 @@ export default function AdminLaptopManager({
     } else {
       setLaptops((prev) => [laptop, ...prev]);
     }
-    router.refresh();
+    // Update state lokal - tidak perlu router.refresh() yang mahal
   };
 
   return (
@@ -687,7 +685,6 @@ export default function AdminLaptopManager({
         onClose={() => setShowImportModal(false)}
         onImportSuccess={(latestLaptops) => {
           setLaptops(latestLaptops);
-          router.refresh();
         }}
       />
     </div>

@@ -23,19 +23,56 @@ export default async function HomePage() {
     prisma.user.findUnique({ where: { id: user.id } }),
     prisma.kuisionerJawaban.findMany({
       where: { userId: user.id },
-      include: {
+      select: {
+        id: true,
+        judul: true,
+        peruntukan: true,
+        budgetMin: true,
+        budgetMax: true,
+        kondisiPilihan: true,
+        tanggalPengisian: true,
+        createdAt: true,
         hasilTopsis: {
-          include: { laptop: true },
-          orderBy: { peringkat: 'asc' },
-          take: 3,
+          select: {
+            id: true,
+            nilaiV: true,
+            peringkat: true,
+            kondisi: true,
+            laptop: {
+              select: {
+                id: true,
+                name: true,
+                brand: true,
+                price: true,
+                imageUrl: true,
+                condition: true,
+              },
+            },
+          },
+          where: { peringkat: 1, kondisi: 'baru' },
+          take: 1,
         },
       },
       orderBy: { createdAt: 'desc' },
-      take: 10,
+      take: 5,
     }),
     prisma.laptop.findMany({
+      select: {
+        id: true,
+        name: true,
+        brand: true,
+        price: true,
+        ramGb: true,
+        storageGb: true,
+        batteryHours: true,
+        weightKg: true,
+        performaKomposit: true,
+        condition: true,
+        category: true,
+        imageUrl: true,
+      },
       orderBy: [{ performaKomposit: 'desc' }, { price: 'asc' }],
-      take: 24,
+      take: 16,
     }),
   ]);
 
@@ -66,12 +103,26 @@ export default async function HomePage() {
     imageUrl: l.imageUrl,
   }));
 
-  const latestSession = consultations[0];
+  // Serialize consultations - konversi BigInt ke string agar aman dipass ke JSX
+  const consultationsSerialized = consultations.map((c) => ({
+    ...c,
+    budgetMin: c.budgetMin.toString(),
+    budgetMax: c.budgetMax.toString(),
+    hasilTopsis: c.hasilTopsis.map((h) => ({
+      ...h,
+      laptop: h.laptop ? {
+        ...h.laptop,
+        price: h.laptop.price.toString(),
+      } : null,
+    })),
+  }));
+
+  const latestSession = consultationsSerialized[0];
   const latestBest = latestSession?.hasilTopsis[0]?.laptop;
 
   return (
     <div className="min-h-screen flex flex-col bg-[#09090d] text-zinc-100">
-      <Navbar user={profile} historyCount={consultations.length} />
+      <Navbar user={profile} historyCount={consultationsSerialized.length} />
 
       <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-12">
         {/* Top Header & Action Banner (21st.dev style with glowing border) */}
@@ -117,7 +168,7 @@ export default async function HomePage() {
               </div>
             </div>
             <div className="text-3xl sm:text-4xl font-black text-white font-mono">
-              {consultations.length}
+              {consultationsSerialized.length}
             </div>
             <p className="text-[11px] text-zinc-500 mt-2 font-mono flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-violet-400" />
@@ -211,7 +262,7 @@ export default async function HomePage() {
             </div>
             <div className="flex items-center gap-3">
               <span className="text-xs text-zinc-400 font-mono px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-800">
-                {consultations.length} Sesi
+                {consultationsSerialized.length} Sesi
               </span>
               <Link
                 href="/history"
@@ -223,7 +274,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {consultations.length === 0 ? (
+          {consultationsSerialized.length === 0 ? (
             <div className="text-center py-16 px-4">
               <div className="w-14 h-14 rounded-2xl bg-zinc-900 border border-white/10 mx-auto flex items-center justify-center text-zinc-400 mb-4">
                 <ClipboardList className="w-7 h-7" />
@@ -252,7 +303,7 @@ export default async function HomePage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {consultations.slice(0, 5).map((item) => {
+                  {consultationsSerialized.map((item) => {
                     const best = item.hasilTopsis[0];
                     const laptop = best?.laptop;
                     const dateFormatted = new Date(item.tanggalPengisian).toLocaleDateString('id-ID', {

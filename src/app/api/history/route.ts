@@ -41,12 +41,34 @@ export async function GET(request: NextRequest) {
       prisma.kuisionerJawaban.count({ where }),
       prisma.kuisionerJawaban.findMany({
         where,
-        include: {
-          bobotHasil: { include: { kriteria: true }, orderBy: { prioritas: 'asc' } },
+        select: {
+          id: true,
+          judul: true,
+          peruntukan: true,
+          budgetMin: true,
+          budgetMax: true,
+          kondisiPilihan: true,
+          frekuensiMembawa: true,
+          createdAt: true,
           hasilTopsis: {
-            include: { laptop: true },
-            orderBy: { peringkat: 'asc' },
-            take: 3,
+            select: {
+              id: true,
+              nilaiV: true,
+              peringkat: true,
+              laptop: {
+                select: {
+                  id: true,
+                  name: true,
+                  brand: true,
+                  price: true,
+                  imageUrl: true,
+                  condition: true,
+                },
+              },
+            },
+            where: { peringkat: 1 },
+            orderBy: { kondisi: 'asc' }, // 'baru' before 'second'
+            take: 1,
           },
         },
         orderBy: { createdAt: 'desc' },
