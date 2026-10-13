@@ -262,12 +262,12 @@ export default function RegisterPage() {
             <div className="flex items-center justify-center gap-2 pt-2 text-[11px] text-zinc-400">
               <span>Bantuan kontak:</span>
               <a
-                href="https://wa.me/6281234567890"
+                href="https://wa.me/6287851164239"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-emerald-400 hover:underline flex items-center gap-1"
               >
-                <span>WhatsApp</span>
+                <span>WhatsApp (0878-5116-4239)</span>
               </a>
               <span>&bull;</span>
               <a
