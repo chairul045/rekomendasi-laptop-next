@@ -63,3 +63,84 @@ body {
   mask-composite: exclude;
   pointer-events: none;
 }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Print styling for PDF export */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #18181b !important;
+  }
+
+  header,
+  footer,
+  .no-print,
+  .bg-grid-pattern,
+  button,
+  .fixed {
+    display: none !important;
+  }
+
+  main {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  * {
+    color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  .rounded-3xl,
+  .rounded-2xl {
+    border-radius: 8px !important;
+    border: 1px solid #e4e4e7 !important;
+    background: #fafafa !important;
+  }
+
+  .text-white {
+    color: #09090b !important;
+  }
+
+  .text-zinc-400,
+  .text-zinc-300,
+  .text-zinc-500 {
+    color: #52525b !important;
+  }
+}

@@ -1,10 +1,10 @@
 import { createClient } from '@/lib/supabase/server';
 import prisma from '@/lib/prisma';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import LaptopCatalog from './LaptopCatalog';
+import LandingPage from '@/components/LandingPage';
 import { getLaptopImageUrl, formatRupiah } from '@/lib/laptop-utils';
 import { ClipboardList, ArrowRight, Clock, Plus } from 'lucide-react';
 
@@ -14,12 +14,56 @@ export default async function HomePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // Fetch preview laptops for both guest landing and logged-in dashboard
+  const laptopsRaw = await prisma.laptop.findMany({
+    select: {
+      id: true,
+      name: true,
+      brand: true,
+      price: true,
+      ramGb: true,
+      storageGb: true,
+      batteryHours: true,
+      weightKg: true,
+      performaKomposit: true,
+      processorScore: true,
+      vgaScore: true,
+      displaySize: true,
+      mobilityScore: true,
+      condition: true,
+      category: true,
+      imageUrl: true,
+    },
+    orderBy: [{ performaKomposit: 'desc' }, { price: 'asc' }],
+    take: 24,
+  });
+
+  const laptops = laptopsRaw.map((l) => ({
+    id: l.id,
+    name: l.name,
+    brand: l.brand,
+    price: l.price.toString(),
+    ramGb: l.ramGb,
+    storageGb: l.storageGb,
+    batteryHours: l.batteryHours,
+    weightKg: l.weightKg,
+    performaKomposit: l.performaKomposit,
+    processorScore: l.processorScore,
+    vgaScore: l.vgaScore,
+    displaySize: l.displaySize,
+    mobilityScore: l.mobilityScore,
+    condition: l.condition,
+    category: l.category,
+    imageUrl: l.imageUrl,
+  }));
+
+  // === GUEST MODE: Show landing page ===
   if (!user) {
-    redirect('/login');
+    return <LandingPage previewLaptops={laptops} />;
   }
 
-  // Fetch profile, riwayat konsultasi, dan katalog laptop secara paralel
-  const [profileExisting, consultations, laptopsRaw] = await Promise.all([
+  // === LOGGED-IN MODE: Fetch profile & consultation history ===
+  const [profileExisting, consultations] = await Promise.all([
     prisma.user.findUnique({ where: { id: user.id } }),
     prisma.kuisionerJawaban.findMany({
       where: { userId: user.id },
@@ -56,24 +100,6 @@ export default async function HomePage() {
       orderBy: { createdAt: 'desc' },
       take: 5,
     }),
-    prisma.laptop.findMany({
-      select: {
-        id: true,
-        name: true,
-        brand: true,
-        price: true,
-        ramGb: true,
-        storageGb: true,
-        batteryHours: true,
-        weightKg: true,
-        performaKomposit: true,
-        condition: true,
-        category: true,
-        imageUrl: true,
-      },
-      orderBy: [{ performaKomposit: 'desc' }, { price: 'asc' }],
-      take: 16,
-    }),
   ]);
 
   let profile = profileExisting;
@@ -87,21 +113,6 @@ export default async function HomePage() {
       },
     });
   }
-
-  const laptops = laptopsRaw.map((l) => ({
-    id: l.id,
-    name: l.name,
-    brand: l.brand,
-    price: l.price.toString(),
-    ramGb: l.ramGb,
-    storageGb: l.storageGb,
-    batteryHours: l.batteryHours,
-    weightKg: l.weightKg,
-    performaKomposit: l.performaKomposit,
-    condition: l.condition,
-    category: l.category,
-    imageUrl: l.imageUrl,
-  }));
 
   // Serialize consultations - konversi BigInt ke string agar aman dipass ke JSX
   const consultationsSerialized = consultations.map((c) => ({
@@ -125,7 +136,7 @@ export default async function HomePage() {
       <Navbar user={profile} historyCount={consultationsSerialized.length} />
 
       <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-12">
-        {/* Top Header & Action Banner (21st.dev style with glowing border) */}
+        {/* Top Header & Action Banner */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-zinc-900/90 via-violet-950/30 to-zinc-900/90 border border-white/10 p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
           <div className="absolute -right-16 -top-16 w-64 h-64 bg-violet-600/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -left-16 -bottom-16 w-64 h-64 bg-cyan-600/10 rounded-full blur-3xl pointer-events-none" />
@@ -141,7 +152,7 @@ export default async function HomePage() {
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-zinc-400 max-w-xl leading-relaxed">
-                Platform pencocokan dan rekomendasi laptop mahasiswa presisi berbasis Smart Decision Matching & AI Analysis.
+                Platform pencocokan dan rekomendasi laptop mahasiswa presisi berbasis Smart Decision Matching &amp; AI Analysis.
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -254,7 +265,7 @@ export default async function HomePage() {
             <div className="space-y-0.5">
               <h2 className="text-base font-bold text-white flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-cyan-400" />
-                <span>Riwayat Konsultasi & Rekomendasi Terakhir</span>
+                <span>Riwayat Konsultasi &amp; Rekomendasi Terakhir</span>
               </h2>
               <p className="text-xs text-zinc-400">
                 Daftar sesi kuisioner yang pernah Anda jalankan.

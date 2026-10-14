@@ -1,7 +1,7 @@
-// app/api/recommendation/[id]/route.ts - GET hasil rekomendasi
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import prisma from '@/lib/prisma';
+import { calculateTopsis, LaptopData } from '@/lib/topsis';
 
 export async function GET(
   request: NextRequest,
@@ -58,6 +58,53 @@ export async function GET(
       jawaban.penjelasanAi.map((p: (typeof jawaban.penjelasanAi)[0]) => [p.laptopId, p.penjelasan])
     );
 
+    // Hitung detail matriks TOPSIS untuk transparansi akademik
+    const rocWeightsMap = Object.fromEntries(
+      jawaban.bobotHasil.map((b: (typeof jawaban.bobotHasil)[0]) => [b.kriteria.kode, b.bobot])
+    );
+    const criteriaTypes = Object.fromEntries(
+      jawaban.bobotHasil.map((b: (typeof jawaban.bobotHasil)[0]) => [b.kriteria.kode, b.kriteria.tipe])
+    );
+
+    const mapToLaptopData = (item: (typeof jawaban.hasilTopsis)[0]): LaptopData => ({
+      id: item.laptop.id,
+      name: item.laptop.name,
+      brand: item.laptop.brand,
+      price: item.laptop.price,
+      performaKomposit: item.laptop.performaKomposit,
+      processorScore: item.laptop.processorScore,
+      vgaScore: item.laptop.vgaScore,
+      ramGb: item.laptop.ramGb,
+      storageGb: item.laptop.storageGb,
+      displaySize: item.laptop.displaySize,
+      batteryHours: item.laptop.batteryHours,
+      weightKg: item.laptop.weightKg,
+      mobilityScore: item.laptop.mobilityScore,
+      category: item.laptop.category,
+      condition: item.laptop.condition,
+      imageUrl: item.laptop.imageUrl,
+    });
+
+    const topsisBaruCalc =
+      hasilBaru.length > 0
+        ? calculateTopsis(
+            hasilBaru.map(mapToLaptopData),
+            rocWeightsMap,
+            criteriaTypes,
+            jawaban.peruntukan
+          )
+        : null;
+
+    const topsisSecondCalc =
+      hasilSecond.length > 0
+        ? calculateTopsis(
+            hasilSecond.map(mapToLaptopData),
+            rocWeightsMap,
+            criteriaTypes,
+            jawaban.peruntukan
+          )
+        : null;
+
     // Serialisasi BigInt
     const serialize = (obj: unknown): unknown => {
       if (typeof obj === 'bigint') return obj.toString();
@@ -89,6 +136,10 @@ export async function GET(
         hasilBaru,
         hasilSecond,
         explanations,
+        topsisCalculation: {
+          baru: topsisBaruCalc,
+          second: topsisSecondCalc,
+        },
       })
     );
   } catch (error) {

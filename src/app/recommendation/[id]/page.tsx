@@ -9,15 +9,26 @@ import {
   Sparkles,
   ExternalLink,
   RotateCcw,
-  Plus,
   History,
   Clock,
   ChevronDown,
   ChevronUp,
+  Printer,
+  Calculator,
+  Scale,
+  Info,
+  Star,
+  CheckCircle,
+  MessageSquare,
+  Link2,
+  Copy,
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { getLaptopImageUrl, formatRupiah, getMarketplaceLinks } from '@/lib/laptop-utils';
+import LaptopDetailModal, { LaptopDetailItem } from '@/components/LaptopDetailModal';
+import LaptopCompareModal from '@/components/LaptopCompareModal';
+import TopsisStepByStepModal, { TopsisCalculationData } from '@/components/TopsisStepByStepModal';
 
 interface LaptopData {
   id: number;
@@ -25,11 +36,16 @@ interface LaptopData {
   brand: string;
   price: string;
   condition: string;
+  category?: string | null;
   ramGb: number | null;
   storageGb: number | null;
   batteryHours: number | null;
   weightKg: number | null;
   performaKomposit: number | null;
+  processorScore?: number | null;
+  vgaScore?: number | null;
+  displaySize?: number | null;
+  mobilityScore?: number | null;
   imageUrl: string | null;
 }
 
@@ -60,7 +76,7 @@ interface JawabanData {
   rankingKriteria: string[];
   merekPilihan: string[];
   tanggalPengisian: string;
-  user: { id: number; name: string; email: string };
+  user: { id: string; name: string; email: string };
   bobotHasil: BobotHasil[];
 }
 
@@ -69,6 +85,10 @@ interface RecommendationData {
   hasilBaru: HasilTopsis[];
   hasilSecond: HasilTopsis[];
   explanations: Record<number, string>;
+  topsisCalculation?: {
+    baru: TopsisCalculationData | null;
+    second: TopsisCalculationData | null;
+  };
 }
 
 function RankBadge({ rank }: { rank: number }) {
@@ -104,10 +124,16 @@ function LaptopCard({
   item,
   rank,
   explanation,
+  onViewDetail,
+  onToggleCompare,
+  isComparing,
 }: {
   item: HasilTopsis;
   rank: number;
   explanation?: string;
+  onViewDetail: (laptop: LaptopData) => void;
+  onToggleCompare: (laptop: LaptopData) => void;
+  isComparing: boolean;
 }) {
   const [showExplain, setShowExplain] = useState(true);
   const scorePct = Math.round(item.nilaiV * 10000) / 100;
@@ -134,12 +160,16 @@ function LaptopCard({
         {/* Header with Image & Info */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           {/* Laptop Image */}
-          <div className="w-24 h-24 rounded-2xl overflow-hidden bg-zinc-950 border border-white/10 shrink-0">
+          <div
+            onClick={() => onViewDetail(item.laptop)}
+            className="w-24 h-24 rounded-2xl overflow-hidden bg-zinc-950 border border-white/10 shrink-0 cursor-pointer hover:border-violet-500/50 transition flex items-center justify-center p-1"
+            title="Klik untuk lihat detail spesifikasi"
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={imgUrl}
               alt={item.laptop.name}
-              className="w-full h-full object-cover"
+              className="max-h-full max-w-full object-contain"
               loading="lazy"
             />
           </div>
@@ -161,7 +191,10 @@ function LaptopCard({
               </span>
             </div>
 
-            <h3 className="font-extrabold text-base sm:text-lg text-white leading-snug">
+            <h3
+              onClick={() => onViewDetail(item.laptop)}
+              className="font-extrabold text-base sm:text-lg text-white leading-snug cursor-pointer hover:text-cyan-300 transition"
+            >
               {item.laptop.name}
             </h3>
 
@@ -241,15 +274,38 @@ function LaptopCard({
           </div>
         )}
 
-        {/* Marketplace Buy Links */}
+        {/* Card Actions & Marketplace */}
         <div className="pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
-          <span className="text-[11px] text-zinc-400 font-mono">Cari & Beli di Marketplace:</span>
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => onViewDetail(item.laptop)}
+              className="px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-white/10 text-xs font-medium transition flex items-center gap-1.5 cursor-pointer"
+            >
+              <Info className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Detail Spek</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onToggleCompare(item.laptop)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 cursor-pointer ${
+                isComparing
+                  ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                  : 'bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-white/10'
+              }`}
+            >
+              <Scale className="w-3.5 h-3.5 text-violet-400" />
+              <span>{isComparing ? 'Dihapus dari Komparasi' : 'Bandingkan'}</span>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-1.5">
+            <span className="text-[11px] text-zinc-400 font-mono hidden sm:inline mr-1">Beli:</span>
             <a
               href={links.shopee}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-orange-950/40 text-orange-300 hover:bg-orange-900/60 border border-orange-800/40 text-xs font-medium transition"
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-orange-950/40 text-orange-300 hover:bg-orange-900/60 border border-orange-800/40 text-xs font-medium transition"
             >
               <span>Shopee</span>
               <ExternalLink className="w-3 h-3" />
@@ -258,7 +314,7 @@ function LaptopCard({
               href={links.tokopedia}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-950/40 text-emerald-300 hover:bg-emerald-900/60 border border-emerald-800/40 text-xs font-medium transition"
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-950/40 text-emerald-300 hover:bg-emerald-900/60 border border-emerald-800/40 text-xs font-medium transition"
             >
               <span>Tokopedia</span>
               <ExternalLink className="w-3 h-3" />
@@ -267,9 +323,9 @@ function LaptopCard({
               href={links.facebook}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-blue-950/40 text-blue-300 hover:bg-blue-900/60 border border-blue-800/40 text-xs font-medium transition"
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-blue-950/40 text-blue-300 hover:bg-blue-900/60 border border-blue-800/40 text-xs font-medium transition"
             >
-              <span>FB Marketplace</span>
+              <span>FB</span>
               <ExternalLink className="w-3 h-3" />
             </a>
           </div>
@@ -287,6 +343,18 @@ export default function RecommendationPage() {
   const [data, setData] = useState<RecommendationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'baru' | 'second'>('baru');
+
+  // Modals & Comparison State
+  const [selectedDetailLaptop, setSelectedDetailLaptop] = useState<LaptopDetailItem | null>(null);
+  const [comparingLaptops, setComparingLaptops] = useState<LaptopDetailItem[]>([]);
+  const [showCompareModal, setShowCompareModal] = useState(false);
+  const [showTopsisModal, setShowTopsisModal] = useState(false);
+
+  // Feedback State
+  const [rating, setRating] = useState<number>(5);
+  const [satisfaction, setSatisfaction] = useState<'sangat' | 'cukup' | 'kurang'>('sangat');
+  const [comment, setComment] = useState('');
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -308,6 +376,12 @@ export default function RecommendationPage() {
         if (json.hasilBaru.length === 0 && json.hasilSecond.length > 0) {
           setActiveTab('second');
         }
+
+        // Check stored feedback for this session
+        const storedFeedback = localStorage.getItem(`lapmatch_feedback_${id}`);
+        if (storedFeedback) {
+          setFeedbackSubmitted(true);
+        }
       } catch {
         toast.error('Terjadi kesalahan memuat data.');
       } finally {
@@ -316,6 +390,36 @@ export default function RecommendationPage() {
     };
     fetchData();
   }, [id, router]);
+
+  const handleToggleCompare = (laptop: LaptopData) => {
+    const exists = comparingLaptops.some((l) => l.id === laptop.id);
+    if (exists) {
+      setComparingLaptops(comparingLaptops.filter((l) => l.id !== laptop.id));
+      toast('Laptop dihapus dari komparasi', { icon: '🗑️' });
+    } else {
+      if (comparingLaptops.length >= 4) {
+        toast.error('Maksimal komparasi 4 laptop sekaligus.');
+        return;
+      }
+      setComparingLaptops([...comparingLaptops, laptop]);
+      toast.success(`${laptop.name} ditambahkan ke komparasi`);
+    }
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleSubmitFeedback = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!id) return;
+    localStorage.setItem(
+      `lapmatch_feedback_${id}`,
+      JSON.stringify({ rating, satisfaction, comment, submittedAt: new Date().toISOString() })
+    );
+    setFeedbackSubmitted(true);
+    toast.success('Terima kasih! Feedback Anda sangat bermanfaat untuk kalibrasi SPK.');
+  };
 
   if (loading) {
     return (
@@ -350,14 +454,23 @@ export default function RecommendationPage() {
     );
   }
 
-  const { jawaban, hasilBaru, hasilSecond, explanations } = data;
+  const { jawaban, hasilBaru, hasilSecond, explanations, topsisCalculation } = data;
   const currentResults = activeTab === 'baru' ? hasilBaru : hasilSecond;
+  const currentTopsisData = activeTab === 'baru' ? topsisCalculation?.baru : topsisCalculation?.second;
 
   const dateFormatted = new Date(jawaban.tanggalPengisian).toLocaleDateString('id-ID', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   });
+
+  const criteriaFormatted = jawaban.bobotHasil.map((b) => ({
+    kode: b.kriteria.kode,
+    nama: b.kriteria.nama,
+    tipe: b.kriteria.tipe,
+    bobot: b.bobot,
+    prioritas: b.prioritas,
+  }));
 
   return (
     <div className="min-h-screen flex flex-col bg-[#09090d] text-zinc-100">
@@ -383,6 +496,28 @@ export default function RecommendationPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
+            {/* Tombol Cetak / PDF */}
+            <button
+              type="button"
+              onClick={handlePrint}
+              className="px-3.5 py-2 rounded-xl bg-violet-600/20 hover:bg-violet-600/30 text-violet-300 border border-violet-500/40 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm"
+              title="Cetak atau Simpan sebagai PDF"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              <span>Cetak / PDF</span>
+            </button>
+
+            {/* Tombol Transparansi TOPSIS */}
+            <button
+              type="button"
+              onClick={() => setShowTopsisModal(true)}
+              className="px-3.5 py-2 rounded-xl bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm"
+              title="Buka transparansi perhitungan matriks TOPSIS"
+            >
+              <Calculator className="w-3.5 h-3.5" />
+              <span>Detail Langkah TOPSIS</span>
+            </button>
+
             <Link
               href="/history"
               className="px-3.5 py-2 rounded-xl bg-[#0e0e15] hover:bg-zinc-800 text-zinc-300 border border-white/10 text-xs font-medium transition flex items-center gap-1.5"
@@ -437,9 +572,18 @@ export default function RecommendationPage() {
         {/* Transparansi Perhitungan Bobot ROC */}
         <div className="p-5 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md space-y-3">
           <div className="flex items-center justify-between mb-1">
-            <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider">
-              Transparansi Perhitungan Bobot ROC (Rank Order Centroid)
+            <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              <span>Transparansi Bobot ROC (Rank Order Centroid)</span>
             </h3>
+            <button
+              type="button"
+              onClick={() => setShowTopsisModal(true)}
+              className="text-xs text-cyan-300 hover:text-cyan-200 underline font-mono flex items-center gap-1"
+            >
+              <span>Lihat Matriks Lengkap TOPSIS</span>
+              <span>→</span>
+            </button>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-6 gap-2 text-center text-xs">
             {jawaban.bobotHasil.map((b) => (
@@ -513,6 +657,9 @@ export default function RecommendationPage() {
                   item={item}
                   rank={item.peringkat}
                   explanation={explanations[item.laptopId]}
+                  onViewDetail={(l) => setSelectedDetailLaptop(l)}
+                  onToggleCompare={(l) => handleToggleCompare(l)}
+                  isComparing={comparingLaptops.some((c) => c.id === item.laptop.id)}
                 />
               ))
             ) : (
@@ -522,7 +669,171 @@ export default function RecommendationPage() {
             )}
           </div>
         </div>
+
+        {/* Feedback / Evaluation Section */}
+        <div className="p-6 sm:p-8 rounded-3xl bg-[#0e0e15]/90 border border-white/10 space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              <MessageSquare className="w-5 h-5 text-amber-300" />
+            </div>
+            <div>
+              <h3 className="text-base sm:text-lg font-bold text-white">
+                Evaluasi Kepuasan Rekomendasi
+              </h3>
+              <p className="text-xs text-zinc-400">
+                Bantu evaluasi dan akurasi sistem SPK Lapmatch dengan memberikan penilaian singkat terhadap hasil ini.
+              </p>
+            </div>
+          </div>
+
+          {feedbackSubmitted ? (
+            <div className="p-4 rounded-2xl bg-emerald-950/40 border border-emerald-800/50 flex items-center gap-3 text-emerald-300 text-xs">
+              <CheckCircle className="w-5 h-5 shrink-0" />
+              <span>
+                Ulasan Anda telah tersimpan. Terima kasih atas kontribusi Anda dalam pengujian akurasi sistem ini!
+              </span>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmitFeedback} className="space-y-4 pt-2">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-zinc-300 block">
+                    Rating Kecocokan Rekomendasi:
+                  </label>
+                  <div className="flex items-center gap-1.5">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setRating(star)}
+                        className="p-1 rounded-lg hover:bg-zinc-800 text-amber-400 transition"
+                      >
+                        <Star
+                          className={`w-5 h-5 ${
+                            star <= rating ? 'fill-amber-400 text-amber-400' : 'text-zinc-600'
+                          }`}
+                        />
+                      </button>
+                    ))}
+                    <span className="text-xs font-mono font-bold text-amber-400 ml-2">
+                      {rating} / 5 Bintang
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-1 sm:pl-6 sm:border-l sm:border-zinc-800">
+                  <label className="text-xs font-semibold text-zinc-300 block">
+                    Tingkat Keselarasan Kebutuhan:
+                  </label>
+                  <div className="flex items-center gap-2">
+                    {[
+                      { val: 'sangat', label: 'Sangat Sesuai' },
+                      { val: 'cukup', label: 'Cukup Sesuai' },
+                      { val: 'kurang', label: 'Kurang Pas' },
+                    ].map((opt) => (
+                      <button
+                        key={opt.val}
+                        type="button"
+                        onClick={() => setSatisfaction(opt.val as typeof satisfaction)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-medium transition ${
+                          satisfaction === opt.val
+                            ? 'bg-amber-400 text-zinc-950 font-bold'
+                            : 'bg-zinc-900 text-zinc-400 hover:text-white border border-white/5'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-zinc-300 block mb-1">
+                  Catatan / Saran untuk Sistem (Opsional):
+                </label>
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Contoh: Rekomendasi #1 sangat pas dengan budget dan kebutuhan coding saya..."
+                  rows={2}
+                  className="w-full px-3.5 py-2.5 rounded-2xl bg-zinc-950 border border-white/10 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 transition resize-none"
+                />
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs transition shadow-md active:scale-95"
+                >
+                  Kirim Evaluasi Sistem
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
       </main>
+
+      {/* Floating Comparison Action Bar */}
+      {comparingLaptops.length > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#0e0e15]/95 border border-white/20 backdrop-blur-2xl rounded-2xl p-3 px-5 shadow-2xl flex items-center gap-4 animate-fadeIn">
+          <div className="flex items-center gap-2">
+            <Scale className="w-4 h-4 text-cyan-300" />
+            <span className="text-xs font-bold text-white">
+              {comparingLaptops.length} Laptop Dipilih
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowCompareModal(true)}
+            className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs transition shadow-md"
+          >
+            Bandingkan Sekarang
+          </button>
+          <button
+            type="button"
+            onClick={() => setComparingLaptops([])}
+            className="text-xs text-zinc-400 hover:text-white"
+          >
+            Batal
+          </button>
+        </div>
+      )}
+
+      {/* Laptop Detail Modal */}
+      <LaptopDetailModal
+        laptop={selectedDetailLaptop}
+        onClose={() => setSelectedDetailLaptop(null)}
+        onCompare={(laptop) => {
+          handleToggleCompare(laptop as unknown as LaptopData);
+          setSelectedDetailLaptop(null);
+        }}
+        isComparing={
+          selectedDetailLaptop
+            ? comparingLaptops.some((c) => c.id === selectedDetailLaptop.id)
+            : false
+        }
+      />
+
+      {/* Laptop Compare Modal */}
+      {showCompareModal && (
+        <LaptopCompareModal
+          laptops={comparingLaptops}
+          onClose={() => setShowCompareModal(false)}
+          onRemove={(id) => setComparingLaptops(comparingLaptops.filter((l) => l.id !== id))}
+          onClear={() => setComparingLaptops([])}
+        />
+      )}
+
+      {/* TOPSIS Step-by-Step Transparency Modal */}
+      {showTopsisModal && (
+        <TopsisStepByStepModal
+          data={currentTopsisData ?? null}
+          criteria={criteriaFormatted}
+          conditionLabel={activeTab === 'baru' ? 'Laptop Baru' : 'Laptop Second'}
+          onClose={() => setShowTopsisModal(false)}
+        />
+      )}
 
       <Footer />
     </div>
