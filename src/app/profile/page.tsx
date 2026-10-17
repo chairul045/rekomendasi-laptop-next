@@ -42,6 +42,56 @@ interface ProfileData {
   } | null;
 }
 
+const getRoleInfo = (role?: string) => {
+  const r = role?.toLowerCase() || 'mahasiswa';
+  if (r === 'admin') {
+    return {
+      label: 'Administrator',
+      icon: '🛡️',
+      color: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+      dot: 'bg-amber-400',
+    };
+  }
+  if (r === 'mahasiswa') {
+    return {
+      label: 'Mahasiswa',
+      icon: '🎓',
+      color: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+      dot: 'bg-cyan-400',
+    };
+  }
+  if (r === 'pelajar') {
+    return {
+      label: 'Pelajar (SMA / SMK)',
+      icon: '🎒',
+      color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+      dot: 'bg-emerald-400',
+    };
+  }
+  if (r === 'pekerja' || r === 'profesional') {
+    return {
+      label: 'Pekerja / Profesional',
+      icon: '💼',
+      color: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
+      dot: 'bg-indigo-400',
+    };
+  }
+  if (r === 'dosen') {
+    return {
+      label: 'Dosen / Tenaga Pendidik',
+      icon: '👨‍🏫',
+      color: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+      dot: 'bg-purple-400',
+    };
+  }
+  return {
+    label: role ? role.charAt(0).toUpperCase() + role.slice(1) : 'Umum',
+    icon: '👤',
+    color: 'bg-zinc-500/20 text-zinc-300 border-zinc-500/30',
+    dot: 'bg-zinc-400',
+  };
+};
+
 export default function ProfilePage() {
   const router = useRouter();
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -51,6 +101,11 @@ export default function ProfilePage() {
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState('');
   const [savingName, setSavingName] = useState(false);
+
+  // Edit Role / Status State
+  const [editingRole, setEditingRole] = useState(false);
+  const [customRoleInput, setCustomRoleInput] = useState('');
+  const [savingRole, setSavingRole] = useState(false);
 
   // Change Password State
   const [newPassword, setNewPassword] = useState('');
@@ -113,6 +168,35 @@ export default function ProfilePage() {
   const handleCancelEdit = () => {
     setNameInput(profile?.name ?? '');
     setEditingName(false);
+  };
+
+  const handleSaveRole = async (targetRole: string) => {
+    if (!targetRole || targetRole.trim() === profile?.role) {
+      setEditingRole(false);
+      return;
+    }
+    setSavingRole(true);
+    try {
+      const res = await fetch('/api/auth/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: targetRole.trim() }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        toast.error(err.error || 'Gagal memperbarui status/profesi.');
+        return;
+      }
+      const updated = await res.json();
+      setProfile((prev) => (prev ? { ...prev, role: updated.role } : prev));
+      setEditingRole(false);
+      setCustomRoleInput('');
+      toast.success('Status / profesi berhasil diperbarui! 🎉');
+    } catch {
+      toast.error('Terjadi kesalahan saat menyimpan status/profesi.');
+    } finally {
+      setSavingRole(false);
+    }
   };
 
   const handleChangePassword = async (e: React.FormEvent) => {
@@ -205,9 +289,15 @@ export default function ProfilePage() {
           <div className="h-28 bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 relative">
             <div className="absolute inset-0 bg-black/20" />
             <div className="absolute top-4 right-4 flex items-center gap-2">
-              <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-black/40 text-white backdrop-blur-md border border-white/20 capitalize">
-                {profile.role === 'admin' ? '🛡️ Administrator' : '🎓 Mahasiswa'}
-              </span>
+              {(() => {
+                const rInfo = getRoleInfo(profile.role);
+                return (
+                  <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-black/40 text-white backdrop-blur-md border border-white/20 capitalize flex items-center gap-1.5">
+                    <span>{rInfo.icon}</span>
+                    <span>{rInfo.label}</span>
+                  </span>
+                );
+              })()}
             </div>
           </div>
 
@@ -264,25 +354,95 @@ export default function ProfilePage() {
                   </div>
                 )}
 
-                <div className="flex flex-wrap items-center gap-2">
-                  <span
-                    className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold ${
-                      profile.role === 'admin'
-                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                        : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                    }`}
-                  >
-                    <span
-                      className={`w-1.5 h-1.5 rounded-full ${
-                        profile.role === 'admin' ? 'bg-amber-400' : 'bg-cyan-400'
-                      }`}
-                    />
-                    {profile.role.toUpperCase()}
-                  </span>
-                  <span className="text-xs text-zinc-400 font-mono">
-                    ID: {profile.id.substring(0, 8)}...
-                  </span>
-                </div>
+                {(() => {
+                  const rInfo = getRoleInfo(profile.role);
+                  return (
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold ${rInfo.color}`}
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full ${rInfo.dot}`} />
+                        <span>{rInfo.icon}</span>
+                        <span>{rInfo.label.toUpperCase()}</span>
+                      </span>
+
+                      {profile.role !== 'admin' && (
+                        <button
+                          type="button"
+                          onClick={() => setEditingRole(!editingRole)}
+                          className="text-xs font-medium text-cyan-400 hover:text-cyan-300 underline cursor-pointer"
+                        >
+                          {editingRole ? 'Batal Ubah' : 'Ubah Status'}
+                        </button>
+                      )}
+
+                      <span className="text-xs text-zinc-400 font-mono">
+                        ID: {profile.id.substring(0, 8)}...
+                      </span>
+                    </div>
+                  );
+                })()}
+
+                {/* Inline Role Editor */}
+                {editingRole && profile.role !== 'admin' && (
+                  <div className="p-3.5 rounded-2xl bg-zinc-950/90 border border-cyan-500/30 space-y-3 mt-2 animate-in fade-in duration-150">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-bold text-white">Pilih Status / Profesi Baru:</p>
+                      <button
+                        onClick={() => setEditingRole(false)}
+                        className="text-xs text-zinc-400 hover:text-white cursor-pointer"
+                      >
+                        Tutup
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      {[
+                        { id: 'mahasiswa', label: '🎓 Mahasiswa' },
+                        { id: 'pelajar', label: '🎒 Pelajar' },
+                        { id: 'pekerja', label: '💼 Pekerja' },
+                        { id: 'dosen', label: '👨‍🏫 Dosen/Guru' },
+                      ].map((item) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          disabled={savingRole}
+                          onClick={() => handleSaveRole(item.id)}
+                          className={`px-3 py-2 rounded-xl text-xs font-bold border transition text-left cursor-pointer ${
+                            profile.role === item.id
+                              ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
+                              : 'bg-white/5 text-zinc-300 border-white/10 hover:border-white/20 hover:bg-white/10'
+                          }`}
+                        >
+                          {item.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-1">
+                      <input
+                        type="text"
+                        placeholder="Atau status lain (contoh: Freelancer / Umum)"
+                        value={customRoleInput}
+                        onChange={(e) => setCustomRoleInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && customRoleInput.trim()) {
+                            handleSaveRole(customRoleInput.trim());
+                          }
+                        }}
+                        className="flex-1 px-3 py-2 rounded-xl bg-zinc-900 border border-white/10 text-xs text-white focus:outline-none focus:border-cyan-400"
+                      />
+                      <button
+                        type="button"
+                        disabled={savingRole || !customRoleInput.trim()}
+                        onClick={() => handleSaveRole(customRoleInput.trim())}
+                        className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 text-xs font-bold text-white hover:opacity-90 disabled:opacity-40 cursor-pointer"
+                      >
+                        {savingRole ? 'Menyimpan...' : 'Simpan'}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <button

@@ -18,7 +18,7 @@ function getServiceClient() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, password } = await request.json();
+    const { name, email, password, role } = await request.json();
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -34,6 +34,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const userRole = typeof role === 'string' && role.trim().length > 0
+      ? role.trim().toLowerCase()
+      : 'mahasiswa';
+
     // 1. Cek apakah email sudah ada di DB kita
     const emailInDb = await prisma.user.findUnique({ where: { email } });
     if (emailInDb) {
@@ -47,12 +51,12 @@ export async function POST(request: NextRequest) {
     let authUserId: string;
 
     if (serviceClient) {
-      // 2a. Buat user via Supabase Admin API (email_confirm: true, bebas rate limit email)
+      // 2a. Buat user via Supabase Admin API (email_confirm: true, langsung aktif tanpa izin admin manual)
       const { data: authData, error: authError } = await serviceClient.auth.admin.createUser({
         email,
         password,
         email_confirm: true,
-        user_metadata: { name },
+        user_metadata: { name, role: userRole },
       });
 
       if (authError) {
@@ -60,6 +64,15 @@ export async function POST(request: NextRequest) {
           authError.message.toLowerCase().includes('already registered') ||
           authError.message.toLowerCase().includes('already exists')
         ) {
+          // Cari user dan pastikan langsung aktif (confirmed)
+          const { data: listData } = await serviceClient.auth.admin.listUsers();
+          const existing = listData?.users?.find(
+            (u) => u.email?.toLowerCase() === email.toLowerCase()
+          );
+          if (existing && !existing.email_confirmed_at) {
+            await serviceClient.auth.admin.updateUserById(existing.id, { email_confirm: true });
+          }
+
           return NextResponse.json(
             { error: 'Email sudah terdaftar di sistem. Silakan langsung masuk.' },
             { status: 409 }
@@ -86,7 +99,7 @@ export async function POST(request: NextRequest) {
         email,
         password,
         options: {
-          data: { name },
+          data: { name, role: userRole },
         },
       });
 
@@ -119,12 +132,12 @@ export async function POST(request: NextRequest) {
     // 3. Simpan ke database PostgreSQL (Prisma)
     const newUser = await prisma.user.upsert({
       where: { email },
-      update: { name },
+      update: { name, role: userRole },
       create: {
         id: authUserId,
         name,
         email,
-        role: 'mahasiswa',
+        role: userRole,
       },
     });
 

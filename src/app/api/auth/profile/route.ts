@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
           id: user.id,
           name: user.user_metadata?.name ?? user.email?.split('@')[0] ?? 'User',
           email: user.email!,
-          role: 'mahasiswa',
+          role: user.user_metadata?.role ?? 'mahasiswa',
         },
       });
     }
@@ -91,9 +91,9 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, password } = body;
+    const { name, password, role } = body;
 
-    if (!name && !password) {
+    if (!name && !password && !role) {
       return NextResponse.json({ error: 'Tidak ada data yang diubah.' }, { status: 400 });
     }
 
@@ -108,6 +108,23 @@ export async function PATCH(request: NextRequest) {
         where: { id: user.id },
         data: { name: name.trim() },
       });
+      await supabase.auth.updateUser({
+        data: { name: name.trim() },
+      });
+    }
+
+    if (role && typeof role === 'string' && role.trim().length > 0) {
+      const current = await prisma.user.findUnique({ where: { id: user.id } });
+      if (current && current.role !== 'admin') {
+        const formattedRole = role.trim().toLowerCase();
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { role: formattedRole },
+        });
+        await supabase.auth.updateUser({
+          data: { role: formattedRole },
+        });
+      }
     }
 
     if (password) {

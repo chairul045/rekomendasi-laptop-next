@@ -32,15 +32,34 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const supabase = createClient();
-      const { error } = await supabase.auth.signInWithPassword({
+      let { error } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
       });
 
+      // Jika akun sebelumnya belum dikonfirmasi, otomatis konfirmasi langsung tanpa perlu izin admin
+      if (error && error.message.toLowerCase().includes('email not confirmed')) {
+        try {
+          const confirmRes = await fetch('/api/auth/auto-confirm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: data.email }),
+          });
+
+          if (confirmRes.ok) {
+            const retry = await supabase.auth.signInWithPassword({
+              email: data.email,
+              password: data.password,
+            });
+            error = retry.error;
+          }
+        } catch {
+          // Lanjutkan penanganan error jika gagal auto-confirm
+        }
+      }
+
       if (error) {
-        if (error.message.toLowerCase().includes('email not confirmed')) {
-          toast.error('Email belum dikonfirmasi. Hubungi admin atau daftar ulang.');
-        } else if (
+        if (
           error.message.toLowerCase().includes('invalid login') ||
           error.message.toLowerCase().includes('invalid credentials')
         ) {

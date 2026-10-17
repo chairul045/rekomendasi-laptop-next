@@ -107,9 +107,9 @@ export default async function HomePage() {
     profile = await prisma.user.create({
       data: {
         id: user.id,
-        name: user.user_metadata?.name ?? user.email?.split('@')[0] ?? 'Mahasiswa',
+        name: user.user_metadata?.name ?? user.email?.split('@')[0] ?? 'User',
         email: user.email!,
-        role: 'mahasiswa',
+        role: user.user_metadata?.role ?? 'mahasiswa',
       },
     });
   }
