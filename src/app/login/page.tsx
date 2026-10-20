@@ -32,12 +32,14 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const supabase = createClient();
+      // Coba login langsung
       let { error } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
       });
 
-      // Jika login gagal (misal email belum sempat konfirmasi), auto-confirm langsung lalu retry otomatis
+      // Jika login gagal (misal email belum dikonfirmasi atau perlu bypass konfirmasi),
+      // auto-confirm langsung via backend tanpa perlu menunggu admin, lalu retry login otomatis
       if (error) {
         try {
           const confirmRes = await fetch('/api/auth/auto-confirm', {
@@ -54,16 +56,36 @@ export default function LoginPage() {
             error = retry.error;
           }
         } catch {
-          // Lanjutkan jika network auto-confirm gagal
+          // Lanjutkan jika auto-confirm retry error
         }
       }
 
       if (error) {
+        const msg = error.message.toLowerCase();
         if (
-          error.message.toLowerCase().includes('invalid login') ||
-          error.message.toLowerCase().includes('invalid credentials')
+          msg.includes('invalid login') ||
+          msg.includes('invalid credentials')
         ) {
           toast.error('Email atau kata sandi salah. Silakan periksa kembali.');
+        } else if (msg.includes('confirm') || msg.includes('verif')) {
+          // Coba konfirmasi sekali lagi secara paksa jika masih tertahan
+          await fetch('/api/auth/auto-confirm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: data.email }),
+          }).catch(() => {});
+
+          const finalRetry = await supabase.auth.signInWithPassword({
+            email: data.email,
+            password: data.password,
+          });
+
+          if (!finalRetry.error) {
+            toast.success('Login berhasil! Selamat datang 👋');
+            window.location.href = '/';
+            return;
+          }
+          toast.error('Gagal mengaktifkan akun secara otomatis. Silakan coba kembali.');
         } else {
           toast.error(error.message || 'Gagal login. Coba lagi.');
         }

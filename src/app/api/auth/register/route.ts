@@ -1,19 +1,9 @@
 // app/api/auth/register/route.ts - Buat akun user langsung via Supabase Admin API
-// Langsung aktif (email_confirm: true) tanpa perlu verifikasi email atau izin admin manual
+// Akun langsung 100% aktif (email_confirm: true) tanpa perlu persetujuan admin atau link konfirmasi email
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient as createServiceClient } from '@supabase/supabase-js';
 import prisma from '@/lib/prisma';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient as createServerClient } from '@/lib/supabase/server';
-
-function getServiceClient() {
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!serviceKey) return null;
-  return createServiceClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://njnvkjhnefmawskhcbdy.supabase.co',
-    serviceKey,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  );
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,73 +29,86 @@ export async function POST(request: NextRequest) {
         : 'mahasiswa';
 
     const normalizedEmail = email.trim().toLowerCase();
-    const serviceClient = getServiceClient();
+    const adminClient = createAdminClient();
 
-    // Pastikan user dibuat via Supabase Admin API dengan email_confirm: true (langsung aktif)
     let authUserId: string | null = null;
 
-    if (serviceClient) {
-      const { data: authData, error: authError } = await serviceClient.auth.admin.createUser({
-        email: normalizedEmail,
-        password,
-        email_confirm: true,
-        user_metadata: { name: name.trim(), role: userRole },
-      });
+    // 1. Buat akun baru via Admin API dengan email_confirm: true
+    const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
+      email: normalizedEmail,
+      password,
+      email_confirm: true,
+      user_metadata: {
+        name: name.trim(),
+        role: userRole,
+        email_verified: true,
+      },
+    });
 
-      if (authError) {
-        // Jika akun sudah pernah dibuat sebelumnya di Supabase Auth tapi mungkin belum aktif
-        if (
-          authError.message.toLowerCase().includes('already registered') ||
-          authError.message.toLowerCase().includes('already exists')
-        ) {
-          const { data: listData } = await serviceClient.auth.admin.listUsers({ perPage: 1000 });
-          const existing = listData?.users?.find(
-            (u) => u.email?.toLowerCase() === normalizedEmail
-          );
+    if (authError) {
+      // Jika email sudah pernah dibuat/terdaftar di Supabase Auth
+      const errMsg = authError.message.toLowerCase();
+      if (
+        errMsg.includes('already registered') ||
+        errMsg.includes('already exists') ||
+        (authError as any).code === 'email_exists' ||
+        (authError as any).status === 422
+      ) {
+        const { data: listData } = await adminClient.auth.admin.listUsers({ perPage: 1000 });
+        const existing = listData?.users?.find(
+          (u) => u.email?.toLowerCase() === normalizedEmail
+        );
 
-          if (existing) {
-            // Aktifkan langsung dan perbarui kata sandi baru
-            await serviceClient.auth.admin.updateUserById(existing.id, {
-              email_confirm: true,
-              password: password,
-              user_metadata: { name: name.trim(), role: userRole },
-            });
-            authUserId = existing.id;
-          }
-        } else {
-          return NextResponse.json(
-            { error: authError.message || 'Gagal membuat akun di sistem autentikasi.' },
-            { status: 400 }
-          );
+        if (existing) {
+          // Aktifkan langsung dan perbarui kata sandi baru serta metadata
+          await adminClient.auth.admin.updateUserById(existing.id, {
+            email_confirm: true,
+            password: password,
+            user_metadata: {
+              ...(existing.user_metadata || {}),
+              name: name.trim(),
+              role: userRole,
+              email_verified: true,
+            },
+          });
+          authUserId = existing.id;
         }
-      } else if (authData?.user) {
-        authUserId = authData.user.id;
+      } else {
+        return NextResponse.json(
+          { error: authError.message || 'Gagal membuat akun di sistem autentikasi.' },
+          { status: 400 }
+        );
+      }
+    } else if (authData?.user) {
+      authUserId = authData.user.id;
+      // Pastikan email_confirm benar-benar aktif
+      if (!authData.user.email_confirmed_at) {
+        await adminClient.auth.admin.updateUserById(authUserId, { email_confirm: true });
       }
     }
 
-    // Fallback jika serviceClient gagal
+    // 2. Fallback darurat jika authUserId belum didapat
     if (!authUserId) {
       const serverClient = await createServerClient();
-      const { data: authData, error: authError } = await serverClient.auth.signUp({
+      const { data: fallbackData, error: fallbackError } = await serverClient.auth.signUp({
         email: normalizedEmail,
         password,
         options: {
-          data: { name: name.trim(), role: userRole },
+          data: { name: name.trim(), role: userRole, email_verified: true },
         },
       });
 
-      if (authError && !authError.message.toLowerCase().includes('already registered')) {
+      if (fallbackError && !fallbackError.message.toLowerCase().includes('already registered')) {
         return NextResponse.json(
-          { error: authError.message || 'Gagal membuat akun.' },
+          { error: fallbackError.message || 'Gagal membuat akun.' },
           { status: 400 }
         );
       }
 
-      if (authData?.user) {
-        authUserId = authData.user.id;
-        if (serviceClient) {
-          await serviceClient.auth.admin.updateUserById(authUserId, { email_confirm: true });
-        }
+      if (fallbackData?.user) {
+        authUserId = fallbackData.user.id;
+        // Langsung konfirmasi via adminClient
+        await adminClient.auth.admin.updateUserById(authUserId, { email_confirm: true });
       }
     }
 
@@ -121,7 +124,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Simpan / update ke database PostgreSQL Prisma
+    // 3. Simpan / sinkronkan ke database PostgreSQL Prisma
     const savedUser = await prisma.user.upsert({
       where: { email: normalizedEmail },
       update: { name: name.trim(), role: userRole },
@@ -135,6 +138,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
+        success: true,
         message: 'Akun berhasil dibuat dan langsung aktif!',
         userId: savedUser.id,
       },

@@ -135,28 +135,34 @@ export default function RegisterPage() {
         return;
       }
 
-      // 2. Langsung sign-in otomatis tanpa butuh konfirmasi admin atau email
+      // 2. Langsung sign-in otomatis tanpa butuh konfirmasi admin atau sistem
       const supabase = createClient();
-      let { error: signInError } = await supabase.auth.signInWithPassword({
+      let { data: sessionData, error: signInError } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
       });
 
+      // Jika ada delay konfirmasi, panggil auto-confirm lalu coba lagi
       if (signInError) {
-        await fetch('/api/auth/auto-confirm', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: data.email }),
-        });
-        const retry = await supabase.auth.signInWithPassword({
-          email: data.email,
-          password: data.password,
-        });
-        signInError = retry.error;
+        try {
+          await fetch('/api/auth/auto-confirm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: data.email }),
+          });
+          const retry = await supabase.auth.signInWithPassword({
+            email: data.email,
+            password: data.password,
+          });
+          signInError = retry.error;
+          sessionData = retry.data;
+        } catch {
+          // Lanjutkan jika auto-confirm retry error
+        }
       }
 
       if (!signInError) {
-        toast.success(`Pendaftaran berhasil sebagai ${finalRole}! Selamat datang 👋`);
+        toast.success(`Pendaftaran berhasil sebagai ${finalRole}! Masuk langsung ke sistem... 👋`);
         window.location.href = '/';
       } else {
         toast.success('Akun berhasil dibuat! Silakan masuk.');
