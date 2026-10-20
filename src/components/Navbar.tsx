@@ -82,9 +82,13 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
         {/* Brand */}
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 via-indigo-600 to-cyan-500 p-0.5 shadow-[0_0_20px_rgba(124,58,237,0.35)] group-hover:shadow-[0_0_30px_rgba(124,58,237,0.6)] transition duration-300">
-              <div className="w-full h-full bg-[#09090d] rounded-[10px] flex items-center justify-center text-white">
-                <Laptop className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 via-indigo-600 to-cyan-500 p-0.5 shadow-[0_0_20px_rgba(124,58,237,0.35)] group-hover:shadow-[0_0_30px_rgba(124,58,237,0.6)] transition duration-300 overflow-hidden shrink-0">
+              <div className="w-full h-full bg-[#09090d] rounded-[9px] overflow-hidden flex items-center justify-center">
+                <img
+                  src="/logo.jpeg"
+                  alt="Lapmatch Logo"
+                  className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
+                />
               </div>
             </div>
             <div className="flex flex-col">

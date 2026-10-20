@@ -5,8 +5,12 @@ export default function Footer() {
     <footer className="relative z-10 border-t border-white/[0.08] bg-[#09090d]/80 backdrop-blur-xl py-8 text-xs text-zinc-400 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 animate-pulse" />
+          <div className="flex items-center gap-2.5">
+            <img
+              src="/logo.jpeg"
+              alt="Lapmatch Logo"
+              className="w-5 h-5 rounded-md object-cover border border-white/10"
+            />
             <span className="code-font text-xs font-semibold text-zinc-200">
               Lapmatch &bull; Smart Laptop Matching Engine
             </span>

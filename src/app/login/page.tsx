@@ -37,8 +37,8 @@ export default function LoginPage() {
         password: data.password,
       });
 
-      // Jika akun sebelumnya belum dikonfirmasi, otomatis konfirmasi langsung tanpa perlu izin admin
-      if (error && error.message.toLowerCase().includes('email not confirmed')) {
+      // Jika login gagal (misal email belum sempat konfirmasi), auto-confirm langsung lalu retry otomatis
+      if (error) {
         try {
           const confirmRes = await fetch('/api/auth/auto-confirm', {
             method: 'POST',
@@ -54,7 +54,7 @@ export default function LoginPage() {
             error = retry.error;
           }
         } catch {
-          // Lanjutkan penanganan error jika gagal auto-confirm
+          // Lanjutkan jika network auto-confirm gagal
         }
       }
 
@@ -63,7 +63,7 @@ export default function LoginPage() {
           error.message.toLowerCase().includes('invalid login') ||
           error.message.toLowerCase().includes('invalid credentials')
         ) {
-          toast.error('Email atau password salah.');
+          toast.error('Email atau kata sandi salah. Silakan periksa kembali.');
         } else {
           toast.error(error.message || 'Gagal login. Coba lagi.');
         }
@@ -90,8 +90,12 @@ export default function LoginPage() {
           <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-400" />
 
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-600/30 via-indigo-600/20 to-cyan-500/30 border border-violet-500/30 text-white mb-4 shadow-[0_0_20px_rgba(124,58,237,0.3)]">
-              <LogIn className="w-6 h-6 text-cyan-300" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600/30 via-indigo-600/20 to-cyan-500/30 border border-violet-500/30 p-1 mb-4 shadow-[0_0_25px_rgba(124,58,237,0.35)] overflow-hidden">
+              <img
+                src="/logo.jpeg"
+                alt="Lapmatch Logo"
+                className="w-full h-full object-cover rounded-xl"
+              />
             </div>
             <h1 className="text-2xl font-extrabold text-white tracking-tight">
               Masuk ke{' '}

@@ -23,9 +23,9 @@ export async function POST(request: NextRequest) {
 
     const serviceClient = getServiceClient();
     if (!serviceClient) {
-      return NextResponse.json({ error: 'Supabase admin service key is not configured.' }, { status: 500 });
+      return NextResponse.json({ error: 'Supabase admin service client tidak tersedia.' }, { status: 500 });
     }
-    const { data, error: listError } = await serviceClient.auth.admin.listUsers();
+    const { data, error: listError } = await serviceClient.auth.admin.listUsers({ perPage: 1000 });
 
     if (listError) {
       console.error('List users error:', listError);
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
         id: targetUser.id,
         name: targetUser.user_metadata?.name || email.split('@')[0],
         email: targetUser.email!,
-        role: 'mahasiswa',
+        role: targetUser.user_metadata?.role || 'mahasiswa',
       },
     });
 

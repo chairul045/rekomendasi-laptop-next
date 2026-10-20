@@ -116,7 +116,7 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterForm) => {
     setLoading(true);
     try {
-      // 1. Buat akun lewat endpoint server (admin.createUser) dengan role pilihan
+      // 1. Buat akun lewat endpoint server (admin.createUser) dengan role pilihan & langsung aktif
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -130,22 +130,19 @@ export default function RegisterPage() {
 
       const result = await res.json();
 
-      if (!res.ok) {
+      if (!res.ok && res.status !== 409) {
         toast.error(result.error || 'Gagal membuat akun.');
-        if (res.status === 409) {
-          router.push('/login');
-        }
         return;
       }
 
-      // 2. Langsung sign-in otomatis tanpa izin admin
+      // 2. Langsung sign-in otomatis tanpa butuh konfirmasi admin atau email
       const supabase = createClient();
       let { error: signInError } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
       });
 
-      if (signInError && signInError.message.toLowerCase().includes('email not confirmed')) {
+      if (signInError) {
         await fetch('/api/auth/auto-confirm', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -222,8 +219,12 @@ export default function RegisterPage() {
           {step === 1 && (
             <div className="space-y-5 animate-in fade-in duration-200">
               <div className="text-center">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-600/30 via-indigo-600/20 to-cyan-500/30 border border-violet-500/30 text-white mb-3 shadow-[0_0_20px_rgba(124,58,237,0.3)]">
-                  <UserPlus className="w-6 h-6 text-cyan-300" />
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600/30 via-indigo-600/20 to-cyan-500/30 border border-violet-500/30 p-1 mb-3 shadow-[0_0_25px_rgba(124,58,237,0.35)] overflow-hidden">
+                  <img
+                    src="/logo.jpeg"
+                    alt="Lapmatch Logo"
+                    className="w-full h-full object-cover rounded-xl"
+                  />
                 </div>
                 <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
                   Apa Status / Profesi Anda?
@@ -319,6 +320,13 @@ export default function RegisterPage() {
           {step === 2 && (
             <div className="animate-in fade-in duration-200">
               <div className="text-center mb-5">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-violet-600/30 via-indigo-600/20 to-cyan-500/30 border border-violet-500/30 p-0.5 mb-2 shadow-[0_0_20px_rgba(124,58,237,0.3)] overflow-hidden">
+                  <img
+                    src="/logo.jpeg"
+                    alt="Lapmatch Logo"
+                    className="w-full h-full object-cover rounded-[10px]"
+                  />
+                </div>
                 <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
                   Lengkapi Data Akun
                 </h1>
