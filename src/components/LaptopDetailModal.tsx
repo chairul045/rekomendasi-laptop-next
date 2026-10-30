@@ -38,7 +38,7 @@ export default function LaptopDetailModal({
   if (!laptop) return null;
 
   const imgUrl = getLaptopImageUrl(laptop.brand, laptop.name, laptop.imageUrl);
-  const links = getMarketplaceLinks(laptop.brand, laptop.name);
+  const links = getMarketplaceLinks(laptop.brand, laptop.name, laptop.price);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">

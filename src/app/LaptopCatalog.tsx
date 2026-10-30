@@ -337,7 +337,7 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {filteredAndSorted.map((laptop) => {
           const imgUrl = getLaptopImageUrl(laptop.brand, laptop.name, laptop.imageUrl);
-          const links = getMarketplaceLinks(laptop.brand, laptop.name);
+          const links = getMarketplaceLinks(laptop.brand, laptop.name, laptop.price);
           const isComparing = comparingLaptops.some((c) => c.id === laptop.id);
 
           return (

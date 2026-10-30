@@ -274,7 +274,7 @@ export default function LaptopCompareModal({
               <tr>
                 <td className="p-3 font-mono font-semibold text-zinc-400">Beli Sekarang</td>
                 {laptops.map((l) => {
-                  const links = getMarketplaceLinks(l.brand, l.name);
+                  const links = getMarketplaceLinks(l.brand, l.name, l.price);
                   return (
                     <td key={l.id} className="p-3">
                       <div className="flex flex-col gap-1.5">

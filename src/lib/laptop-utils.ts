@@ -126,12 +126,47 @@ export function formatRupiah(value: number | string | bigint): string {
   return `Rp ${num.toLocaleString('id-ID')}`;
 }
 
-export function getMarketplaceLinks(brand?: string | null, name?: string | null) {
-  const query = encodeURIComponent(`${brand ?? ''} ${name ?? ''}`.trim());
+export function getMarketplaceLinks(
+  brand?: string | null,
+  name?: string | null,
+  price?: number | string | bigint | null
+) {
+  const cleanBrand = (brand ?? '').trim();
+  const cleanName = (name ?? '').trim();
+
+  // Hindari duplikasi jika nama laptop sudah memuat nama merek
+  const brandLower = cleanBrand.toLowerCase();
+  const nameLower = cleanName.toLowerCase();
+  let queryText = cleanName;
+  if (cleanBrand && !nameLower.includes(brandLower)) {
+    queryText = `${cleanBrand} ${cleanName}`;
+  }
+
+  const query = encodeURIComponent(queryText.trim());
+
+  // Parameter rentang harga jika data harga tersedia
+  let shopeePriceFilter = '';
+  let tokopediaPriceFilter = '';
+  let facebookPriceFilter = '';
+  let blibliPriceFilter = '';
+
+  const numPrice = typeof price === 'bigint' ? Number(price) : Number(price || 0);
+
+  if (numPrice && numPrice > 0) {
+    // Toleransi rentang harga 15% agar tepat menampilkan unit laptop (bukan aksesoris Rp 20rb)
+    const minPrice = Math.max(500000, Math.floor(numPrice * 0.85));
+    const maxPrice = Math.ceil(numPrice * 1.15);
+
+    shopeePriceFilter = `&minPrice=${minPrice}&maxPrice=${maxPrice}`;
+    tokopediaPriceFilter = `&pmin=${minPrice}&pmax=${maxPrice}`;
+    facebookPriceFilter = `&minPrice=${minPrice}&maxPrice=${maxPrice}`;
+    blibliPriceFilter = `?price=${minPrice}-${maxPrice}`;
+  }
+
   return {
-    shopee: `https://shopee.co.id/search?keyword=${query}`,
-    tokopedia: `https://www.tokopedia.com/search?st=product&q=${query}`,
-    facebook: `https://www.facebook.com/marketplace/search/?query=${query}`,
-    blibli: `https://www.blibli.com/cari/${query}`,
+    shopee: `https://shopee.co.id/search?keyword=${query}${shopeePriceFilter}`,
+    tokopedia: `https://www.tokopedia.com/search?st=product&q=${query}${tokopediaPriceFilter}`,
+    facebook: `https://www.facebook.com/marketplace/search/?query=${query}${facebookPriceFilter}`,
+    blibli: `https://www.blibli.com/cari/${query}${blibliPriceFilter}`,
   };
 }

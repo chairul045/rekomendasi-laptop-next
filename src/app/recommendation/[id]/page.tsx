@@ -138,7 +138,7 @@ function LaptopCard({
   const [showExplain, setShowExplain] = useState(true);
   const scorePct = Math.round(item.nilaiV * 10000) / 100;
   const imgUrl = getLaptopImageUrl(item.laptop.brand, item.laptop.name, item.laptop.imageUrl);
-  const links = getMarketplaceLinks(item.laptop.brand, item.laptop.name);
+  const links = getMarketplaceLinks(item.laptop.brand, item.laptop.name, item.laptop.price);
 
   return (
     <div
