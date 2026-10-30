@@ -48,6 +48,25 @@ export default function LoginPage() {
   useEffect(() => {
     document.title = 'Masuk - Lapmatch';
 
+    // Cek error dari URL params atau hash (dari redirect Google / Supabase)
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+      const errorMsg =
+        searchParams.get('error_description') ||
+        searchParams.get('error') ||
+        hashParams.get('error_description') ||
+        hashParams.get('error');
+
+      if (errorMsg) {
+        if (errorMsg.includes('auth_callback_failed') || errorMsg.includes('provider')) {
+          setErrorMessage('Autentikasi Google gagal atau belum diaktifkan di server. Silakan gunakan email & kata sandi.');
+        } else {
+          setErrorMessage(decodeURIComponent(errorMsg));
+        }
+      }
+    }
+
     // Cek jika pengguna saat ini sudah memiliki sesi
     const checkSession = async () => {
       try {
