@@ -106,17 +106,32 @@ export async function POST(request: NextRequest) {
     const wantsBaru = ['baru', 'keduanya'].includes(kondisiPilihan);
     const wantsSecond = ['second', 'keduanya'].includes(kondisiPilihan);
 
+    // Bangun variasi case untuk setiap merek yang dipilih user
+    // agar filter tetap benar meski user pilih "ASUS" tapi DB simpan "Asus" atau sebaliknya
+    const buildBrandVariants = (brands: string[]): string[] => {
+      const variants = new Set<string>();
+      brands.forEach((b) => {
+        variants.add(b);                                       // exact as-is
+        variants.add(b.toUpperCase());                         // ALL CAPS
+        variants.add(b.toLowerCase());                         // all lowercase
+        variants.add(b.charAt(0).toUpperCase() + b.slice(1).toLowerCase()); // Title case
+      });
+      return Array.from(variants);
+    };
+
     // Fungsi pencari laptop kandidat yang ketat menghormati budget & preferensi merek user
     const fetchCandidates = async (condition: 'baru' | 'second') => {
       // KASUS 1: Pengguna memilih merek tertentu (misal: hanya ASUS, atau ASUS & Lenovo)
       // MEREK TIDAK BOLEH PERNAH DILEPAS. Semua hasil WAJIB dari merek pilihan pengguna.
       if (!isAllBrand) {
-        // Step 1: Cari laptop dengan merek pilihan dan dalam rentang budget
+        const brandVariants = buildBrandVariants(merekArr);
+
+        // Step 1: Cari laptop dengan merek pilihan (semua variasi case) dan dalam rentang budget
         let laptops = await prisma.laptop.findMany({
           where: {
             condition,
             price: { gte: minPrice, lte: maxPrice },
-            brand: { in: merekArr },
+            brand: { in: brandVariants, mode: 'insensitive' },
           },
         });
 
@@ -128,7 +143,7 @@ export async function POST(request: NextRequest) {
             where: {
               condition,
               price: { gte: expandedMin, lte: expandedMax },
-              brand: { in: merekArr },
+              brand: { in: brandVariants, mode: 'insensitive' },
             },
             take: 30,
             orderBy: { price: 'asc' },
@@ -141,7 +156,7 @@ export async function POST(request: NextRequest) {
           laptops = await prisma.laptop.findMany({
             where: {
               condition,
-              brand: { in: merekArr },
+              brand: { in: brandVariants, mode: 'insensitive' },
             },
             take: 30,
             orderBy: { price: 'asc' },
@@ -151,7 +166,7 @@ export async function POST(request: NextRequest) {
         return laptops;
       }
 
-      // KASUS 2: Pengguna memilih 'Semua Merek'
+      // KASUS 2: Pengguna memilih 'Semua Merek' — ambil dari seluruh data laptop yang diupload admin
       let laptops = await prisma.laptop.findMany({
         where: {
           condition,

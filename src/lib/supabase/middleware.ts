@@ -31,18 +31,32 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { pathname } = request.nextUrl;
+  const { pathname, searchParams } = request.nextUrl;
 
   // Jangan redirect request API ke halaman login
   if (pathname.startsWith('/api')) {
     return supabaseResponse;
   }
 
-  const publicRoutes = ['/login', '/register'];
-  const isPublicRoute = publicRoutes.some((r) => pathname.startsWith(r));
+  // Rute publik yang dapat diakses siapa saja
+  const publicRoutes = [
+    '/login',
+    '/register',
+    '/forgot-password',
+    '/reset-password',
+    '/auth/callback',
+    '/logout',
+    '/tentang',
+    '/kebijakan-privasi',
+    '/syarat-penggunaan',
+  ];
 
-  // Not logged in → redirect to /login
-  if (!user && !isPublicRoute) {
+  const isPublicRoute = publicRoutes.some((r) => pathname.startsWith(r));
+  const isGuestQuestionnaire =
+    pathname === '/questionnaire' && searchParams.get('guest') === 'true';
+
+  // Belum login & mencoba mengakses rute terproteksi → redirect ke /login
+  if (!user && !isPublicRoute && !isGuestQuestionnaire) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = '/login';
     const redirectResponse = NextResponse.redirect(loginUrl);
@@ -52,8 +66,10 @@ export async function updateSession(request: NextRequest) {
     return redirectResponse;
   }
 
-  // Already logged in → redirect away from /login or /register
-  if (user && isPublicRoute) {
+  // Sudah login & mencoba membuka halaman login atau register (kecuali jika minta switch/logout)
+  const isSwitchingAccount = searchParams.get('switch') === 'true' || searchParams.get('logout') === 'true';
+  const authOnlyPages = ['/login', '/register'];
+  if (user && authOnlyPages.some((r) => pathname.startsWith(r)) && !isSwitchingAccount) {
     const homeUrl = request.nextUrl.clone();
     homeUrl.pathname = '/';
     const redirectResponse = NextResponse.redirect(homeUrl);

@@ -1,24 +1,84 @@
+// app/login/page.tsx - Halaman Masuk Lapmatch
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import toast from 'react-hot-toast';
 import Link from 'next/link';
-import { LogIn, Eye, EyeOff } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import {
+  Mail,
+  Sparkles,
+  Zap,
+  BarChart3,
+  CheckCircle2,
+  HelpCircle,
+  X,
+  MessageSquare,
+  ArrowRight,
+} from 'lucide-react';
+import Input from '@/components/auth/Input';
+import PasswordInput from '@/components/auth/PasswordInput';
+import AuthButton from '@/components/auth/AuthButton';
+import GoogleButton from '@/components/auth/GoogleButton';
+import AuthAlert from '@/components/auth/AuthAlert';
 import { createClient } from '@/lib/supabase/client';
 
 const loginSchema = z.object({
-  email: z.string().email('Format email tidak valid'),
-  password: z.string().min(1, 'Password tidak boleh kosong'),
+  email: z
+    .string()
+    .min(1, 'Alamat email wajib diisi')
+    .email('Format alamat email tidak valid'),
+  password: z.string().min(1, 'Kata sandi wajib diisi'),
+  rememberMe: z.boolean().optional(),
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [contactModalOpen, setContactModalOpen] = useState(false);
+  const [activeUserEmail, setActiveUserEmail] = useState<string | null>(null);
+
+  // Set document title untuk Bahasa Indonesia yang konsisten
+  useEffect(() => {
+    document.title = 'Masuk - Lapmatch';
+
+    // Cek jika pengguna saat ini sudah memiliki sesi
+    const checkSession = async () => {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase.auth.getSession();
+        if (data.session?.user?.email) {
+          setActiveUserEmail(data.session.user.email);
+        }
+      } catch {
+        // Abaikan
+      }
+    };
+    checkSession();
+  }, []);
+
+  const handleLogoutCurrent = async () => {
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      await fetch('/api/auth/signout', { method: 'POST' });
+    } catch {
+      // Abaikan
+    } finally {
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch {}
+      setActiveUserEmail(null);
+      window.location.href = '/login';
+    }
+  };
 
   const {
     register,
@@ -26,227 +86,395 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      rememberMe: false,
+    },
   });
 
   const onSubmit = async (data: LoginForm) => {
     setLoading(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
     try {
-      const supabase = createClient();
-      // Coba login langsung
-      let { error } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
+      // Kirim ke endpoint proteksi server (rate limit + secure cookie set)
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+          rememberMe: data.rememberMe,
+        }),
       });
 
-      // Jika login gagal (misal email belum dikonfirmasi atau perlu bypass konfirmasi),
-      // auto-confirm langsung via backend tanpa perlu menunggu admin, lalu retry login otomatis
-      if (error) {
-        try {
-          const confirmRes = await fetch('/api/auth/auto-confirm', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: data.email }),
-          });
+      const result = await res.json();
 
-          if (confirmRes.ok) {
-            const retry = await supabase.auth.signInWithPassword({
-              email: data.email,
-              password: data.password,
-            });
-            error = retry.error;
-          }
-        } catch {
-          // Lanjutkan jika auto-confirm retry error
-        }
+      if (!res.ok) {
+        setErrorMessage(
+          result.error || 'Email atau kata sandi salah. Silakan periksa kembali.'
+        );
+        setLoading(false);
+        return;
       }
 
-      if (error) {
-        const msg = error.message.toLowerCase();
-        if (
-          msg.includes('invalid login') ||
-          msg.includes('invalid credentials')
-        ) {
-          toast.error('Email atau kata sandi salah. Silakan periksa kembali.');
-        } else if (msg.includes('confirm') || msg.includes('verif')) {
-          // Coba konfirmasi sekali lagi secara paksa jika masih tertahan
-          await fetch('/api/auth/auto-confirm', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: data.email }),
-          }).catch(() => {});
-
-          const finalRetry = await supabase.auth.signInWithPassword({
-            email: data.email,
-            password: data.password,
-          });
-
-          if (!finalRetry.error) {
-            toast.success('Login berhasil! Selamat datang 👋');
-            window.location.href = '/';
-            return;
-          }
-          toast.error('Gagal mengaktifkan akun secara otomatis. Silakan coba kembali.');
-        } else {
-          toast.error(error.message || 'Gagal login. Coba lagi.');
-        }
-      } else {
-        toast.success('Login berhasil! Selamat datang 👋');
+      setSuccessMessage('Login berhasil! Mengalihkan ke dashboard...');
+      setTimeout(() => {
         window.location.href = '/';
-      }
+      }, 600);
     } catch {
-      toast.error('Terjadi kesalahan jaringan. Periksa koneksi internet Anda.');
-    } finally {
+      setErrorMessage(
+        'Terjadi kendala jaringan saat menghubungkan ke server. Silakan coba kembali.'
+      );
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center py-12 px-4">
-      <div className="w-full max-w-md relative">
-        {/* 21st.dev glow effect background */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 rounded-3xl blur-xl opacity-20 group-hover:opacity-30 transition duration-500" />
+    <div className="min-h-screen flex flex-col justify-between bg-[#09090d] text-zinc-100 relative overflow-hidden">
+      {/* Background ambient lighting */}
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-violet-600/15 via-indigo-600/10 to-transparent blur-[120px] pointer-events-none -z-10" />
 
-        {/* Auth Card */}
-        <div className="relative p-8 rounded-3xl bg-[#0e0e15]/90 border border-white/10 shadow-2xl backdrop-blur-2xl overflow-hidden">
-          {/* Top colorful line accent */}
-          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-400" />
-
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600/30 via-indigo-600/20 to-cyan-500/30 border border-violet-500/30 p-1 mb-4 shadow-[0_0_25px_rgba(124,58,237,0.35)] overflow-hidden">
-              <img
-                src="/logo.jpeg"
-                alt="Lapmatch Logo"
-                className="w-full h-full object-cover rounded-xl"
-              />
-            </div>
-            <h1 className="text-2xl font-extrabold text-white tracking-tight">
-              Masuk ke{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-200 via-indigo-200 to-cyan-300">
-                Akun Anda
-              </span>
-            </h1>
-            <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">
-              Sistem Pendukung Keputusan Pemilihan Laptop Mahasiswa
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-semibold text-zinc-300">
-                  Alamat Email (Gmail)
-                </label>
-                <span className="text-[11px] text-zinc-400">Akun terdaftar</span>
+      {/* Main Container */}
+      <main className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 z-10 my-auto">
+        <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          
+          {/* Kolom Kiri (Desktop): Nilai Jual Lapmatch */}
+          <section className="lg:col-span-5 space-y-6 text-left hidden sm:block">
+            <Link href="/" className="inline-flex items-center gap-3 group">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-600 via-indigo-600 to-cyan-500 p-0.5 shadow-[0_0_25px_rgba(124,58,237,0.4)] group-hover:scale-105 transition-transform">
+                <div className="w-full h-full bg-[#0e0e15] rounded-[14px] p-2 flex items-center justify-center">
+                  <img src="/logo.svg" alt="Lapmatch Logo" className="w-full h-full object-contain" />
+                </div>
               </div>
-              <div className="relative">
-                <input
-                  {...register('email')}
-                  type="email"
-                  placeholder="nama@gmail.com"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-zinc-950/90 border border-white/10 text-zinc-100 placeholder-zinc-500 text-sm focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
-                  disabled={loading}
-                />
-                <svg
-                  className="w-4 h-4 text-zinc-400 absolute left-3.5 top-3"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
-                  />
-                </svg>
+              <div>
+                <span className="font-extrabold text-xl tracking-tight text-white group-hover:text-cyan-300 transition">
+                  Lapmatch
+                </span>
+                <span className="block text-[11px] font-mono text-zinc-400">
+                  Smart Laptop Decision Support
+                </span>
               </div>
-              {errors.email && (
-                <p className="mt-1 text-xs text-rose-400">{errors.email.message}</p>
-              )}
+            </Link>
+
+            <div className="space-y-3">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-snug">
+                Temukan Laptop Idealmu Tanpa Keraguan.
+              </h1>
+              <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+                Lapmatch menganalisis kebutuhan akademis dan anggaranmu dengan algoritma multi-kriteria mutakhir, memberikan rekomendasi laptop paling objektif dan presisi.
+              </p>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
-                Kata Sandi
-              </label>
-              <div className="relative">
-                <input
-                  {...register('password')}
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-zinc-950/90 border border-white/10 text-zinc-100 placeholder-zinc-500 text-sm focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
-                  disabled={loading}
-                />
-                <svg
-                  className="w-4 h-4 text-zinc-400 absolute left-3.5 top-3"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                  />
-                </svg>
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-3 flex items-center text-zinc-400 hover:text-zinc-200"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
+            {/* 3 Poin Keunggulan Utama */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-zinc-950/60 border border-white/5 backdrop-blur-sm">
+                <div className="w-8 h-8 rounded-xl bg-violet-500/20 text-violet-300 flex items-center justify-center shrink-0 border border-violet-500/30">
+                  <BarChart3 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h2 className="text-xs font-bold text-zinc-100">Algoritma TOPSIS & ROC Presisi</h2>
+                  <p className="text-[11px] text-zinc-400 leading-normal mt-0.5">
+                    Pembobotan ilmiah berdasarkan prioritas kebutuhan komputasi, bukan sekadar popularitas iklan.
+                  </p>
+                </div>
               </div>
-              {errors.password && (
-                <p className="mt-1 text-xs text-rose-400">{errors.password.message}</p>
-              )}
+
+              <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-zinc-950/60 border border-white/5 backdrop-blur-sm">
+                <div className="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center shrink-0 border border-cyan-500/30">
+                  <Zap className="w-4 h-4" />
+                </div>
+                <div>
+                  <h2 className="text-xs font-bold text-zinc-100">Analisis Kinerja Cepat</h2>
+                  <p className="text-[11px] text-zinc-400 leading-normal mt-0.5">
+                    Evaluasi komposit CPU, GPU, RAM, baterai, dan bobot mobilitas dalam hitungan detik.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-zinc-950/60 border border-white/5 backdrop-blur-sm">
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center shrink-0 border border-emerald-500/30">
+                  <CheckCircle2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h2 className="text-xs font-bold text-zinc-100">Transparan & Bebas Bias</h2>
+                  <p className="text-[11px] text-zinc-400 leading-normal mt-0.5">
+                    Hasil ranking laptop dilengkapi kalkulasi matriks yang dapat dipelajari secara terbuka.
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full mt-3 py-3 px-4 rounded-xl bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-bold text-sm shadow-[0_0_25px_rgba(124,58,237,0.4)] hover:shadow-[0_0_35px_rgba(124,58,237,0.6)] active:scale-[0.98] transition cursor-pointer disabled:opacity-50"
-            >
-              {loading ? 'Memproses...' : 'Masuk Sekarang →'}
-            </button>
-          </form>
-
-          <div className="mt-6 pt-5 border-t border-white/[0.08] text-center text-xs text-zinc-400 space-y-3">
-            <p>
-              Belum memiliki akun?{' '}
+            {/* Tombol Akses Tanpa Akun (Tamu) */}
+            <div className="pt-2">
               <Link
-                href="/register"
-                className="text-cyan-300 hover:text-cyan-200 font-semibold ml-1 underline decoration-cyan-500/50 underline-offset-4"
+                href="/questionnaire?guest=true"
+                className="inline-flex items-center gap-2 text-xs font-semibold text-zinc-300 hover:text-cyan-300 px-4 py-2.5 rounded-xl border border-white/10 hover:border-cyan-500/40 bg-white/[0.02] hover:bg-white/[0.05] transition-all min-h-[44px]"
               >
-                Daftar Akun Baru
+                <span>Coba dulu tanpa akun (Versi Terbatas)</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
+            </div>
+          </section>
+
+          {/* Kolom Kanan: Kartu Form Login */}
+          <section className="lg:col-span-7 w-full max-w-md mx-auto">
+            <div className="relative">
+              {/* Glow Accent */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 rounded-3xl blur-xl opacity-25" />
+
+              <div className="relative p-6 sm:p-8 rounded-3xl bg-[#0e0e15]/95 border border-white/10 shadow-2xl backdrop-blur-2xl">
+                {/* Garis Aksen Gradien Atas */}
+                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-400 rounded-t-3xl" />
+
+                {/* Mobile Header Branding (Tampil jika layar kecil) */}
+                <div className="sm:hidden text-center mb-5">
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#0e0e15] border border-white/10 p-2.5 mb-2 shadow-lg">
+                    <img src="/logo.svg" alt="Lapmatch Logo" className="w-full h-full object-contain" />
+                  </div>
+                </div>
+
+                <div className="text-center sm:text-left mb-6">
+                  <h2 className="text-2xl font-extrabold text-white tracking-tight">
+                    Masuk ke <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-300 via-indigo-200 to-cyan-300">Lapmatch</span>
+                  </h2>
+                  <p className="text-xs text-zinc-400 mt-1">
+                    Silakan masuk untuk mengakses rekomendasi dan riwayat konsultasi laptop Anda.
+                  </p>
+                </div>
+
+                {/* Sesi Aktif Terdeteksi Banner */}
+                {activeUserEmail && (
+                  <div className="mb-5 p-3 rounded-2xl bg-violet-950/40 border border-violet-500/30 flex items-center justify-between gap-3 text-xs">
+                    <div className="truncate text-zinc-300">
+                      <span className="text-zinc-400 block text-[10px]">Sesi Saat Ini:</span>
+                      <strong className="text-white truncate">{activeUserEmail}</strong>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <Link
+                        href="/"
+                        className="px-2.5 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 text-white font-semibold text-[11px] transition shadow"
+                      >
+                        Ke Dashboard →
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={handleLogoutCurrent}
+                        className="px-2.5 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[11px] transition cursor-pointer"
+                      >
+                        Keluar
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Feedback Pesan (Aria-live) */}
+                <div className="space-y-3 mb-5">
+                  {errorMessage && <AuthAlert type="error" message={errorMessage} />}
+                  {successMessage && <AuthAlert type="success" message={successMessage} />}
+                </div>
+
+                {/* Tombol OAuth Google */}
+                <div className="mb-5">
+                  <GoogleButton
+                    label="Masuk dengan Google"
+                    disabled={loading}
+                    onError={(err) => setErrorMessage(err)}
+                  />
+
+                  <div className="relative flex items-center justify-center my-5">
+                    <div className="border-t border-white/10 w-full" />
+                    <span className="bg-[#0e0e15] px-3 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider shrink-0">
+                      atau dengan email
+                    </span>
+                    <div className="border-t border-white/10 w-full" />
+                  </div>
+                </div>
+
+                {/* Formulir Email + Password */}
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+                  <Input
+                    id="email"
+                    label="Alamat Email"
+                    type="email"
+                    autoComplete="username"
+                    autoFocus
+                    placeholder="nama@email.com"
+                    icon={<Mail className="w-4 h-4" />}
+                    error={errors.email?.message}
+                    disabled={loading}
+                    {...register('email')}
+                  />
+
+                  <div>
+                    <PasswordInput
+                      id="password"
+                      label="Kata Sandi"
+                      autoComplete="current-password"
+                      placeholder="••••••••"
+                      error={errors.password?.message}
+                      disabled={loading}
+                      hint={
+                        <Link
+                          href="/forgot-password"
+                          className="text-cyan-300 hover:text-cyan-200 font-medium hover:underline min-h-[44px] inline-flex items-center"
+                        >
+                          Lupa kata sandi?
+                        </Link>
+                      }
+                      {...register('password')}
+                    />
+                  </div>
+
+                  {/* Opsi Ingat Saya */}
+                  <div className="flex items-center justify-between pt-1">
+                    <label
+                      htmlFor="rememberMe"
+                      className="inline-flex items-center gap-2.5 text-xs text-zinc-300 cursor-pointer select-none min-h-[44px]"
+                    >
+                      <input
+                        id="rememberMe"
+                        type="checkbox"
+                        className="w-4 h-4 rounded bg-zinc-950 border-white/20 text-violet-600 focus:ring-violet-500 focus:ring-offset-0 focus:ring-1 cursor-pointer"
+                        {...register('rememberMe')}
+                      />
+                      <span>Ingat saya</span>
+                    </label>
+                  </div>
+
+                  {/* Tombol Submit */}
+                  <AuthButton
+                    type="submit"
+                    loading={loading}
+                    loadingText="Memverifikasi Kredensial..."
+                  >
+                    Masuk Sekarang →
+                  </AuthButton>
+                </form>
+
+                {/* Link Registrasi & Bantuan */}
+                <div className="mt-6 pt-5 border-t border-white/[0.08] text-center text-xs text-zinc-400 space-y-3">
+                  <p>
+                    Belum memiliki akun?{' '}
+                    <Link
+                      href="/register"
+                      className="text-cyan-300 hover:text-cyan-200 font-semibold underline decoration-cyan-500/50 underline-offset-4 ml-1 min-h-[44px] inline-flex items-center"
+                    >
+                      Daftar Akun Baru
+                    </Link>
+                  </p>
+
+                  <div className="sm:hidden pt-2">
+                    <Link
+                      href="/questionnaire?guest=true"
+                      className="text-[11px] text-zinc-400 hover:text-white underline block min-h-[44px] flex items-center justify-center"
+                    >
+                      Coba dulu tanpa akun (Versi Terbatas)
+                    </Link>
+                  </div>
+
+                  {/* Bantuan Kontak */}
+                  <div className="pt-2 flex items-center justify-center gap-2 text-[11px] text-zinc-400">
+                    <span>Kendala akses?</span>
+                    <button
+                      type="button"
+                      onClick={() => setContactModalOpen(true)}
+                      className="text-cyan-400 hover:text-cyan-300 font-medium hover:underline inline-flex items-center gap-1 min-h-[44px] px-2 cursor-pointer"
+                    >
+                      <HelpCircle className="w-3.5 h-3.5" />
+                      <span>Hubungi Tim Dukungan</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      {/* Footer Navigasi Sederhana */}
+      <footer className="relative z-10 border-t border-white/[0.08] bg-[#09090d]/80 backdrop-blur-xl py-4 text-xs text-zinc-400">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-center sm:text-left text-zinc-400">
+            &copy; {new Date().getFullYear()} Lapmatch &bull; Rekomendasi Laptop Cerdas Mahasiswa
+          </p>
+          <div className="flex items-center gap-4 text-[11px]">
+            <Link href="/tentang" className="hover:text-white transition">
+              Tentang
+            </Link>
+            <span>&bull;</span>
+            <Link href="/kebijakan-privasi" className="hover:text-white transition">
+              Kebijakan Privasi
+            </Link>
+            <span>&bull;</span>
+            <Link href="/syarat-penggunaan" className="hover:text-white transition">
+              Syarat Penggunaan
+            </Link>
+          </div>
+        </div>
+      </footer>
+
+      {/* Modal Bantuan Kontak Tanpa Memajang Nomor Pribadi Terbuka */}
+      {contactModalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in"
+        >
+          <div className="relative w-full max-w-md p-6 rounded-2xl bg-[#0e0e15] border border-white/10 shadow-2xl text-left">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2 text-white font-bold text-sm">
+                <MessageSquare className="w-4 h-4 text-cyan-400" />
+                <span>Pusat Bantuan Lapmatch</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setContactModalOpen(false)}
+                className="text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-white/5 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                aria-label="Tutup dialog"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-xs text-zinc-300 mb-5 leading-relaxed">
+              Jika Anda mengalami kesulitan saat masuk akun, reset kata sandi, atau memerlukan bantuan teknis, silakan hubungi saluran resmi kami:
             </p>
 
-            {/* Kontak Bantuan Cepat */}
-            <div className="flex items-center justify-center gap-2 pt-2 text-[11px] text-zinc-400">
-              <span>Butuh bantuan?</span>
+            <div className="space-y-3">
               <a
-                href="https://wa.me/6287851164239"
+                href="https://wa.me/6287851164239?text=Halo%20Admin%20Lapmatch,%20saya%20butuh%20bantuan%20terkait%20akun%20Lapmatch"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-emerald-400 hover:underline flex items-center gap-1"
+                className="flex items-center justify-between p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-800/40 hover:border-emerald-600 text-emerald-200 text-xs font-semibold transition"
               >
-                <span>WhatsApp (0878-5116-4239)</span>
+                <span>Bantuan Cepat via WhatsApp</span>
+                <span className="text-emerald-400 font-mono text-[11px]">Chat Sekarang →</span>
               </a>
-              <span>&bull;</span>
+
               <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-400 hover:underline flex items-center gap-1"
+                href="mailto:support@lapmatch.com?subject=Bantuan%20Akun%20Lapmatch"
+                className="flex items-center justify-between p-3.5 rounded-xl bg-zinc-900 border border-white/10 hover:border-white/20 text-zinc-200 text-xs font-semibold transition"
               >
-                <span>Facebook</span>
+                <span>Kirim Email Bantuan</span>
+                <span className="text-cyan-400 font-mono text-[11px]">support@lapmatch.com →</span>
               </a>
+            </div>
+
+            <div className="mt-5 pt-4 border-t border-white/10 text-right">
+              <button
+                type="button"
+                onClick={() => setContactModalOpen(false)}
+                className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold text-zinc-200 min-h-[44px]"
+              >
+                Tutup
+              </button>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

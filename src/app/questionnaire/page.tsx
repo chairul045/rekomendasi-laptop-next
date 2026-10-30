@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import toast from 'react-hot-toast';
 import {
   DndContext,
@@ -83,7 +84,9 @@ const ALL_CRITERIA = [
   },
 ];
 
-const BRANDS = ['ASUS', 'Lenovo', 'HP', 'Acer', 'MSI', 'Apple', 'Dell', 'Huawei', 'Axioo', 'ADVAN'];
+// Daftar brand sesuai data laptop yang diupload admin di database
+// Diperbarui otomatis saat admin menambah laptop baru (fetch dari API)
+const BRANDS_DEFAULT = ['ASUS', 'Lenovo', 'HP', 'MSI', 'Acer', 'Dell', 'Razer', 'Axioo', 'ADVAN', 'Microsoft', 'MacBook', 'INFINIX'];
 
 const PERUNTUKAN_OPTIONS = [
   { value: 'Kuliah', label: 'Kuliah & Tugas Harian', desc: 'Office, browsing, presentasi, dan riset' },
@@ -157,11 +160,31 @@ function SortableItem({ id, index }: { id: string; index: number }) {
   );
 }
 
-// ── Main Page ─────────────────────────────────────────────────────────────────
+// ── Main Page Content ─────────────────────────────────────────────────────────
 
-export default function QuestionnairePage() {
+function QuestionnaireContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isGuest = searchParams.get('guest') === 'true';
+
   const [loading, setLoading] = useState(false);
+  const [guestResults, setGuestResults] = useState<any[] | null>(null);
+  const [showGuestModal, setShowGuestModal] = useState(false);
+
+  // Brand list diambil dinamis dari database
+  const [brands, setBrands] = useState<string[]>(BRANDS_DEFAULT);
+  useEffect(() => {
+    fetch('/api/admin/laptops')
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data?.brands) && data.brands.length > 0) {
+          setBrands(data.brands.map((b: { name: string }) => b.name));
+        }
+      })
+      .catch(() => {
+        // Tetap pakai BRANDS_DEFAULT jika gagal fetch
+      });
+  }, []);
 
   // Form State
   const [judul, setJudul] = useState('');
@@ -232,6 +255,39 @@ export default function QuestionnairePage() {
     }
 
     setLoading(true);
+
+    if (isGuest) {
+      try {
+        const res = await fetch('/api/questionnaire/guest', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            budgetMin,
+            budgetMax,
+            peruntukan,
+            kondisiPilihan,
+            merekPilihan: selectedBrands,
+            rankingKriteria,
+          }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          toast.error(data.error || 'Gagal memproses simulasi tamu.');
+          return;
+        }
+
+        setGuestResults(data.previewResults || []);
+        setShowGuestModal(true);
+        toast.success('Simulasi rekomendasi berhasil dihitung!');
+      } catch {
+        toast.error('Terjadi kesalahan jaringan.');
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
     try {
       const res = await fetch('/api/questionnaire', {
         method: 'POST',
@@ -268,6 +324,27 @@ export default function QuestionnairePage() {
       <Navbar />
 
       <main className="flex-grow max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* Banner Mode Tamu */}
+        {isGuest && (
+          <div className="p-4 sm:p-5 rounded-3xl bg-amber-950/30 border border-amber-500/30 backdrop-blur-md shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="space-y-1 text-center sm:text-left">
+              <div className="flex items-center justify-center sm:justify-start gap-2 text-amber-300 font-bold text-xs sm:text-sm">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
+                <span>Mode Simulasi Tanpa Akun (Tamu)</span>
+              </div>
+              <p className="text-xs text-amber-200/80 leading-relaxed">
+                Anda sedang mencoba versi pratinjau terbatas (maksimal 3 laptop). Hasil tidak akan disimpan dalam riwayat akun.
+              </p>
+            </div>
+            <Link
+              href="/register"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-bold text-xs whitespace-nowrap shadow-md transition"
+            >
+              Daftar Akun Gratis →
+            </Link>
+          </div>
+        )}
+
         {/* Header */}
         <div className="text-center sm:text-left">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono bg-gradient-to-r from-violet-950/60 to-cyan-950/60 border border-violet-500/30 text-cyan-300 mb-3 shadow-[0_0_15px_rgba(124,58,237,0.2)]">
@@ -490,7 +567,7 @@ export default function QuestionnairePage() {
               >
                 ✨ Semua Merek
               </button>
-              {BRANDS.map((brand) => (
+              {brands.map((brand) => (
                 <button
                   key={brand}
                   type="button"
@@ -626,9 +703,108 @@ export default function QuestionnairePage() {
             </button>
           </div>
         </form>
+
+        {/* Modal Hasil Pratinjau Terbatas Tamu */}
+        {showGuestModal && guestResults && (
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in"
+          >
+            <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-8 rounded-3xl bg-[#0e0e15] border border-white/10 shadow-2xl space-y-6">
+              <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                <div>
+                  <span className="text-[11px] font-mono text-cyan-400 font-semibold uppercase tracking-wider">
+                    Hasil Pratinjau Terbatas (Tamu)
+                  </span>
+                  <h2 className="text-xl sm:text-2xl font-extrabold text-white">
+                    3 Rekomendasi Teratas untuk Anda
+                  </h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowGuestModal(false)}
+                  className="text-zinc-400 hover:text-white p-2 rounded-xl hover:bg-white/5 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Daftar 3 Laptop */}
+              <div className="space-y-3">
+                {guestResults.map((item, idx) => (
+                  <div
+                    key={item.laptop?.id || idx}
+                    className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-zinc-950/70 border border-white/10"
+                  >
+                    <div className="flex items-center gap-3.5 w-full sm:w-auto">
+                      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-cyan-500 text-white font-mono font-bold flex items-center justify-center text-sm shrink-0">
+                        #{item.peringkat}
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="text-sm font-bold text-white truncate">
+                          {item.laptop?.name}
+                        </h3>
+                        <p className="text-xs text-zinc-400">
+                          {item.laptop?.brand} &bull; RAM {item.laptop?.ramGb}GB &bull; SSD {item.laptop?.storageGb}GB
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="text-right w-full sm:w-auto flex sm:flex-col justify-between items-center sm:items-end">
+                      <div className="text-sm font-extrabold text-cyan-300">
+                        Rp {Number(item.laptop?.price).toLocaleString('id-ID')}
+                      </div>
+                      <span className="text-[10px] font-mono text-zinc-400">
+                        Skor TOPSIS: {(item.skor * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Ajakan Mendaftar Akun */}
+              <div className="p-5 rounded-2xl bg-gradient-to-r from-violet-950/50 via-indigo-950/40 to-cyan-950/50 border border-cyan-500/30 space-y-3 text-center sm:text-left">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <h3 className="text-sm font-bold text-white">
+                      Ingin Menyimpan Hasil & Buka Analisis AI Mendalam?
+                    </h3>
+                    <p className="text-xs text-zinc-300">
+                      Daftar akun Lapmatch secara gratis untuk melihat perbandingan matriks lengkap, penjelasan AI, dan melacak riwayat konsultasi laptop Anda.
+                    </p>
+                  </div>
+                  <Link
+                    href="/register"
+                    className="min-h-[44px] px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 text-white font-bold text-xs shadow-lg hover:scale-105 transition shrink-0 flex items-center justify-center"
+                  >
+                    Daftar Sekarang →
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       <Footer />
     </div>
+  );
+}
+
+export default function QuestionnairePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#09090d] text-zinc-100 flex items-center justify-center">
+          <div className="flex items-center gap-3 text-sm font-medium">
+            <span className="w-5 h-5 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
+            <span>Memuat Kuisioner Lapmatch...</span>
+          </div>
+        </div>
+      }
+    >
+      <QuestionnaireContent />
+    </Suspense>
   );
 }

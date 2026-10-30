@@ -1,4 +1,4 @@
-// app/api/admin/laptops/route.ts - API Admin: Create Laptop
+// app/api/admin/laptops/route.ts - API Admin: Create Laptop + GET Brands
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import prisma from '@/lib/prisma';
@@ -10,6 +10,23 @@ async function checkAdmin() {
   const profile = await prisma.user.findUnique({ where: { id: user.id } });
   if (!profile || profile.role !== 'admin') return null;
   return user;
+}
+
+// GET: Ambil daftar brand unik dari database (dipakai di form kuisioner)
+export async function GET() {
+  try {
+    const brands = await prisma.laptop.groupBy({
+      by: ['brand'],
+      _count: { id: true },
+      orderBy: { _count: { id: 'desc' } },
+    });
+    return NextResponse.json({
+      brands: brands.map((b) => ({ name: b.brand, count: b._count.id })),
+    });
+  } catch (error) {
+    console.error('GET brands error:', error);
+    return NextResponse.json({ error: 'Terjadi kesalahan server.' }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest) {

@@ -13,6 +13,7 @@ import {
   ChevronRight,
   ClipboardList,
 } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 interface NavbarProps {
   user?: {
@@ -58,8 +59,16 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
 
   const handleSignOut = async () => {
     try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
       await fetch('/api/auth/signout', { method: 'POST' });
+    } catch {
+      // Abaikan error jaringan saat logout
     } finally {
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch {}
       window.location.href = '/login';
     }
   };
@@ -85,9 +94,9 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 via-indigo-600 to-cyan-500 p-0.5 shadow-[0_0_20px_rgba(124,58,237,0.35)] group-hover:shadow-[0_0_30px_rgba(124,58,237,0.6)] transition duration-300 overflow-hidden shrink-0">
               <div className="w-full h-full bg-[#09090d] rounded-[9px] overflow-hidden flex items-center justify-center">
                 <img
-                  src="/logo.jpeg"
+                  src="/logo.svg"
                   alt="Lapmatch Logo"
-                  className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
+                  className="w-full h-full object-contain p-1 group-hover:scale-110 transition duration-300"
                 />
               </div>
             </div>

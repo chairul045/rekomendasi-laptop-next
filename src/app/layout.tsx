@@ -6,9 +6,9 @@ export const metadata: Metadata = {
   title: 'Lapmatch - Smart Laptop Matching & Recommendation',
   description: 'Lapmatch: Platform Rekomendasi Laptop Cerdas Mahasiswa Berbasis AI & Algoritma Multi-Kriteria Presisi',
   icons: {
-    icon: '/logo.jpeg',
-    shortcut: '/logo.jpeg',
-    apple: '/logo.jpeg',
+    icon: '/logo.svg',
+    shortcut: '/logo.svg',
+    apple: '/logo.svg',
   },
 };
 

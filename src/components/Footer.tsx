@@ -1,53 +1,148 @@
+// components/Footer.tsx - Footer Lapmatch
+'use client';
+
+import React, { useState } from 'react';
 import Link from 'next/link';
+import { HelpCircle, MessageSquare, Mail, X } from 'lucide-react';
 
 export default function Footer() {
+  const [modalOpen, setModalOpen] = useState(false);
+
   return (
-    <footer className="relative z-10 border-t border-white/[0.08] bg-[#09090d]/80 backdrop-blur-xl py-8 text-xs text-zinc-400 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
-          <div className="flex items-center gap-2.5">
-            <img
-              src="/logo.jpeg"
-              alt="Lapmatch Logo"
-              className="w-5 h-5 rounded-md object-cover border border-white/10"
-            />
-            <span className="code-font text-xs font-semibold text-zinc-200">
-              Lapmatch &bull; Smart Laptop Matching Engine
-            </span>
+    <>
+      <footer className="relative z-10 border-t border-white/[0.08] bg-[#09090d]/80 backdrop-blur-xl py-6 text-xs text-zinc-400 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            {/* Branding & Deskripsi */}
+            <div className="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
+              <div className="flex items-center gap-2.5">
+                <div className="w-6 h-6 rounded-lg bg-zinc-900 border border-white/10 p-0.5 flex items-center justify-center">
+                  <img
+                    src="/logo.svg"
+                    alt="Lapmatch Logo"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <span className="font-semibold text-zinc-200">
+                  Lapmatch &bull; Smart Laptop Matching
+                </span>
+              </div>
+              <span className="hidden sm:inline text-zinc-600">|</span>
+              <span className="text-zinc-400">
+                Sistem Pendukung Keputusan Pemilihan Laptop Mahasiswa Berbasis Multi-Kriteria
+              </span>
+            </div>
+
+            {/* Tombol Hubungi Kami */}
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setModalOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-white/10 hover:border-white/25 transition shadow-sm min-h-[44px] cursor-pointer"
+              >
+                <HelpCircle className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Pusat Bantuan & Kontak</span>
+              </button>
+            </div>
           </div>
-          <span className="hidden sm:inline text-zinc-600">|</span>
-          <span className="text-zinc-400">
-            Platform Pencari & Rekomendasi Laptop Ideal Mahasiswa Berbasis Analisis Cerdas
-          </span>
-        </div>
 
-        {/* Kontak No HP / WhatsApp & Facebook */}
-        <div className="flex items-center gap-3">
-          <a
-            href="https://wa.me/6287851164239"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-emerald-950/40 hover:bg-emerald-900/50 text-emerald-300 border border-emerald-800/50 hover:border-emerald-600 transition shadow-sm"
-          >
-            <svg className="w-3.5 h-3.5 text-emerald-400" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.772.825 2.791.826 3.182 0 5.768-2.587 5.768-5.766-.001-3.181-2.587-5.767-5.768-5.767zm3.393 8.163c-.144.405-.837.774-1.17.824-.312.045-.694.073-2.128-.521-1.615-.669-2.716-2.316-2.799-2.427-.083-.111-.663-.882-.663-1.682s.421-1.194.571-1.357c.149-.163.328-.204.437-.204.108 0 .217.001.312.006.101.005.236-.038.37.284.144.344.492 1.197.535 1.285.043.088.072.19.014.305-.058.115-.088.187-.174.288-.087.101-.183.226-.261.304-.088.087-.18.181-.077.357.103.176.458.756.983 1.224.675.602 1.244.788 1.42.875.176.087.279.073.383-.044.103-.118.444-.517.562-.693.118-.176.236-.147.397-.088.161.059 1.02.481 1.196.569.176.088.293.132.337.206.044.073.044.425-.1.83z" />
-            </svg>
-            <span>WhatsApp (0878-5116-4239)</span>
-          </a>
+          {/* Navigasi Footer Legal & Hak Cipta */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-white/[0.05] text-[11px] text-zinc-400">
+            <p>
+              &copy; {new Date().getFullYear()} Lapmatch. Dikembangkan untuk mahasiswa Indonesia.
+            </p>
 
-          <a
-            href="https://facebook.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-blue-950/40 hover:bg-blue-900/50 text-blue-300 border border-blue-800/50 hover:border-blue-600 transition shadow-sm"
-          >
-            <svg className="w-3.5 h-3.5 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-            </svg>
-            <span>Facebook</span>
-          </a>
+            <nav className="flex items-center gap-4" aria-label="Footer Navigasi">
+              <Link
+                href="/tentang"
+                className="hover:text-white transition py-2 px-1 min-h-[44px] inline-flex items-center"
+              >
+                Tentang
+              </Link>
+              <span className="text-zinc-600">&bull;</span>
+              <Link
+                href="/kebijakan-privasi"
+                className="hover:text-white transition py-2 px-1 min-h-[44px] inline-flex items-center"
+              >
+                Kebijakan Privasi
+              </Link>
+              <span className="text-zinc-600">&bull;</span>
+              <Link
+                href="/syarat-penggunaan"
+                className="hover:text-white transition py-2 px-1 min-h-[44px] inline-flex items-center"
+              >
+                Syarat Penggunaan
+              </Link>
+            </nav>
+          </div>
         </div>
-      </div>
-    </footer>
+      </footer>
+
+      {/* Modal Dialog Kontak Resmi */}
+      {modalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in"
+        >
+          <div className="relative w-full max-w-md p-6 rounded-2xl bg-[#0e0e15] border border-white/10 shadow-2xl text-left">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2 text-white font-bold text-sm">
+                <MessageSquare className="w-4 h-4 text-cyan-400" />
+                <span>Hubungi Tim Lapmatch</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setModalOpen(false)}
+                className="text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-white/5 min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer"
+                aria-label="Tutup dialog"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-xs text-zinc-300 mb-5 leading-relaxed">
+              Memiliki pertanyaan mengenai rekomendasi laptop atau masukan untuk Lapmatch? Kami siap membantu melalui kontak resmi berikut:
+            </p>
+
+            <div className="space-y-3">
+              <a
+                href="https://wa.me/6287851164239?text=Halo%20Tim%20Lapmatch,%20saya%20ingin%20bertanya%20mengenai%20layanan"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-800/40 hover:border-emerald-600 text-emerald-200 text-xs font-semibold transition min-h-[44px]"
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Konsultasi Cepat via WhatsApp</span>
+                </div>
+                <span className="text-emerald-400 font-mono text-[11px]">Chat Tim Kami →</span>
+              </a>
+
+              <a
+                href="mailto:support@lapmatch.com?subject=Pertanyaan%20Layanan%20Lapmatch"
+                className="flex items-center justify-between p-3.5 rounded-xl bg-zinc-900 border border-white/10 hover:border-white/20 text-zinc-200 text-xs font-semibold transition min-h-[44px]"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Mail className="w-4 h-4 text-cyan-400" />
+                  <span>Email Dukungan Resmi</span>
+                </div>
+                <span className="text-cyan-400 font-mono text-[11px]">support@lapmatch.com →</span>
+              </a>
+            </div>
+
+            <div className="mt-5 pt-4 border-t border-white/10 text-right">
+              <button
+                type="button"
+                onClick={() => setModalOpen(false)}
+                className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold text-zinc-200 min-h-[44px] cursor-pointer"
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
