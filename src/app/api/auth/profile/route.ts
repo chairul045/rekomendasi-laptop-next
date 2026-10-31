@@ -1,6 +1,7 @@
 // app/api/auth/profile/route.ts - GET & PATCH user profile
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import prisma from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
@@ -47,11 +48,13 @@ export async function GET(request: NextRequest) {
         createdAt: true,
         hasilTopsis: {
           where: { peringkat: 1 },
-          include: { laptop: { select: { name: true, brand: true } } },
+          include: { laptop: { select: { id: true, name: true, brand: true, price: true } } },
           take: 1,
         },
       },
     });
+
+    const topItem = lastConsultation?.hasilTopsis[0];
 
     return NextResponse.json({
       id: profile.id,
@@ -69,7 +72,13 @@ export async function GET(request: NextRequest) {
             judul: lastConsultation.judul,
             peruntukan: lastConsultation.peruntukan,
             createdAt: lastConsultation.createdAt,
-            topLaptop: lastConsultation.hasilTopsis[0]?.laptop ?? null,
+            topLaptop: topItem
+              ? {
+                  name: topItem.laptop.name,
+                  brand: topItem.laptop.brand,
+                  scorePct: Math.round(topItem.nilaiV * 10000) / 100,
+                }
+              : null,
           }
         : null,
     });
@@ -151,5 +160,42 @@ export async function PATCH(request: NextRequest) {
   } catch (error) {
     console.error('Profile PATCH error:', error);
     return NextResponse.json({ error: 'Terjadi kesalahan server.' }, { status: 500 });
+  }
+}
+
+// DELETE user account and all associated consultation data
+export async function DELETE(request: NextRequest) {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const userId = user.id;
+
+    // 1. Hapus data pengguna di Prisma (akan cascade ke kuisioner_jawaban, hasil_topsis, dll)
+    await prisma.user.delete({
+      where: { id: userId },
+    });
+
+    // 2. Hapus data pengguna di Supabase Auth via admin client
+    try {
+      const adminClient = createAdminClient();
+      await adminClient.auth.admin.deleteUser(userId);
+    } catch (adminErr) {
+      console.warn('Supabase admin deleteUser warning:', adminErr);
+    }
+
+    // 3. Sign out session
+    await supabase.auth.signOut();
+
+    return NextResponse.json({ success: true, message: 'Akun Anda berhasil dihapus secara permanen.' });
+  } catch (error) {
+    console.error('Profile DELETE error:', error);
+    return NextResponse.json({ error: 'Gagal menghapus akun.' }, { status: 500 });
   }
 }

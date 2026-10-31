@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { getLaptopImageUrl, formatRupiah } from '@/lib/laptop-utils';
+import { getLaptopImageUrl, formatRupiah, formatTanggal } from '@/lib/laptop-utils';
 
 interface LaptopItem {
   id: number;
@@ -250,11 +250,7 @@ export default function HistoryPage() {
             {consultations.map((item) => {
               const best = item.hasilTopsis[0];
               const laptop = best?.laptop;
-              const dateFormatted = new Date(item.createdAt).toLocaleDateString('id-ID', {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric',
-              });
+              const dateFormatted = formatTanggal(item.createdAt);
 
               return (
                 <div
@@ -270,19 +266,19 @@ export default function HistoryPage() {
                           {item.judul ?? `Konsultasi ${item.peruntukan}`}
                         </h3>
                       </div>
-                      <p className="text-[11px] text-cyan-300 font-mono flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-cyan-400" />
+                      <p className="text-xs text-cyan-300 font-mono flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5 text-cyan-400" />
                         <span>{dateFormatted}</span>
                       </p>
                     </div>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-mono capitalize bg-violet-950/40 text-violet-300 border border-violet-800/40">
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-mono capitalize bg-violet-950/40 text-violet-300 border border-violet-800/40">
                       {item.peruntukan}
                     </span>
                   </div>
 
                   {/* Recommended Top Laptop with Image */}
                   <div className="space-y-2">
-                    <div className="text-[10px] text-zinc-400 uppercase tracking-wider font-mono">
+                    <div className="text-xs text-zinc-400 uppercase tracking-wider font-mono">
                       Rekomendasi Teratas:
                     </div>
                     {laptop ? (
@@ -303,7 +299,7 @@ export default function HistoryPage() {
                               {formatRupiah(laptop.price)}
                             </span>
                             {best && (
-                              <span className="text-cyan-300 text-[11px]">
+                              <span className="text-cyan-300 text-xs">
                                 Skor: <strong>{(best.nilaiV * 100).toFixed(1)}%</strong>
                               </span>
                             )}
@@ -317,14 +313,14 @@ export default function HistoryPage() {
 
                   {/* Filter Parameter Badges */}
                   <div className="pt-3 border-t border-zinc-800/60">
-                    <div className="flex flex-wrap gap-1.5 text-[10px]">
-                      <span className="px-2 py-0.5 rounded bg-zinc-950 text-zinc-300 border border-zinc-800">
+                    <div className="flex flex-wrap gap-1.5 text-xs">
+                      <span className="px-2.5 py-1 rounded bg-zinc-950 text-zinc-300 border border-zinc-800 text-xs">
                         💰 {Number(item.budgetMin) / 1000000} - {Number(item.budgetMax) / 1000000} Jt
                       </span>
-                      <span className="px-2 py-0.5 rounded bg-zinc-950 text-zinc-300 border border-zinc-800 uppercase">
+                      <span className="px-2.5 py-1 rounded bg-zinc-950 text-zinc-300 border border-zinc-800 uppercase text-xs">
                         🏷️ {item.kondisiPilihan}
                       </span>
-                      <span className="px-2 py-0.5 rounded bg-zinc-950 text-zinc-300 border border-zinc-800">
+                      <span className="px-2.5 py-1 rounded bg-zinc-950 text-zinc-300 border border-zinc-800 text-xs">
                         🎒 {item.frekuensiMembawa ?? 'Rutin'}
                       </span>
                     </div>
@@ -335,14 +331,14 @@ export default function HistoryPage() {
                     <button
                       type="button"
                       onClick={() => handleDelete(item.id)}
-                      className="p-2 rounded-xl text-zinc-500 hover:text-rose-400 hover:bg-rose-950/20 border border-transparent hover:border-rose-900/30 transition cursor-pointer"
+                      className="p-2 min-h-[40px] min-w-[40px] rounded-xl text-zinc-500 hover:text-rose-400 hover:bg-rose-950/20 border border-transparent hover:border-rose-900/30 transition cursor-pointer flex items-center justify-center"
                       title="Hapus Sesi"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
                     <Link
                       href={`/recommendation/${item.id}`}
-                      className="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs transition text-center flex items-center justify-center gap-1.5 shadow-md shadow-violet-600/20"
+                      className="flex-1 min-h-[40px] py-2 px-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs transition text-center flex items-center justify-center gap-1.5 shadow-md shadow-violet-600/20"
                     >
                       <span>Lihat Hasil Analisis</span>
                       <ArrowRight className="w-3.5 h-3.5" />

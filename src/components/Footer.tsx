@@ -52,7 +52,14 @@ export default function Footer() {
               &copy; {new Date().getFullYear()} Lapmatch. Dikembangkan untuk mahasiswa Indonesia.
             </p>
 
-            <nav className="flex items-center gap-4" aria-label="Footer Navigasi">
+            <nav className="flex items-center gap-4 flex-wrap" aria-label="Footer Navigasi">
+              <Link
+                href="/tentang-metode"
+                className="hover:text-white transition py-2 px-1 min-h-[44px] inline-flex items-center text-cyan-400/90 hover:text-cyan-300"
+              >
+                Tentang Metode (ROC & TOPSIS)
+              </Link>
+              <span className="text-zinc-600">&bull;</span>
               <Link
                 href="/tentang"
                 className="hover:text-white transition py-2 px-1 min-h-[44px] inline-flex items-center"

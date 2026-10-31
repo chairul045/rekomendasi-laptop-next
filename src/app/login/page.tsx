@@ -157,7 +157,7 @@ export default function LoginPage() {
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-violet-600/15 via-indigo-600/10 to-transparent blur-[120px] pointer-events-none -z-10" />
 
       {/* Main Container */}
-      <main className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 z-10 my-auto">
+      <main className="flex-1 flex items-center justify-center px-4 py-6 sm:py-12 z-10">
         <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           
           {/* Kolom Kiri (Desktop): Nilai Jual Lapmatch */}
@@ -230,10 +230,15 @@ export default function LoginPage() {
             <div className="pt-2">
               <Link
                 href="/questionnaire?guest=true"
-                className="inline-flex items-center gap-2 text-xs font-semibold text-zinc-300 hover:text-cyan-300 px-4 py-2.5 rounded-xl border border-white/10 hover:border-cyan-500/40 bg-white/[0.02] hover:bg-white/[0.05] transition-all min-h-[44px]"
+                className="inline-flex flex-col items-start gap-1 p-3 rounded-2xl border border-white/10 hover:border-cyan-500/40 bg-white/[0.02] hover:bg-white/[0.05] transition-all min-h-[44px]"
               >
-                <span>Coba dulu tanpa akun (Versi Terbatas)</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <div className="flex items-center gap-2 text-xs font-semibold text-zinc-300 hover:text-cyan-300">
+                  <span>Coba dulu tanpa akun (Versi Terbatas)</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </div>
+                <span className="text-xs text-zinc-400">
+                  *Pratinjau maks 3 laptop, riwayat sesi tidak tersimpan di database.
+                </span>
               </Link>
             </div>
           </section>
@@ -388,14 +393,17 @@ export default function LoginPage() {
                   <div className="sm:hidden pt-2">
                     <Link
                       href="/questionnaire?guest=true"
-                      className="text-[11px] text-zinc-400 hover:text-white underline block min-h-[44px] flex items-center justify-center"
+                      className="text-xs text-cyan-400 hover:text-cyan-300 underline block min-h-[44px] flex flex-col items-center justify-center text-center py-2"
                     >
-                      Coba dulu tanpa akun (Versi Terbatas)
+                      <span>Coba dulu tanpa akun (Versi Terbatas)</span>
+                      <span className="text-xs text-zinc-400 font-normal no-underline">
+                        *Pratinjau maks 3 laptop &amp; tanpa simpan riwayat
+                      </span>
                     </Link>
                   </div>
 
                   {/* Bantuan Kontak */}
-                  <div className="pt-2 flex items-center justify-center gap-2 text-[11px] text-zinc-400">
+                  <div className="pt-2 flex items-center justify-center gap-2 text-xs text-zinc-400">
                     <span>Kendala akses?</span>
                     <button
                       type="button"

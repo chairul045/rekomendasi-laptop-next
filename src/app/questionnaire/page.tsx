@@ -197,6 +197,15 @@ function QuestionnaireContent() {
   const [frekuensiMembawa, setFrekuensiMembawa] = useState('Rutin');
   const [rankingKriteria, setRankingKriteria] = useState(ALL_CRITERIA.map((c) => c.code));
 
+  // Validasi inline budget
+  const isBudgetNegative = budgetMin < 0 || budgetMax < 0;
+  const isBudgetInverted = budgetMin > budgetMax;
+  const budgetError = isBudgetNegative
+    ? 'Batas minimal dan maksimal budget tidak boleh bernilai negatif.'
+    : isBudgetInverted
+    ? 'Batas minimal budget tidak boleh lebih besar dari batas maksimal.'
+    : null;
+
   const sensors = useSensors(useSensor(PointerSensor));
 
   const handleSelectPeruntukan = (val: string) => {
@@ -249,8 +258,8 @@ function QuestionnaireContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (budgetMin > budgetMax) {
-      toast.error('Batas minimal budget tidak boleh lebih besar dari batas maksimal.');
+    if (budgetError) {
+      toast.error(budgetError);
       return;
     }
 
@@ -277,9 +286,14 @@ function QuestionnaireContent() {
           return;
         }
 
-        setGuestResults(data.previewResults || []);
+        const results = data.previewResults || [];
+        setGuestResults(results);
         setShowGuestModal(true);
-        toast.success('Simulasi rekomendasi berhasil dihitung!');
+        if (results.length > 0) {
+          toast.success('Simulasi rekomendasi berhasil dihitung!');
+        } else {
+          toast('Tidak ada laptop yang cocok dengan filter budget ini.', { icon: 'ℹ️' });
+        }
       } catch {
         toast.error('Terjadi kesalahan jaringan.');
       } finally {
@@ -294,6 +308,7 @@ function QuestionnaireContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           judul: judul || `Konsultasi ${peruntukan} (${new Date().toLocaleDateString('id-ID')})`,
+          tanggalPengisian,
           budgetMin,
           budgetMax,
           peruntukan,
@@ -313,7 +328,7 @@ function QuestionnaireContent() {
       toast.success('Pencocokan Lapmatch & analisis AI selesai!');
       router.push(`/recommendation/${data.jawabanId}`);
     } catch {
-      toast.error('Terjadi kesalahan jaringan.');
+      toast.error('Terjadi kesalahan jaringan saat memproses kuisioner. Silakan periksa koneksi internet Anda.');
     } finally {
       setLoading(false);
     }
@@ -448,7 +463,9 @@ function QuestionnaireContent() {
                   onChange={(e) => setBudgetMin(Number(e.target.value))}
                   step="500000"
                   min="0"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950/90 border border-zinc-800 text-zinc-100 font-mono text-sm focus:outline-none focus:border-cyan-400 transition"
+                  className={`w-full px-3.5 py-2.5 rounded-xl bg-zinc-950/90 border font-mono text-sm focus:outline-none transition ${
+                    budgetError ? 'border-rose-500/80 text-rose-200 focus:border-rose-400' : 'border-zinc-800 text-zinc-100 focus:border-cyan-400'
+                  }`}
                 />
               </div>
               <div>
@@ -458,11 +475,20 @@ function QuestionnaireContent() {
                   value={budgetMax}
                   onChange={(e) => setBudgetMax(Number(e.target.value))}
                   step="500000"
-                  min="1000000"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950/90 border border-zinc-800 text-zinc-100 font-mono text-sm focus:outline-none focus:border-cyan-400 transition"
+                  min="0"
+                  className={`w-full px-3.5 py-2.5 rounded-xl bg-zinc-950/90 border font-mono text-sm focus:outline-none transition ${
+                    budgetError ? 'border-rose-500/80 text-rose-200 focus:border-rose-400' : 'border-zinc-800 text-zinc-100 focus:border-cyan-400'
+                  }`}
                 />
               </div>
             </div>
+
+            {budgetError && (
+              <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+                <span className="font-bold">⚠️</span>
+                <span>{budgetError}</span>
+              </div>
+            )}
           </div>
 
           {/* 2. Peruntukan Pemakaian */}
@@ -730,37 +756,46 @@ function QuestionnaireContent() {
                 </button>
               </div>
 
-              {/* Daftar 3 Laptop */}
+              {/* Daftar 3 Laptop atau Empty State */}
               <div className="space-y-3">
-                {guestResults.map((item, idx) => (
-                  <div
-                    key={item.laptop?.id || idx}
-                    className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-zinc-950/70 border border-white/10"
-                  >
-                    <div className="flex items-center gap-3.5 w-full sm:w-auto">
-                      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-cyan-500 text-white font-mono font-bold flex items-center justify-center text-sm shrink-0">
-                        #{item.peringkat}
+                {guestResults.length > 0 ? (
+                  guestResults.map((item, idx) => (
+                    <div
+                      key={item.laptop?.id || idx}
+                      className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-zinc-950/70 border border-white/10"
+                    >
+                      <div className="flex items-center gap-3.5 w-full sm:w-auto">
+                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-cyan-500 text-white font-mono font-bold flex items-center justify-center text-sm shrink-0">
+                          #{item.peringkat}
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="text-sm font-bold text-white truncate">
+                            {item.laptop?.name}
+                          </h3>
+                          <p className="text-xs text-zinc-400">
+                            {item.laptop?.brand} &bull; RAM {item.laptop?.ramGb ?? '—'}GB &bull; SSD {item.laptop?.storageGb ?? '—'}GB
+                          </p>
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <h3 className="text-sm font-bold text-white truncate">
-                          {item.laptop?.name}
-                        </h3>
-                        <p className="text-xs text-zinc-400">
-                          {item.laptop?.brand} &bull; RAM {item.laptop?.ramGb}GB &bull; SSD {item.laptop?.storageGb}GB
-                        </p>
-                      </div>
-                    </div>
 
-                    <div className="text-right w-full sm:w-auto flex sm:flex-col justify-between items-center sm:items-end">
-                      <div className="text-sm font-extrabold text-cyan-300">
-                        Rp {Number(item.laptop?.price).toLocaleString('id-ID')}
+                      <div className="text-right w-full sm:w-auto flex sm:flex-col justify-between items-center sm:items-end">
+                        <div className="text-sm font-extrabold text-cyan-300">
+                          Rp {Number(item.laptop?.price).toLocaleString('id-ID')}
+                        </div>
+                        <span className="text-xs font-mono text-zinc-400">
+                          Skor Kecocokan: {(item.skor * 100).toFixed(1)}%
+                        </span>
                       </div>
-                      <span className="text-[10px] font-mono text-zinc-400">
-                        Skor TOPSIS: {(item.skor * 100).toFixed(1)}%
-                      </span>
                     </div>
+                  ))
+                ) : (
+                  <div className="p-6 rounded-2xl bg-zinc-950/70 border border-white/10 text-center space-y-2">
+                    <p className="text-sm font-bold text-white">Tidak Ada Laptop yang Cocok</p>
+                    <p className="text-xs text-zinc-400 max-w-sm mx-auto">
+                      Tidak ditemukan laptop dalam rentang budget Rp {budgetMin.toLocaleString('id-ID')} - {budgetMax.toLocaleString('id-ID')}. Coba naikkan batas maksimal budget atau pilih Semua Merek.
+                    </p>
                   </div>
-                ))}
+                )}
               </div>
 
               {/* Ajakan Mendaftar Akun */}

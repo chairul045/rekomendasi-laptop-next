@@ -213,9 +213,11 @@ export default function LaptopCompareModal({
                   const isHighest = (l.batteryHours ?? 0) === maxBattery && maxBattery > 0;
                   return (
                     <td key={l.id} className="p-3">
-                      <span className="font-bold text-white">{l.batteryHours ?? '—'} Jam</span>
+                      <span className="font-bold text-white text-xs">
+                        {l.batteryHours != null ? `${l.batteryHours} Jam` : 'Data belum tersedia'}
+                      </span>
                       {isHighest && (
-                        <span className="ml-2 inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                        <span className="ml-2 inline-block px-2 py-0.5 rounded text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
                           Paling Awet
                         </span>
                       )}
@@ -231,9 +233,11 @@ export default function LaptopCompareModal({
                   const isLowest = (l.weightKg ?? 99) === minWeight && minWeight < 99;
                   return (
                     <td key={l.id} className="p-3">
-                      <span className="font-bold text-white">{l.weightKg ?? '—'} kg</span>
+                      <span className="font-bold text-white text-xs">
+                        {l.weightKg != null ? `${l.weightKg} kg` : 'Data belum tersedia'}
+                      </span>
                       {isLowest && (
-                        <span className="ml-2 inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/30">
+                        <span className="ml-2 inline-block px-2 py-0.5 rounded text-xs font-bold bg-pink-500/20 text-pink-300 border border-pink-500/30">
                           Paling Ringan
                         </span>
                       )}
@@ -246,8 +250,8 @@ export default function LaptopCompareModal({
               <tr className="hover:bg-white/[0.02]">
                 <td className="p-3 font-mono font-semibold text-zinc-400">Ukuran Layar</td>
                 {laptops.map((l) => (
-                  <td key={l.id} className="p-3 text-zinc-200">
-                    {l.displaySize ? `${l.displaySize}" Inci` : '14.0" Inci'}
+                  <td key={l.id} className="p-3 text-zinc-200 text-xs">
+                    {l.displaySize ? `${l.displaySize}" Inci` : 'Data belum tersedia'}
                   </td>
                 ))}
               </tr>
@@ -258,7 +262,7 @@ export default function LaptopCompareModal({
                 {laptops.map((l) => (
                   <td key={l.id} className="p-3">
                     <span
-                      className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold capitalize ${
+                      className={`px-2 py-0.5 rounded-md text-xs font-mono font-bold capitalize ${
                         l.condition === 'second'
                           ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                           : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
@@ -278,24 +282,28 @@ export default function LaptopCompareModal({
                   return (
                     <td key={l.id} className="p-3">
                       <div className="flex flex-col gap-1.5">
-                        <a
-                          href={links.shopee}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-2.5 py-1 rounded-lg bg-orange-950/40 hover:bg-orange-900/60 text-orange-300 border border-orange-800/40 text-[11px] font-medium transition flex items-center justify-between"
-                        >
-                          <span>Shopee</span>
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
-                        <a
-                          href={links.tokopedia}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-2.5 py-1 rounded-lg bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-800/40 text-[11px] font-medium transition flex items-center justify-between"
-                        >
-                          <span>Tokopedia</span>
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
+                        {links.shopee && (
+                          <a
+                            href={links.shopee}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1.5 rounded-xl bg-orange-950/40 hover:bg-orange-900/60 text-orange-300 border border-orange-800/40 text-xs font-medium transition flex items-center justify-between min-h-[40px]"
+                          >
+                            <span>Shopee</span>
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                        )}
+                        {links.tokopedia && (
+                          <a
+                            href={links.tokopedia}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1.5 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-800/40 text-xs font-medium transition flex items-center justify-between min-h-[40px]"
+                          >
+                            <span>Tokopedia</span>
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                        )}
                       </div>
                     </td>
                   );

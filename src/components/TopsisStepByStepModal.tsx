@@ -81,7 +81,7 @@ export default function TopsisStepByStepModal({
                 </span>
               </div>
               <p className="text-xs text-zinc-400">
-                Langkah-langkah matematis terperinci pembentukan matriks keputusan hingga nilai preferensi $V_i$.
+                Langkah-langkah matematis terperinci pembentukan matriks keputusan hingga skor kecocokan $V_i$.
               </p>
             </div>
           </div>
@@ -103,7 +103,7 @@ export default function TopsisStepByStepModal({
             { step: 2, title: '2. Normalisasi (R)' },
             { step: 3, title: '3. Terbobot (Y)' },
             { step: 4, title: '4. Solusi Ideal (A+, A-)' },
-            { step: 5, title: '5. Jarak & Skor Preferensi (V)' },
+            { step: 5, title: '5. Jarak & Skor Kecocokan (V)' },
           ].map((tab) => (
             <button
               key={tab.step}
@@ -357,13 +357,13 @@ export default function TopsisStepByStepModal({
             </div>
           )}
 
-          {/* STEP 5: Jarak Solusi & Nilai Preferensi V */}
+          {/* STEP 5: Jarak Solusi & Skor Kecocokan V */}
           {activeStep === 5 && (
             <div className="space-y-4">
               <div className="p-4 rounded-2xl bg-zinc-950/70 border border-white/10 space-y-1 text-xs">
                 <span className="font-bold text-white flex items-center gap-1.5">
                   <Calculator className="w-4 h-4 text-cyan-400" />
-                  <span>Tahap 5: Perhitungan Jarak Euclidean & Nilai Preferensi ($V_i$)</span>
+                  <span>Tahap 5: Perhitungan Jarak Euclidean & Skor Kecocokan ($V_i$)</span>
                 </span>
                 <p className="text-zinc-400 leading-relaxed font-mono text-[11px]">
                   D_i⁺ = √[ ∑ (y_ij - y_j⁺)² ] &nbsp;|&nbsp; D_i⁻ = √[ ∑ (y_ij - y_j⁻)² ]<br />
@@ -382,7 +382,7 @@ export default function TopsisStepByStepModal({
                       <th className="p-3">Alternatif Laptop</th>
                       <th className="p-3 font-mono text-emerald-400">Jarak D⁺</th>
                       <th className="p-3 font-mono text-rose-400">Jarak D⁻</th>
-                      <th className="p-3 font-mono text-cyan-300">Nilai Preferensi (V_i)</th>
+                      <th className="p-3 font-mono text-cyan-300">Skor Kecocokan (V_i)</th>
                       <th className="p-3 font-mono text-amber-300">Skor Persen</th>
                     </tr>
                   </thead>

@@ -135,77 +135,76 @@ export default function LaptopDetailModal({
 
             {/* Battery */}
             <div className="p-3.5 rounded-2xl bg-zinc-950/70 border border-white/5 space-y-1">
-              <span className="text-[10px] font-mono text-amber-400 flex items-center gap-1.5">
+              <span className="text-xs font-mono text-amber-400 flex items-center gap-1.5">
                 <Battery className="w-3.5 h-3.5" />
                 <span>Daya Tahan Baterai</span>
               </span>
               <div className="text-base font-extrabold text-white">
-                {laptop.batteryHours ? `${laptop.batteryHours} Jam` : '—'}
+                {laptop.batteryHours ? `${laptop.batteryHours} Jam` : 'Data belum tersedia'}
               </div>
-              <span className="text-[10px] text-zinc-500 block">Pemakaian Normal</span>
+              <span className="text-xs text-zinc-500 block">Pemakaian Normal</span>
             </div>
 
             {/* Weight */}
             <div className="p-3.5 rounded-2xl bg-zinc-950/70 border border-white/5 space-y-1">
-              <span className="text-[10px] font-mono text-pink-400 flex items-center gap-1.5">
+              <span className="text-xs font-mono text-pink-400 flex items-center gap-1.5">
                 <Scale className="w-3.5 h-3.5" />
                 <span>Bobot Laptop</span>
               </span>
               <div className="text-base font-extrabold text-white">
-                {laptop.weightKg ? `${laptop.weightKg} kg` : '—'}
+                {laptop.weightKg ? `${laptop.weightKg} kg` : 'Data belum tersedia'}
               </div>
-              <span className="text-[10px] text-zinc-500 block">Portabel ke Kampus</span>
+              <span className="text-xs text-zinc-500 block">Portabel ke Kampus</span>
             </div>
 
             {/* Processor Score */}
             <div className="p-3.5 rounded-2xl bg-zinc-950/70 border border-white/5 space-y-1">
-              <span className="text-[10px] font-mono text-cyan-400 flex items-center gap-1.5">
+              <span className="text-xs font-mono text-cyan-400 flex items-center gap-1.5">
                 <Gauge className="w-3.5 h-3.5" />
                 <span>Skor Prosesor (CPU)</span>
               </span>
               <div className="text-base font-extrabold text-cyan-300 font-mono">
-                {laptop.processorScore ?? laptop.performaKomposit ?? '—'}
-                <span className="text-xs text-zinc-500 font-normal"> / 100</span>
+                {laptop.processorScore ?? laptop.performaKomposit ?? 'Data belum tersedia'}
+                {laptop.processorScore != null && <span className="text-xs text-zinc-500 font-normal"> / 100</span>}
               </div>
-              <span className="text-[10px] text-zinc-500 block">Kekuatan Komputasi</span>
+              <span className="text-xs text-zinc-500 block">Kekuatan Komputasi</span>
             </div>
 
             {/* VGA Score */}
             <div className="p-3.5 rounded-2xl bg-zinc-950/70 border border-white/5 space-y-1">
-              <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1.5">
+              <span className="text-xs font-mono text-emerald-400 flex items-center gap-1.5">
                 <Gauge className="w-3.5 h-3.5" />
                 <span>Skor Grafis (GPU/VGA)</span>
               </span>
               <div className="text-base font-extrabold text-emerald-300 font-mono">
-                {laptop.vgaScore ?? '45'}
-                <span className="text-xs text-zinc-500 font-normal"> / 100</span>
+                {laptop.vgaScore != null ? `${laptop.vgaScore} / 100` : 'Data belum tersedia'}
               </div>
-              <span className="text-[10px] text-zinc-500 block">Gaming & Rendering</span>
+              <span className="text-xs text-zinc-500 block">Gaming &amp; Rendering</span>
             </div>
 
             {/* Display Size */}
             <div className="p-3.5 rounded-2xl bg-zinc-950/70 border border-white/5 space-y-1">
-              <span className="text-[10px] font-mono text-blue-400 flex items-center gap-1.5">
+              <span className="text-xs font-mono text-blue-400 flex items-center gap-1.5">
                 <Monitor className="w-3.5 h-3.5" />
                 <span>Ukuran Layar</span>
               </span>
               <div className="text-base font-extrabold text-white">
-                {laptop.displaySize ? `${laptop.displaySize}" Inci` : '14.0" Inci'}
+                {laptop.displaySize ? `${laptop.displaySize}" Inci` : 'Data belum tersedia'}
               </div>
-              <span className="text-[10px] text-zinc-500 block">FHD IPS Display</span>
+              <span className="text-xs text-zinc-500 block">Panel Display</span>
             </div>
 
             {/* Mobility Score */}
             <div className="p-3.5 rounded-2xl bg-zinc-950/70 border border-white/5 space-y-1">
-              <span className="text-[10px] font-mono text-rose-400 flex items-center gap-1.5">
+              <span className="text-xs font-mono text-rose-400 flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5" />
                 <span>Skor Portabilitas</span>
               </span>
               <div className="text-base font-extrabold text-rose-300 font-mono">
-                {laptop.mobilityScore ?? Math.round(100 - (laptop.weightKg ?? 1.5) * 20)}
-                <span className="text-xs text-zinc-500 font-normal"> / 100</span>
+                {laptop.mobilityScore ?? (laptop.weightKg ? Math.round(100 - laptop.weightKg * 20) : 'Data belum tersedia')}
+                {laptop.mobilityScore != null && <span className="text-xs text-zinc-500 font-normal"> / 100</span>}
               </div>
-              <span className="text-[10px] text-zinc-500 block">Mobilitas Mahasiswa</span>
+              <span className="text-xs text-zinc-500 block">Mobilitas Mahasiswa</span>
             </div>
           </div>
         </div>

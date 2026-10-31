@@ -1,5 +1,5 @@
-// lib/topsis.ts - Algoritma TOPSIS (Technique for Order Preference by Similarity to Ideal Solution)
-// Dikonversi dari PHP TopsisService.php ke TypeScript
+// src/lib/topsis.ts - Algoritma TOPSIS (Technique for Order Preference by Similarity to Ideal Solution)
+// Murni matematis, dilengkapi imputasi spesifikasi kategori, guard pembagian nol, dan penanganan edge case
 
 export interface LaptopData {
   id: number;
@@ -32,6 +32,10 @@ export interface TopsisResultItem {
   baterai: number;
   berat: number;
   performa: number;
+  isBatteryEstimated: boolean;
+  isWeightEstimated: boolean;
+  isSubstandard?: boolean;
+  substandardNote?: string;
   dPos: number;
   dNeg: number;
   nilaiV: number;
@@ -55,11 +59,61 @@ interface CriteriaConfig {
 }
 
 /**
+ * Imputasi cerdas spesifikasi baterai dan bobot berdasarkan kategori laptop
+ * Menggunakan nilai representatif/median kategori industri
+ */
+export function getCategoryImputedSpecs(category?: string | null): { batteryHours: number; weightKg: number } {
+  const cat = (category || '').toLowerCase();
+  if (cat.includes('gaming')) {
+    return { batteryHours: 4.5, weightKg: 2.3 };
+  }
+  if (cat.includes('bisnis') || cat.includes('portabel') || cat.includes('ultrabook')) {
+    return { batteryHours: 9.0, weightKg: 1.35 };
+  }
+  if (cat.includes('desain') || cat.includes('multimedia')) {
+    return { batteryHours: 6.0, weightKg: 1.8 };
+  }
+  if (cat.includes('programming') || cat.includes('coding')) {
+    return { batteryHours: 7.0, weightKg: 1.6 };
+  }
+  // Default umum / kuliah
+  return { batteryHours: 6.5, weightKg: 1.55 };
+}
+
+/**
+ * Estimasi skor performa laptop jika performaKomposit bernilai null.
+ * Mencegah laptop lawas ber-RAM 2GB mendapatkan skor default 50 yang tidak wajar.
+ */
+export function estimatePerformanceScore(laptop: LaptopData, peruntukan?: string): number {
+  if (laptop.performaKomposit != null && laptop.performaKomposit > 0) {
+    if (peruntukan === 'Gaming' && (laptop.vgaScore || laptop.processorScore)) {
+      const vga = laptop.vgaScore ?? 45;
+      const proc = laptop.processorScore ?? laptop.performaKomposit;
+      return Math.round(vga * 0.65 + proc * 0.35);
+    }
+    if (peruntukan === 'Desain Grafis' && (laptop.vgaScore || laptop.processorScore)) {
+      const vga = laptop.vgaScore ?? 45;
+      const proc = laptop.processorScore ?? laptop.performaKomposit;
+      return Math.round(vga * 0.45 + proc * 0.55);
+    }
+    return laptop.performaKomposit;
+  }
+
+  // Jika skor komposit kosong, estimasi proporsional berdasarkan RAM dan prosesor
+  const ram = laptop.ramGb ?? 4;
+  if (ram <= 2) return 15; // Netbook / spek sangat rendah
+  if (ram <= 4) return 35; // Entry-level lawas
+  if (ram <= 8) return 55; // Standar mainstream
+  if (ram <= 16) return 75; // Mid-high
+  return 85; // High-end
+}
+
+/**
  * Menjalankan algoritme TOPSIS untuk sekumpulan alternatif laptop.
  * @param laptops Array laptop yang akan dievaluasi
- * @param rocWeights Bobot ROC per kode kriteria { 'C1': 0.4490, ... }
- * @param criteriaTypes Tipe tiap kriteria dari database { 'C1': 'cost', 'C2': 'benefit', ... }
- * @param peruntukan Peruntukan pemakaian user (Gaming, Kuliah, Programming, Desain Grafis, Bisnis)
+ * @param rocWeights Bobot ROC per kode kriteria { 'C1': 0.4083, ... }
+ * @param criteriaTypes Tipe tiap kriteria { 'C1': 'cost', 'C2': 'benefit', ... }
+ * @param peruntukan Peruntukan pemakaian user (Kuliah, Programming, Desain Grafis, Gaming, Bisnis)
  */
 export function calculateTopsis(
   laptops: LaptopData[],
@@ -76,59 +130,48 @@ export function calculateTopsis(
     idealNegative: {},
   };
 
-  if (laptops.length === 0) return emptyResult;
+  if (!laptops || laptops.length === 0) return emptyResult;
 
-  // Pemetaan 6 kriteria disesuaikan dengan kebutuhan komputasi
+  // ── Pemetaan 6 Kriteria Standar SPK Lapmatch ──────────────────────────────
   const criteriaMap: Record<string, CriteriaConfig> = {
     C1: {
       name: 'Harga',
-      attribute: (l) => Number(l.price) || 10000000,
+      attribute: (l) => {
+        const p = Number(l.price);
+        return p > 0 ? p : 10000000;
+      },
       type: (criteriaTypes['C1'] as 'benefit' | 'cost') || 'cost',
     },
     C2: {
       name: 'Performa',
-      attribute: (l) => {
-        // Jika kebutuhan Gaming, bobot GPU (VGA) diutamakan
-        if (peruntukan === 'Gaming' && (l.vgaScore || l.processorScore)) {
-          const vga = l.vgaScore ?? 45;
-          const proc = l.processorScore ?? l.performaKomposit ?? 50;
-          return Math.round(vga * 0.65 + proc * 0.35);
-        }
-        // Jika kebutuhan Desain Grafis / Rendering
-        if (peruntukan === 'Desain Grafis' && (l.vgaScore || l.processorScore)) {
-          const vga = l.vgaScore ?? 45;
-          const proc = l.processorScore ?? l.performaKomposit ?? 50;
-          return Math.round(vga * 0.45 + proc * 0.55);
-        }
-        return l.performaKomposit || 50;
-      },
+      attribute: (l) => estimatePerformanceScore(l, peruntukan),
       type: (criteriaTypes['C2'] as 'benefit' | 'cost') || 'benefit',
     },
     C3: {
       name: 'RAM',
-      attribute: (l) => l.ramGb || 8,
+      attribute: (l) => l.ramGb ?? 8,
       type: (criteriaTypes['C3'] as 'benefit' | 'cost') || 'benefit',
     },
     C4: {
       name: 'Storage',
-      attribute: (l) => l.storageGb || 512,
+      attribute: (l) => l.storageGb ?? 512,
       type: (criteriaTypes['C4'] as 'benefit' | 'cost') || 'benefit',
     },
     C5: {
       name: 'Baterai',
-      attribute: (l) => l.batteryHours || 6.0,
+      attribute: (l) => l.batteryHours ?? getCategoryImputedSpecs(l.category).batteryHours,
       type: (criteriaTypes['C5'] as 'benefit' | 'cost') || 'benefit',
     },
     C6: {
       name: 'Portabilitas',
-      attribute: (l) => l.weightKg || 1.6,
+      attribute: (l) => l.weightKg ?? getCategoryImputedSpecs(l.category).weightKg,
       type: (criteriaTypes['C6'] as 'benefit' | 'cost') || 'cost',
     },
   };
 
   const codes = Object.keys(criteriaMap);
 
-  // 1. Matriks Keputusan X
+  // ── 1. Matriks Keputusan X ────────────────────────────────────────────────
   const matrixX: Record<number, Record<string, number>> = {};
   for (const laptop of laptops) {
     const row: Record<string, number> = {};
@@ -138,11 +181,13 @@ export function calculateTopsis(
     matrixX[laptop.id] = row;
   }
 
-  // 2. Normalisasi Vektor r_ij = x_ij / sqrt(sum(x_kj^2))
+  // ── 2. Normalisasi Vektor r_ij = x_ij / sqrt(sum(x_kj^2)) ─────────────────
   const divider: Record<string, number> = {};
   for (const code of codes) {
     const sumSquares = laptops.reduce((acc, l) => acc + Math.pow(matrixX[l.id][code], 2), 0);
-    divider[code] = Math.sqrt(sumSquares) || 1.0;
+    const sqrtVal = Math.sqrt(sumSquares);
+    // Guard: pembagi nol jika semua nilai nol
+    divider[code] = sqrtVal > 0 ? sqrtVal : 1.0;
   }
 
   const matrixR: Record<number, Record<string, number>> = {};
@@ -154,7 +199,7 @@ export function calculateTopsis(
     matrixR[laptop.id] = rRow;
   }
 
-  // 3. Matriks Ternormalisasi Terbobot y_ij = W_j * r_ij
+  // ── 3. Matriks Ternormalisasi Terbobot y_ij = W_j * r_ij ──────────────────
   const matrixY: Record<number, Record<string, number>> = {};
   for (const laptop of laptops) {
     const yRow: Record<string, number> = {};
@@ -165,7 +210,7 @@ export function calculateTopsis(
     matrixY[laptop.id] = yRow;
   }
 
-  // 4. Solusi Ideal Positif (A+) dan Negatif (A-)
+  // ── 4. Solusi Ideal Positif (A+) dan Solusi Ideal Negatif (A-) ────────────
   const idealPositive: Record<string, number> = {};
   const idealNegative: Record<string, number> = {};
 
@@ -178,12 +223,50 @@ export function calculateTopsis(
       idealPositive[code] = maxVal;
       idealNegative[code] = minVal;
     } else {
+      // Cost: terkecil adalah ideal positif, terbesar adalah ideal negatif
       idealPositive[code] = minVal;
       idealNegative[code] = maxVal;
     }
   }
 
-  // 5. Hitung Jarak & Nilai Preferensi V_i
+  // ── 5. Kasus Khusus: Hanya 1 Laptop Lolos Filter ──────────────────────────
+  if (laptops.length === 1) {
+    const single = laptops[0];
+    const imputed = getCategoryImputedSpecs(single.category);
+    const isSubstandard = (single.ramGb ?? 0) < 4;
+    const item: TopsisResultItem = {
+      laptop: single,
+      laptopId: single.id,
+      nama: single.name,
+      merek: single.brand,
+      harga: Number(single.price),
+      kondisi: single.condition,
+      ram: single.ramGb ?? 0,
+      storage: single.storageGb ?? 0,
+      baterai: single.batteryHours ?? imputed.batteryHours,
+      berat: single.weightKg ?? imputed.weightKg,
+      performa: estimatePerformanceScore(single, peruntukan),
+      isBatteryEstimated: single.batteryHours == null,
+      isWeightEstimated: single.weightKg == null,
+      isSubstandard,
+      substandardNote: isSubstandard ? 'RAM di bawah 4GB (Tidak disarankan untuk kuliah)' : undefined,
+      dPos: 0,
+      dNeg: 1.0,
+      nilaiV: 1.0,
+      skorPersen: 100.0,
+      peringkat: 1,
+    };
+    return {
+      ranked: [item],
+      matrixX,
+      matrixR,
+      matrixY,
+      idealPositive,
+      idealNegative,
+    };
+  }
+
+  // ── 6. Hitung Jarak Euclidean & Nilai Preferensi V_i = D- / (D+ + D-) ───────
   const results: TopsisResultItem[] = laptops.map((laptop) => {
     const yRow = matrixY[laptop.id];
 
@@ -197,23 +280,17 @@ export function calculateTopsis(
     const dPos = Math.sqrt(sumDPos);
     const dNeg = Math.sqrt(sumDNeg);
     const sumDist = dPos + dNeg;
-    let nilaiV = sumDist > 0 ? dNeg / sumDist : 0;
 
-    // Keselarasan kategori laptop dengan peruntukan yang diinput user
-    if (peruntukan && laptop.category) {
-      const catLower = laptop.category.toLowerCase();
-      const peruntukanLower = peruntukan.toLowerCase();
-      if (catLower === peruntukanLower) {
-        // Bonus kecocokan kategori langsung (+6%)
-        nilaiV = Math.min(0.9999, nilaiV * 1.06);
-      } else if (
-        (peruntukanLower === 'gaming' && catLower === 'kuliah' && (laptop.vgaScore ?? 0) < 55) ||
-        (peruntukanLower === 'desain grafis' && catLower === 'kuliah' && (laptop.vgaScore ?? 0) < 45)
-      ) {
-        // Penyesuaian jika laptop spek kuliah biasa tanpa GPU untuk gaming berat (-12%)
-        nilaiV = Math.max(0.01, nilaiV * 0.88);
-      }
+    // Guard pembagian nol jika semua alternatif memiliki nilai identik di semua kriteria
+    let nilaiV: number;
+    if (sumDist > 0) {
+      nilaiV = dNeg / sumDist;
+    } else {
+      nilaiV = 0.5; // Nilai netral jika semua kriteria identik
     }
+
+    const imputed = getCategoryImputedSpecs(laptop.category);
+    const isSubstandard = (laptop.ramGb ?? 0) > 0 && (laptop.ramGb ?? 0) < 4;
 
     return {
       laptop,
@@ -222,11 +299,15 @@ export function calculateTopsis(
       merek: laptop.brand,
       harga: Number(laptop.price),
       kondisi: laptop.condition,
-      ram: laptop.ramGb || 0,
-      storage: laptop.storageGb || 0,
-      baterai: laptop.batteryHours || 0,
-      berat: laptop.weightKg || 0,
-      performa: laptop.performaKomposit || 0,
+      ram: laptop.ramGb ?? 0,
+      storage: laptop.storageGb ?? 0,
+      baterai: laptop.batteryHours ?? imputed.batteryHours,
+      berat: laptop.weightKg ?? imputed.weightKg,
+      performa: estimatePerformanceScore(laptop, peruntukan),
+      isBatteryEstimated: laptop.batteryHours == null,
+      isWeightEstimated: laptop.weightKg == null,
+      isSubstandard,
+      substandardNote: isSubstandard ? 'RAM di bawah 4GB (Tidak disarankan untuk kuliah)' : undefined,
       dPos: Math.round(dPos * 100000) / 100000,
       dNeg: Math.round(dNeg * 100000) / 100000,
       nilaiV: Math.round(nilaiV * 1000000) / 1000000,
@@ -235,10 +316,10 @@ export function calculateTopsis(
     };
   });
 
-  // 6. Urutkan berdasarkan Nilai V terbesar
+  // ── 7. Urutkan berdasarkan Nilai V terbesar ───────────────────────────────
   results.sort((a, b) => b.nilaiV - a.nilaiV);
 
-  // 7. Berikan nomor peringkat
+  // ── 8. Berikan nomor peringkat ────────────────────────────────────────────
   results.forEach((item, index) => {
     item.peringkat = index + 1;
   });

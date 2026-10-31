@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { getLaptopImageUrl, formatRupiah, getMarketplaceLinks } from '@/lib/laptop-utils';
+import { getLaptopImageUrl, formatRupiah, getMarketplaceLinks, formatTanggal } from '@/lib/laptop-utils';
 import LaptopDetailModal, { LaptopDetailItem } from '@/components/LaptopDetailModal';
 import LaptopCompareModal from '@/components/LaptopCompareModal';
 import TopsisStepByStepModal, { TopsisCalculationData } from '@/components/TopsisStepByStepModal';
@@ -208,15 +208,15 @@ function LaptopCard({
             <div className="text-2xl font-black font-mono text-cyan-300">
               {scorePct}%
             </div>
-            <div className="text-[10px] text-zinc-400 font-mono">
-              Skor Preferensi V_i
+            <div className="text-xs text-zinc-400 font-mono">
+              Skor Kecocokan
             </div>
           </div>
         </div>
 
         {/* Score Progress Bar */}
         <div>
-          <div className="flex justify-between text-[11px] font-mono text-zinc-400 mb-1">
+          <div className="flex justify-between text-xs font-mono text-zinc-400 mb-1">
             <span>Tingkat Kecocokan Laptop (Lapmatch Score)</span>
             <span className="text-cyan-300 font-bold">{scorePct}%</span>
           </div>
@@ -232,23 +232,39 @@ function LaptopCard({
           </div>
         </div>
 
+        {/* Substandard warning if RAM < 4GB */}
+        {item.laptop.ramGb != null && item.laptop.ramGb < 4 && (
+          <div className="p-2.5 rounded-xl bg-amber-950/40 border border-amber-500/40 flex items-center gap-2 text-amber-300 text-xs">
+            <span>⚠️</span>
+            <span>Spesifikasi sangat rendah (RAM &lt; 4GB) — <strong>Tidak disarankan untuk perkuliahan aktif</strong>.</span>
+          </div>
+        )}
+
         {/* Specs 4-Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
           <div className="p-2.5 rounded-xl bg-zinc-950/80 border border-white/5">
-            <span className="text-[10px] font-mono text-violet-400 block">RAM</span>
-            <span className="font-bold text-white">{item.laptop.ramGb ?? '—'} GB</span>
+            <span className="text-xs font-mono text-violet-400 block mb-0.5">RAM</span>
+            <span className="font-bold text-white text-xs">{item.laptop.ramGb != null ? `${item.laptop.ramGb} GB` : 'Data belum tersedia'}</span>
           </div>
           <div className="p-2.5 rounded-xl bg-zinc-950/80 border border-white/5">
-            <span className="text-[10px] font-mono text-indigo-400 block">Storage SSD</span>
-            <span className="font-bold text-white">{item.laptop.storageGb ?? '—'} GB</span>
+            <span className="text-xs font-mono text-indigo-400 block mb-0.5">Storage SSD</span>
+            <span className="font-bold text-white text-xs">{item.laptop.storageGb != null ? `${item.laptop.storageGb} GB` : 'Data belum tersedia'}</span>
           </div>
           <div className="p-2.5 rounded-xl bg-zinc-950/80 border border-white/5">
-            <span className="text-[10px] font-mono text-amber-400 block">Baterai</span>
-            <span className="font-bold text-white">{item.laptop.batteryHours ?? '—'} Jam</span>
+            <span className="text-xs font-mono text-amber-400 block mb-0.5">Baterai</span>
+            <span className="font-bold text-white text-xs">
+              {item.laptop.batteryHours != null
+                ? `${item.laptop.batteryHours} Jam`
+                : 'Data belum tersedia'}
+            </span>
           </div>
           <div className="p-2.5 rounded-xl bg-zinc-950/80 border border-white/5">
-            <span className="text-[10px] font-mono text-pink-400 block">Bobot</span>
-            <span className="font-bold text-white">{item.laptop.weightKg ?? '—'} kg</span>
+            <span className="text-xs font-mono text-pink-400 block mb-0.5">Bobot</span>
+            <span className="font-bold text-white text-xs">
+              {item.laptop.weightKg != null
+                ? `${item.laptop.weightKg} kg`
+                : 'Data belum tersedia'}
+            </span>
           </div>
         </div>
 
@@ -258,7 +274,7 @@ function LaptopCard({
             <button
               type="button"
               onClick={() => setShowExplain(!showExplain)}
-              className="w-full flex items-center justify-between text-xs font-bold text-violet-300 hover:text-white transition cursor-pointer"
+              className="w-full flex items-center justify-between text-xs font-bold text-violet-300 hover:text-white transition cursor-pointer min-h-[40px]"
             >
               <div className="flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
@@ -280,54 +296,60 @@ function LaptopCard({
             <button
               type="button"
               onClick={() => onViewDetail(item.laptop)}
-              className="px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-white/10 text-xs font-medium transition flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-white/10 text-xs font-medium transition flex items-center gap-1.5 cursor-pointer min-h-[40px]"
             >
-              <Info className="w-3.5 h-3.5 text-cyan-400" />
+              <Info className="w-4 h-4 text-cyan-400" />
               <span>Detail Spek</span>
             </button>
             <button
               type="button"
               onClick={() => onToggleCompare(item.laptop)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1.5 cursor-pointer min-h-[40px] ${
                 isComparing
                   ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
                   : 'bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-white/10'
               }`}
             >
-              <Scale className="w-3.5 h-3.5 text-violet-400" />
+              <Scale className="w-4 h-4 text-violet-400" />
               <span>{isComparing ? 'Dihapus dari Komparasi' : 'Bandingkan'}</span>
             </button>
           </div>
 
           <div className="flex items-center gap-1.5">
-            <span className="text-[11px] text-zinc-400 font-mono hidden sm:inline mr-1">Beli:</span>
-            <a
-              href={links.shopee}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-orange-950/40 text-orange-300 hover:bg-orange-900/60 border border-orange-800/40 text-xs font-medium transition"
-            >
-              <span>Shopee</span>
-              <ExternalLink className="w-3 h-3" />
-            </a>
-            <a
-              href={links.tokopedia}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-950/40 text-emerald-300 hover:bg-emerald-900/60 border border-emerald-800/40 text-xs font-medium transition"
-            >
-              <span>Tokopedia</span>
-              <ExternalLink className="w-3 h-3" />
-            </a>
-            <a
-              href={links.facebook}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-blue-950/40 text-blue-300 hover:bg-blue-900/60 border border-blue-800/40 text-xs font-medium transition"
-            >
-              <span>FB</span>
-              <ExternalLink className="w-3 h-3" />
-            </a>
+            <span className="text-xs text-zinc-400 font-mono hidden sm:inline mr-1">Beli:</span>
+            {links.shopee && (
+              <a
+                href={links.shopee}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-orange-950/40 text-orange-300 hover:bg-orange-900/60 border border-orange-800/40 text-xs font-medium transition min-h-[40px]"
+              >
+                <span>Shopee</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            )}
+            {links.tokopedia && (
+              <a
+                href={links.tokopedia}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-emerald-950/40 text-emerald-300 hover:bg-emerald-900/60 border border-emerald-800/40 text-xs font-medium transition min-h-[40px]"
+              >
+                <span>Tokopedia</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            )}
+            {links.facebook && (
+              <a
+                href={links.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-blue-950/40 text-blue-300 hover:bg-blue-900/60 border border-blue-800/40 text-xs font-medium transition min-h-[40px]"
+              >
+                <span>FB</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            )}
           </div>
         </div>
       </div>
@@ -458,11 +480,7 @@ export default function RecommendationPage() {
   const currentResults = activeTab === 'baru' ? hasilBaru : hasilSecond;
   const currentTopsisData = activeTab === 'baru' ? topsisCalculation?.baru : topsisCalculation?.second;
 
-  const dateFormatted = new Date(jawaban.tanggalPengisian).toLocaleDateString('id-ID', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
+  const dateFormatted = formatTanggal(jawaban.tanggalPengisian || (jawaban as unknown as { createdAt?: string }).createdAt);
 
   const criteriaFormatted = jawaban.bobotHasil.map((b) => ({
     kode: b.kriteria.kode,
@@ -663,8 +681,33 @@ export default function RecommendationPage() {
                 />
               ))
             ) : (
-              <div className="text-center py-16 rounded-3xl bg-[#0e0e15]/80 border border-white/10">
-                <p className="text-zinc-400 text-sm">Tidak ada alternatif laptop pada kategori ini.</p>
+              <div className="text-center py-12 px-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 space-y-4">
+                <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-zinc-700 mx-auto flex items-center justify-center text-xl">
+                  🔍
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-sm font-bold text-white">Tidak Ada Laptop yang Cocok di Kategori Ini</h3>
+                  <p className="text-xs text-zinc-400 max-w-md mx-auto leading-relaxed">
+                    Tidak ditemukan unit {activeTab === 'baru' ? 'laptop baru' : 'laptop second'} dalam rentang budget {formatRupiah(jawaban.budgetMin)} - {formatRupiah(jawaban.budgetMax)} dengan filter merek saat ini.
+                  </p>
+                </div>
+                <div className="p-3 rounded-2xl bg-violet-950/30 border border-violet-500/20 max-w-md mx-auto text-xs text-violet-300 text-left space-y-1">
+                  <span className="font-bold text-white block">💡 Saran untuk Anda:</span>
+                  <ul className="list-disc list-inside space-y-0.5 text-zinc-300">
+                    <li>Coba perlebar rentang anggaran (naikkan batas maksimal).</li>
+                    <li>Ubah filter merek menjadi &quot;Semua Merek&quot; agar lebih banyak opsi tersedia.</li>
+                    <li>Periksa tab kondisi lainnya di atas ({activeTab === 'baru' ? 'Laptop Second' : 'Laptop Baru'}).</li>
+                  </ul>
+                </div>
+                <div className="pt-2">
+                  <Link
+                    href="/questionnaire"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs transition shadow-md shadow-violet-600/20 min-h-[40px]"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Ubah Kriteria Kuisioner</span>
+                  </Link>
+                </div>
               </div>
             )}
           </div>

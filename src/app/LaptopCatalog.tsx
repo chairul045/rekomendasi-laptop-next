@@ -400,22 +400,22 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
                 </div>
 
                 {/* Specs Pill Summary */}
-                <div className="grid grid-cols-2 gap-2 text-[11px]">
+                <div className="grid grid-cols-2 gap-2 text-xs">
                   <div className="p-2 rounded-xl bg-zinc-950/70 border border-white/5">
-                    <span className="text-[9px] text-zinc-500 block font-mono">RAM</span>
-                    <span className="font-bold text-zinc-200">{laptop.ramGb ?? '—'} GB</span>
+                    <span className="text-xs text-zinc-500 block font-mono">RAM</span>
+                    <span className="font-bold text-zinc-200 text-xs">{laptop.ramGb != null ? `${laptop.ramGb} GB` : 'Data belum tersedia'}</span>
                   </div>
                   <div className="p-2 rounded-xl bg-zinc-950/70 border border-white/5">
-                    <span className="text-[9px] text-zinc-500 block font-mono">SSD</span>
-                    <span className="font-bold text-zinc-200">{laptop.storageGb ?? '—'} GB</span>
+                    <span className="text-xs text-zinc-500 block font-mono">SSD</span>
+                    <span className="font-bold text-zinc-200 text-xs">{laptop.storageGb != null ? `${laptop.storageGb} GB` : 'Data belum tersedia'}</span>
                   </div>
                   <div className="p-2 rounded-xl bg-zinc-950/70 border border-white/5">
-                    <span className="text-[9px] text-zinc-500 block font-mono">Baterai</span>
-                    <span className="font-bold text-zinc-200">{laptop.batteryHours ?? '—'} Jam</span>
+                    <span className="text-xs text-zinc-500 block font-mono">Baterai</span>
+                    <span className="font-bold text-zinc-200 text-xs">{laptop.batteryHours != null ? `${laptop.batteryHours} Jam` : 'Data belum tersedia'}</span>
                   </div>
                   <div className="p-2 rounded-xl bg-zinc-950/70 border border-white/5">
-                    <span className="text-[9px] text-zinc-500 block font-mono">Bobot</span>
-                    <span className="font-bold text-zinc-200">{laptop.weightKg ?? '—'} kg</span>
+                    <span className="text-xs text-zinc-500 block font-mono">Bobot</span>
+                    <span className="font-bold text-zinc-200 text-xs">{laptop.weightKg != null ? `${laptop.weightKg} kg` : 'Data belum tersedia'}</span>
                   </div>
                 </div>
               </div>

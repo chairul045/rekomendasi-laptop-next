@@ -19,9 +19,12 @@ import {
   KeyRound,
   ArrowRight,
   Sparkles,
+  Trash2,
+  AlertTriangle,
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { formatTanggal } from '@/lib/date-utils';
 
 interface ProfileData {
   id: string;
@@ -38,7 +41,7 @@ interface ProfileData {
     judul: string | null;
     peruntukan: string;
     createdAt: string;
-    topLaptop: { name: string; brand: string } | null;
+    topLaptop: { name: string; brand: string; scorePct?: number } | null;
   } | null;
 }
 
@@ -112,6 +115,32 @@ export default function ProfilePage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
+
+  // Delete Account State
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deletingAccount, setDeletingAccount] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText.trim().toLowerCase() !== 'hapus akun') {
+      toast.error('Ketik "hapus akun" untuk mengonfirmasi.');
+      return;
+    }
+    setDeletingAccount(true);
+    try {
+      const res = await fetch('/api/auth/profile', { method: 'DELETE' });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Gagal menghapus akun');
+      }
+      toast.success('Akun Anda telah berhasil dihapus.');
+      window.location.href = '/login';
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Terjadi kesalahan saat menghapus akun.';
+      toast.error(msg);
+      setDeletingAccount(false);
+    }
+  };
 
   useEffect(() => {
     fetchProfile();
@@ -272,11 +301,7 @@ export default function ProfilePage() {
     );
   }
 
-  const joinDate = new Date(profile.createdAt).toLocaleDateString('id-ID', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
+  const joinDate = formatTanggal(profile.createdAt);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#09090d] text-zinc-100">
@@ -477,13 +502,13 @@ export default function ProfilePage() {
               </div>
               <div>
                 <h3 className="font-bold text-sm text-white">Keamanan & Password Akun</h3>
-                <p className="text-xs text-zinc-400">Perbarui kata sandi login Supabase Auth Anda</p>
+                <p className="text-xs text-zinc-400">Perbarui kata sandi login Anda</p>
               </div>
             </div>
             <button
               type="button"
               onClick={() => setShowPasswordForm(!showPasswordForm)}
-              className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 transition cursor-pointer px-3 py-1.5 rounded-xl border border-cyan-500/30 bg-cyan-950/30"
+              className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 transition cursor-pointer px-3 py-1.5 rounded-xl border border-cyan-500/30 bg-cyan-950/30 min-h-[40px] flex items-center justify-center"
             >
               {showPasswordForm ? 'Tutup Form' : 'Ganti Password'}
             </button>
@@ -520,7 +545,7 @@ export default function ProfilePage() {
                 <button
                   type="submit"
                   disabled={changingPassword}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs transition disabled:opacity-50 cursor-pointer shadow-lg shadow-violet-600/20"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs transition disabled:opacity-50 cursor-pointer shadow-lg shadow-violet-600/20 min-h-[40px]"
                 >
                   <Lock className="w-3.5 h-3.5" />
                   <span>{changingPassword ? 'Memperbarui...' : 'Simpan Password Baru'}</span>
@@ -534,24 +559,42 @@ export default function ProfilePage() {
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md">
             <div className="flex items-center justify-between text-xs text-zinc-400 mb-2">
-              <span className="font-mono uppercase text-[11px]">Total Sesi Kuisioner</span>
+              <span className="font-mono uppercase text-xs">Total Sesi Kuisioner</span>
               <ClipboardList className="w-4 h-4 text-violet-400" />
             </div>
             <div className="text-3xl font-black text-white font-mono">
               {profile.stats.totalKonsultasi}
             </div>
-            <p className="text-[11px] text-zinc-500 mt-1 font-mono">Riwayat sesi Lapmatch Anda</p>
+            <p className="text-xs text-zinc-400 mt-1 font-mono">Sesi konsultasi Lapmatch yang tersimpan</p>
           </div>
 
           <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md">
             <div className="flex items-center justify-between text-xs text-zinc-400 mb-2">
-              <span className="font-mono uppercase text-[11px]">Rekomendasi Teratas (#1)</span>
+              <span className="font-mono uppercase text-xs">Rekomendasi Teratas Terakhir</span>
               <Trophy className="w-4 h-4 text-amber-400" />
             </div>
-            <div className="text-3xl font-black text-amber-300 font-mono">
-              {profile.stats.totalLaptopDirekomendasikan}
-            </div>
-            <p className="text-[11px] text-zinc-500 mt-1 font-mono">Laptop peringkat 1 yang didapat</p>
+            {profile.lastConsultation?.topLaptop ? (
+              <div>
+                <div className="text-base sm:text-lg font-extrabold text-amber-300 leading-snug line-clamp-1">
+                  {profile.lastConsultation.topLaptop.brand} {profile.lastConsultation.topLaptop.name}
+                </div>
+                <div className="flex items-center gap-2 mt-1.5 text-xs font-mono">
+                  <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold">
+                    Peringkat 1
+                  </span>
+                  {profile.lastConsultation.topLaptop.scorePct ? (
+                    <span className="text-cyan-300 font-semibold text-xs">
+                      Skor Kecocokan: <strong>{profile.lastConsultation.topLaptop.scorePct}%</strong>
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div className="text-base font-bold text-zinc-400">Belum Ada Sesi Konsultasi</div>
+                <p className="text-xs text-zinc-500 mt-1">Mulai kuisioner untuk melihat rekomendasi laptop.</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -560,8 +603,8 @@ export default function ProfilePage() {
           <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-mono uppercase text-zinc-400">Konsultasi Terakhir</span>
-              <span className="text-[11px] font-mono text-cyan-400">
-                {new Date(profile.lastConsultation.createdAt).toLocaleDateString('id-ID')}
+              <span className="text-xs font-mono text-cyan-400">
+                {formatTanggal(profile.lastConsultation.createdAt)}
               </span>
             </div>
 
@@ -599,7 +642,7 @@ export default function ProfilePage() {
           <div className="grid sm:grid-cols-2 gap-3">
             <Link
               href="/questionnaire"
-              className="p-4 rounded-2xl bg-zinc-950/70 border border-white/5 hover:border-violet-500/40 transition flex items-center justify-between group"
+              className="p-4 rounded-2xl bg-zinc-950/70 border border-white/5 hover:border-violet-500/40 transition flex items-center justify-between group min-h-[44px]"
             >
               <div>
                 <p className="font-bold text-sm text-white group-hover:text-cyan-300 transition">
@@ -612,7 +655,7 @@ export default function ProfilePage() {
 
             <Link
               href="/history"
-              className="p-4 rounded-2xl bg-zinc-950/70 border border-white/5 hover:border-violet-500/40 transition flex items-center justify-between group"
+              className="p-4 rounded-2xl bg-zinc-950/70 border border-white/5 hover:border-violet-500/40 transition flex items-center justify-between group min-h-[44px]"
             >
               <div>
                 <p className="font-bold text-sm text-white group-hover:text-cyan-300 transition">
@@ -624,7 +667,95 @@ export default function ProfilePage() {
             </Link>
           </div>
         </div>
+
+        {/* Zona Bahaya / Hapus Akun */}
+        <div className="p-6 rounded-3xl bg-rose-950/20 border border-rose-500/20 backdrop-blur-md space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-sm font-bold text-rose-300 flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-rose-400" />
+                <span>Zona Bahaya: Hapus Akun</span>
+              </h3>
+              <p className="text-xs text-zinc-400 mt-1 max-w-xl leading-relaxed">
+                Menghapus akun Anda akan menghapus seluruh data profil, preferensi, dan seluruh riwayat konsultasi SPK Lapmatch Anda secara permanen. Tindakan ini tidak dapat dibatalkan.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowDeleteModal(true)}
+              className="px-4 py-2.5 rounded-xl bg-rose-950/50 hover:bg-rose-900/60 border border-rose-800/60 text-rose-300 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2 min-h-[40px] shrink-0"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Hapus Akun Saya</span>
+            </button>
+          </div>
+        </div>
       </main>
+
+      {/* Modal Konfirmasi Hapus Akun */}
+      {showDeleteModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in"
+        >
+          <div className="relative w-full max-w-md p-6 rounded-3xl bg-[#0e0e15] border border-rose-500/40 shadow-2xl space-y-5 text-left">
+            <div className="flex items-center gap-3 text-rose-400">
+              <div className="p-2.5 rounded-2xl bg-rose-950/60 border border-rose-500/30">
+                <AlertTriangle className="w-6 h-6 text-rose-400" />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-base text-white">Konfirmasi Penghapusan Akun</h3>
+                <p className="text-xs text-rose-300">Tindakan ini permanen & tidak dapat dibatalkan</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-zinc-300 leading-relaxed">
+              Seluruh riwayat konsultasi, hasil perankingan, dan data personal Anda akan dihapus secara permanen dari server. Untuk melanjutkan, ketik kata <strong className="text-white font-mono bg-zinc-900 px-1.5 py-0.5 rounded">hapus akun</strong> di bawah ini:
+            </p>
+
+            <input
+              type="text"
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder='Ketik "hapus akun"'
+              className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-rose-500/30 text-white placeholder-zinc-500 text-xs focus:outline-none focus:border-rose-400 font-mono"
+            />
+
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setDeleteConfirmText('');
+                }}
+                disabled={deletingAccount}
+                className="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-semibold min-h-[40px] cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteAccount}
+                disabled={deletingAccount || deleteConfirmText.trim().toLowerCase() !== 'hapus akun'}
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-40 text-white font-bold text-xs min-h-[40px] cursor-pointer shadow-lg shadow-rose-600/30 transition flex items-center gap-2"
+              >
+                {deletingAccount ? (
+                  <>
+                    <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Menghapus...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Ya, Hapus Akun Permanen</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

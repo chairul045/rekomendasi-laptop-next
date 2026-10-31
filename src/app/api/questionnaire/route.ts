@@ -27,11 +27,28 @@ export async function POST(request: NextRequest) {
       kondisiPilihan = 'keduanya',
       frekuensiMembawa,
       judul,
+      tanggalPengisian,
     } = body;
 
     // Validasi input ranking kriteria
     if (!rankingKriteria || !Array.isArray(rankingKriteria) || rankingKriteria.length !== 6) {
       return NextResponse.json({ error: 'Ranking kriteria tidak valid.' }, { status: 400 });
+    }
+
+    // Validasi input budget
+    const numBudgetMin = Number(budgetMin);
+    const numBudgetMax = Number(budgetMax);
+    if (isNaN(numBudgetMin) || isNaN(numBudgetMax)) {
+      return NextResponse.json({ error: 'Nilai budget harus berupa angka.' }, { status: 400 });
+    }
+    if (numBudgetMin < 0 || numBudgetMax < 0) {
+      return NextResponse.json({ error: 'Batas budget tidak boleh bernilai negatif.' }, { status: 400 });
+    }
+    if (numBudgetMin > numBudgetMax) {
+      return NextResponse.json(
+        { error: 'Batas minimal budget tidak boleh lebih besar dari batas maksimal.' },
+        { status: 400 }
+      );
     }
 
     const userId = user.id;
@@ -49,9 +66,18 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const minPrice = BigInt(Math.max(0, Number(budgetMin) || 0));
-    const maxPrice = BigInt(Math.max(Number(budgetMin) || 0, Number(budgetMax) || 50000000));
+    const minPrice = BigInt(Math.max(0, numBudgetMin));
+    const maxPrice = BigInt(Math.max(numBudgetMin, numBudgetMax));
     const peruntukanText = peruntukan || 'Kuliah';
+
+    // Parse tanggal pengisian secara aman
+    let parsedTanggalPengisian = new Date();
+    if (tanggalPengisian) {
+      const d = new Date(tanggalPengisian);
+      if (!isNaN(d.getTime())) {
+        parsedTanggalPengisian = d;
+      }
+    }
 
     // 1. Simpan kuisioner jawaban ke DB
     const jawaban = await prisma.kuisionerJawaban.create({
@@ -66,8 +92,8 @@ export async function POST(request: NextRequest) {
         frekuensiMembawa: frekuensiMembawa || 'Rutin',
         judul:
           judul ||
-          `Konsultasi ${peruntukanText} (${new Date().toLocaleDateString('id-ID')})`,
-        tanggalPengisian: new Date(),
+          `Konsultasi ${peruntukanText} (${new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Jakarta' }).format(parsedTanggalPengisian)})`,
+        tanggalPengisian: parsedTanggalPengisian,
       },
     });
 
@@ -119,83 +145,37 @@ export async function POST(request: NextRequest) {
       return Array.from(variants);
     };
 
-    // Fungsi pencari laptop kandidat yang ketat menghormati budget & preferensi merek user
+    // Fungsi pencari laptop kandidat yang ketat menghormati rentang budget input & preferensi user
     const fetchCandidates = async (condition: 'baru' | 'second') => {
+      // Kondisi dasar: harus di dalam rentang budget min - max (STRICT, tanpa auto-expansion)
+      // Exclude laptop di bawah spek minimum mahasiswa (RAM < 4GB)
+      const baseFilter = {
+        condition,
+        price: { gte: minPrice, lte: maxPrice },
+        NOT: {
+          ramGb: { lt: 4 },
+        },
+      };
+
       // KASUS 1: Pengguna memilih merek tertentu (misal: hanya ASUS, atau ASUS & Lenovo)
-      // MEREK TIDAK BOLEH PERNAH DILEPAS. Semua hasil WAJIB dari merek pilihan pengguna.
       if (!isAllBrand) {
         const brandVariants = buildBrandVariants(merekArr);
-
-        // Step 1: Cari laptop dengan merek pilihan (semua variasi case) dan dalam rentang budget
-        let laptops = await prisma.laptop.findMany({
+        return await prisma.laptop.findMany({
           where: {
-            condition,
-            price: { gte: minPrice, lte: maxPrice },
+            ...baseFilter,
             brand: { in: brandVariants, mode: 'insensitive' },
           },
-        });
-
-        // Step 2: Jika dalam rentang budget belum ada, perlebar rentang harga TETAP DENGAN MEREK PILIHAN
-        if (laptops.length === 0) {
-          const expandedMin = BigInt(Math.max(0, Math.round(Number(minPrice) * 0.7)));
-          const expandedMax = BigInt(Math.round(Number(maxPrice) * 1.4));
-          laptops = await prisma.laptop.findMany({
-            where: {
-              condition,
-              price: { gte: expandedMin, lte: expandedMax },
-              brand: { in: brandVariants, mode: 'insensitive' },
-            },
-            take: 30,
-            orderBy: { price: 'asc' },
-          });
-        }
-
-        // Step 3: Jika masih kosong, ambil SEMUA laptop dari merek pilihan tersebut tanpa batas harga
-        // Menjamin tidak ada merek asing yang keluar
-        if (laptops.length === 0) {
-          laptops = await prisma.laptop.findMany({
-            where: {
-              condition,
-              brand: { in: brandVariants, mode: 'insensitive' },
-            },
-            take: 30,
-            orderBy: { price: 'asc' },
-          });
-        }
-
-        return laptops;
-      }
-
-      // KASUS 2: Pengguna memilih 'Semua Merek' — ambil dari seluruh data laptop yang diupload admin
-      let laptops = await prisma.laptop.findMany({
-        where: {
-          condition,
-          price: { gte: minPrice, lte: maxPrice },
-        },
-      });
-
-      if (laptops.length === 0) {
-        const expandedMin = BigInt(Math.max(0, Math.round(Number(minPrice) * 0.7)));
-        const expandedMax = BigInt(Math.round(Number(maxPrice) * 1.35));
-        laptops = await prisma.laptop.findMany({
-          where: {
-            condition,
-            price: { gte: expandedMin, lte: expandedMax },
-          },
-          take: 30,
+          take: 50,
           orderBy: { price: 'asc' },
         });
       }
 
-      if (laptops.length === 0) {
-        laptops = await prisma.laptop.findMany({
-          where: { condition },
-          take: 20,
-          orderBy: { price: Number(maxPrice) < 15000000 ? 'asc' : 'desc' },
-        });
-      }
-
-      return laptops;
+      // KASUS 2: Pengguna memilih 'Semua Merek'
+      return await prisma.laptop.findMany({
+        where: baseFilter,
+        take: 50,
+        orderBy: { price: 'asc' },
+      });
     };
 
     // Helper mapping laptop ke tipe data TOPSIS

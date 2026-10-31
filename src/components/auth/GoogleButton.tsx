@@ -120,9 +120,9 @@ export default function GoogleButton({
           <button
             type="button"
             onClick={() => setModalOpen(true)}
-            className="text-[11px] text-cyan-400 hover:text-cyan-300 hover:underline transition font-medium cursor-pointer"
+            className="text-xs text-cyan-400 hover:text-cyan-300 hover:underline transition font-medium cursor-pointer"
           >
-            Kendala Google OAuth? Masuk Langsung dengan Akun Gmail →
+            Masuk Cepat dengan Akun Gmail →
           </button>
         </div>
       </div>

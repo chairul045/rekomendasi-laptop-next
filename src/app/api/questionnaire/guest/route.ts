@@ -25,6 +25,9 @@ export async function POST(request: NextRequest) {
         gte: minPrice,
         lte: maxPrice,
       },
+      NOT: {
+        ramGb: { lt: 4 },
+      },
     };
 
     if (kondisiPilihan && kondisiPilihan !== 'keduanya') {
@@ -42,23 +45,18 @@ export async function POST(request: NextRequest) {
       };
     }
 
-    let rawLaptops = await prisma.laptop.findMany({
+    const rawLaptops = await prisma.laptop.findMany({
       where: whereClause,
-      take: 20,
+      take: 30,
+      orderBy: { price: 'asc' },
     });
 
     if (rawLaptops.length === 0) {
-      rawLaptops = await prisma.laptop.findMany({
-        take: 10,
-        orderBy: { price: 'asc' },
+      return NextResponse.json({
+        previewResults: [],
+        isGuest: true,
+        message: 'Tidak ada laptop yang cocok dalam rentang budget ini.',
       });
-    }
-
-    if (rawLaptops.length === 0) {
-      return NextResponse.json(
-        { error: 'Katalog laptop sedang kosong.' },
-        { status: 404 }
-      );
     }
 
     // Format data laptop untuk TOPSIS

@@ -1,5 +1,6 @@
-// lib/laptop-utils.ts - Utility untuk mapping gambar laptop, link marketplace, dan format mata uang
+// lib/laptop-utils.ts - Utility untuk mapping gambar laptop, link marketplace, format mata uang, dan tanggal
 // Sesuai implementasi di proyek www (Laravel)
+export { formatTanggal, formatTanggalWaktu } from './date-utils';
 
 export function getLaptopImageUrl(brand?: string | null, name?: string | null, image?: string | null): string {
   if (image) {
