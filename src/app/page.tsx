@@ -158,7 +158,7 @@ export default async function HomePage() {
             <div className="flex items-center gap-3">
               <Link
                 href="/questionnaire"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm transition shadow-lg shadow-violet-600/25 active:scale-[0.98]"
+                className="shimmer-button inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm transition shadow-lg shadow-violet-600/25 active:scale-[0.98]"
               >
                 <Plus className="w-4 h-4" />
                 <span>Mulai Kuisioner Baru</span>
@@ -169,12 +169,12 @@ export default async function HomePage() {
 
         {/* Stats Overview Cards */}
         <div className="grid sm:grid-cols-3 gap-4 sm:gap-6">
-          <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md relative overflow-hidden group hover:border-violet-500/40 transition duration-300">
+          <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md relative overflow-hidden group hover:border-violet-500/40 transition duration-300 card-interactive shadow-lg">
             <div className="flex items-center justify-between text-xs text-zinc-400 mb-3">
               <span className="font-mono uppercase text-[11px] tracking-wider text-zinc-400">
                 Total Sesi Kuisioner
               </span>
-              <div className="w-8 h-8 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400">
+              <div className="w-8 h-8 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 group-hover:scale-110 transition-transform">
                 <ClipboardList className="w-4 h-4" />
               </div>
             </div>
@@ -182,17 +182,17 @@ export default async function HomePage() {
               {consultationsSerialized.length}
             </div>
             <p className="text-[11px] text-zinc-500 mt-2 font-mono flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-violet-400" />
+              <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
               <span>Riwayat pencocokan Lapmatch tersimpan</span>
             </p>
           </div>
 
-          <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md relative overflow-hidden group hover:border-cyan-500/40 transition duration-300">
+          <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md relative overflow-hidden group hover:border-cyan-500/40 transition duration-300 card-interactive shadow-lg">
             <div className="flex items-center justify-between text-xs text-zinc-400 mb-3">
               <span className="font-mono uppercase text-[11px] tracking-wider text-zinc-400">
                 Rekomendasi Terakhir
               </span>
-              <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+              <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
                 <Clock className="w-4 h-4" />
               </div>
             </div>
@@ -202,7 +202,7 @@ export default async function HomePage() {
                 <img
                   src={getLaptopImageUrl(latestBest.brand, latestBest.name, latestBest.imageUrl)}
                   alt={latestBest.name}
-                  className="w-12 h-12 rounded-xl object-cover border border-white/10 flex-shrink-0"
+                  className="w-12 h-12 rounded-xl object-cover border border-white/10 flex-shrink-0 group-hover:scale-105 transition-transform"
                   loading="lazy"
                 />
                 <div className="min-w-0">
@@ -224,7 +224,7 @@ export default async function HomePage() {
             )}
           </div>
 
-          <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md relative overflow-hidden group hover:border-emerald-500/40 transition duration-300">
+          <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md relative overflow-hidden group hover:border-emerald-500/40 transition duration-300 card-interactive shadow-lg">
             <div className="flex items-center justify-between text-xs text-zinc-400 mb-3">
               <span className="font-mono uppercase text-[11px] tracking-wider text-zinc-400">
                 Algoritma Pencocokan

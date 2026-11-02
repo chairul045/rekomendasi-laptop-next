@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getLaptopImageUrl, formatRupiah, getMarketplaceLinks } from '@/lib/laptop-utils';
 import {
   Zap,
@@ -341,9 +342,11 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
           const isComparing = comparingLaptops.some((c) => c.id === laptop.id);
 
           return (
-            <div
+            <motion.div
               key={laptop.id}
-              className={`rounded-3xl bg-[#0e0e15]/90 border transition-all duration-300 overflow-hidden backdrop-blur-xl flex flex-col justify-between shadow-lg group hover:border-violet-500/50 hover:shadow-2xl ${
+              whileHover={{ y: -6 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              className={`rounded-3xl bg-[#0e0e15]/90 border transition-colors duration-300 overflow-hidden backdrop-blur-xl flex flex-col justify-between shadow-lg group hover:border-violet-500/50 hover:shadow-2xl hover:shadow-violet-600/10 ${
                 isComparing ? 'border-cyan-500/60 ring-1 ring-cyan-500/30' : 'border-white/10'
               }`}
             >
@@ -465,7 +468,7 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
                   </a>
                 </div>
               </div>
-            </div>
+            </motion.div>
           );
         })}
       </div>
@@ -484,30 +487,38 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
       )}
 
       {/* Floating Comparison Action Bar */}
-      {comparingLaptops.length > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#0e0e15]/95 border border-white/20 backdrop-blur-2xl rounded-2xl p-3 px-5 shadow-2xl flex items-center gap-4 animate-fadeIn">
-          <div className="flex items-center gap-2">
-            <Scale className="w-4 h-4 text-cyan-300" />
-            <span className="text-xs font-bold text-white">
-              {comparingLaptops.length} Laptop Dipilih
-            </span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setShowCompareModal(true)}
-            className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs transition shadow-md"
+      <AnimatePresence>
+        {comparingLaptops.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 30, scale: 0.95 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] as const }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#0e0e15]/95 border border-white/20 backdrop-blur-2xl rounded-2xl p-3 px-5 shadow-2xl flex items-center gap-4"
           >
-            Bandingkan Sekarang
-          </button>
-          <button
-            type="button"
-            onClick={() => setComparingLaptops([])}
-            className="text-xs text-zinc-400 hover:text-white"
-          >
-            Batal
-          </button>
-        </div>
-      )}
+            <div className="flex items-center gap-2">
+              <Scale className="w-4 h-4 text-cyan-300 animate-pulse" />
+              <span className="text-xs font-bold text-white">
+                {comparingLaptops.length} Laptop Dipilih
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowCompareModal(true)}
+              className="shimmer-button px-4 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs transition shadow-md active:scale-95 cursor-pointer"
+            >
+              Bandingkan Sekarang
+            </button>
+            <button
+              type="button"
+              onClick={() => setComparingLaptops([])}
+              className="text-xs text-zinc-400 hover:text-white transition cursor-pointer"
+            >
+              Batal
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Laptop Detail Modal */}
       <LaptopDetailModal

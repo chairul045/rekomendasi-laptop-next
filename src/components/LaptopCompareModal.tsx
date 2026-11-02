@@ -1,5 +1,6 @@
 'use client';
 
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, ExternalLink, Trophy, CheckCircle, Scale, Trash2 } from 'lucide-react';
 import { getLaptopImageUrl, formatRupiah, getMarketplaceLinks } from '@/lib/laptop-utils';
 import { LaptopDetailItem } from './LaptopDetailModal';
@@ -39,11 +40,23 @@ export default function LaptopCompareModal({
   const maxPerforma = Math.max(...validPerforma);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-fadeIn">
-      <div
-        className="relative w-full max-w-6xl max-h-[92vh] flex flex-col rounded-3xl bg-[#0e0e15] border border-white/15 text-zinc-100 shadow-2xl overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md"
+        onClick={onClose}
       >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.94, y: 16 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.94, y: 16 }}
+          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] as const }}
+          className="relative w-full max-w-6xl max-h-[92vh] flex flex-col rounded-3xl bg-[#0e0e15] border border-white/15 text-zinc-100 shadow-2xl overflow-hidden"
+          onClick={(e) => e.stopPropagation()}
+        >
         {/* Glow Header Line */}
         <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-400" />
 
@@ -312,7 +325,8 @@ export default function LaptopCompareModal({
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   );
 }

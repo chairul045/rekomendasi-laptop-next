@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import {
   Trophy,
@@ -141,16 +142,18 @@ function LaptopCard({
   const links = getMarketplaceLinks(item.laptop.brand, item.laptop.name, item.laptop.price);
 
   return (
-    <div
-      className={`rounded-3xl bg-[#0e0e15]/90 border transition-all duration-300 overflow-hidden backdrop-blur-xl flex flex-col justify-between shadow-2xl ${
+    <motion.div
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.25 }}
+      className={`rounded-3xl bg-[#0e0e15]/90 border transition-colors duration-300 overflow-hidden backdrop-blur-xl flex flex-col justify-between shadow-2xl card-interactive ${
         rank === 1
-          ? 'border-amber-500/50 shadow-[0_0_30px_rgba(245,158,11,0.15)] ring-1 ring-amber-500/30'
-          : 'border-white/10 hover:border-white/20'
+          ? 'border-amber-500/50 shadow-[0_0_30px_rgba(245,158,11,0.2)] ring-1 ring-amber-500/40'
+          : 'border-white/10 hover:border-violet-500/30'
       }`}
     >
       {/* Top Banner for Rank 1 */}
       {rank === 1 && (
-        <div className="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-zinc-950 text-xs font-extrabold text-center py-1.5 flex items-center justify-center gap-1.5 tracking-wider font-mono">
+        <div className="shimmer-button bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-zinc-950 text-xs font-extrabold text-center py-1.5 flex items-center justify-center gap-1.5 tracking-wider font-mono shadow-md">
           <Trophy className="w-3.5 h-3.5" />
           <span>REKOMENDASI TERBAIK LAPMATCH</span>
         </div>
@@ -270,23 +273,33 @@ function LaptopCard({
 
         {/* AI Explanation Box */}
         {explanation && (
-          <div className="rounded-2xl bg-gradient-to-br from-violet-950/40 via-indigo-950/20 to-zinc-950 border border-violet-500/30 p-4 space-y-2">
+          <div className="rounded-2xl bg-gradient-to-br from-violet-950/40 via-indigo-950/20 to-zinc-950 border border-violet-500/30 p-4 space-y-2 overflow-hidden">
             <button
               type="button"
               onClick={() => setShowExplain(!showExplain)}
               className="w-full flex items-center justify-between text-xs font-bold text-violet-300 hover:text-white transition cursor-pointer min-h-[40px]"
             >
               <div className="flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
+                <Sparkles className="w-3.5 h-3.5 text-cyan-300 animate-pulse" />
                 <span>Analisis & Penjelasan Naratif AI</span>
               </div>
-              {showExplain ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              <motion.div animate={{ rotate: showExplain ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                <ChevronDown className="w-3.5 h-3.5" />
+              </motion.div>
             </button>
-            {showExplain && (
-              <p className="text-xs text-zinc-300 leading-relaxed pt-1 border-t border-white/5">
-                {explanation}
-              </p>
-            )}
+            <AnimatePresence>
+              {showExplain && (
+                <motion.p
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] as const }}
+                  className="text-xs text-zinc-300 leading-relaxed pt-1 border-t border-white/5"
+                >
+                  {explanation}
+                </motion.p>
+              )}
+            </AnimatePresence>
           </div>
         )}
 
@@ -296,7 +309,7 @@ function LaptopCard({
             <button
               type="button"
               onClick={() => onViewDetail(item.laptop)}
-              className="px-3.5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-white/10 text-xs font-medium transition flex items-center gap-1.5 cursor-pointer min-h-[40px]"
+              className="px-3.5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-white/10 text-xs font-medium transition flex items-center gap-1.5 cursor-pointer min-h-[40px] active:scale-95"
             >
               <Info className="w-4 h-4 text-cyan-400" />
               <span>Detail Spek</span>
@@ -304,7 +317,7 @@ function LaptopCard({
             <button
               type="button"
               onClick={() => onToggleCompare(item.laptop)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1.5 cursor-pointer min-h-[40px] ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1.5 cursor-pointer min-h-[40px] active:scale-95 ${
                 isComparing
                   ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
                   : 'bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-white/10'
@@ -322,7 +335,7 @@ function LaptopCard({
                 href={links.shopee}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-orange-950/40 text-orange-300 hover:bg-orange-900/60 border border-orange-800/40 text-xs font-medium transition min-h-[40px]"
+                className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-orange-950/40 text-orange-300 hover:bg-orange-900/60 border border-orange-800/40 text-xs font-medium transition min-h-[40px] hover:scale-105 active:scale-95"
               >
                 <span>Shopee</span>
                 <ExternalLink className="w-3.5 h-3.5" />
@@ -333,7 +346,7 @@ function LaptopCard({
                 href={links.tokopedia}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-emerald-950/40 text-emerald-300 hover:bg-emerald-900/60 border border-emerald-800/40 text-xs font-medium transition min-h-[40px]"
+                className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-emerald-950/40 text-emerald-300 hover:bg-emerald-900/60 border border-emerald-800/40 text-xs font-medium transition min-h-[40px] hover:scale-105 active:scale-95"
               >
                 <span>Tokopedia</span>
                 <ExternalLink className="w-3.5 h-3.5" />
@@ -344,7 +357,7 @@ function LaptopCard({
                 href={links.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-blue-950/40 text-blue-300 hover:bg-blue-900/60 border border-blue-800/40 text-xs font-medium transition min-h-[40px]"
+                className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-blue-950/40 text-blue-300 hover:bg-blue-900/60 border border-blue-800/40 text-xs font-medium transition min-h-[40px] hover:scale-105 active:scale-95"
               >
                 <span>FB</span>
                 <ExternalLink className="w-3.5 h-3.5" />
@@ -353,7 +366,7 @@ function LaptopCard({
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, ExternalLink, Cpu, HardDrive, Battery, Gauge, Monitor, ShieldCheck, Sparkles, Scale } from 'lucide-react';
 import { getLaptopImageUrl, formatRupiah, getMarketplaceLinks } from '@/lib/laptop-utils';
 
@@ -41,11 +42,23 @@ export default function LaptopDetailModal({
   const links = getMarketplaceLinks(laptop.brand, laptop.name, laptop.price);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
-      <div
-        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-[#0e0e15] border border-white/15 p-6 sm:p-8 text-zinc-100 shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+        onClick={onClose}
       >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.94, y: 16 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.94, y: 16 }}
+          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] as const }}
+          className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-[#0e0e15] border border-white/15 p-6 sm:p-8 text-zinc-100 shadow-2xl"
+          onClick={(e) => e.stopPropagation()}
+        >
         {/* Glow Header Accent */}
         <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-400" />
 
@@ -256,7 +269,8 @@ export default function LaptopDetailModal({
             </button>
           )}
         </div>
-      </div>
-    </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   );
 }

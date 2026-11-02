@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Laptop,
   LogOut,
@@ -237,67 +238,75 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
       </div>
 
       {/* Mobile Drawer Menu */}
-      {currentUser && mobileMenuOpen && (
-        <div className="md:hidden border-t border-white/10 bg-[#09090d]/95 backdrop-blur-2xl px-4 py-4 space-y-3">
-          {/* User Info Bar */}
-          <Link
-            href="/profile"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-2xl bg-zinc-900/80 border border-white/10"
+      <AnimatePresence>
+        {currentUser && mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] as const }}
+            className="md:hidden border-t border-white/10 bg-[#09090d]/95 backdrop-blur-2xl px-4 py-4 space-y-3 overflow-hidden"
           >
-            <div className="w-9 h-9 rounded-full bg-violet-600/30 border border-violet-500/40 flex items-center justify-center font-bold text-xs text-violet-300">
-              {currentUser.name ? currentUser.name.substring(0, 2).toUpperCase() : 'U'}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-xs font-bold text-white truncate">{currentUser.name}</div>
-              <div className="text-[10px] text-zinc-400 truncate">{currentUser.email}</div>
-            </div>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30 uppercase">
-              {currentUser.role}
-            </span>
-          </Link>
-
-          {/* Links */}
-          <div className="space-y-1 text-xs">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`block px-3.5 py-2.5 rounded-xl transition ${
-                  link.active
-                    ? 'bg-violet-600/20 text-white font-bold border border-violet-500/30'
-                    : 'text-zinc-400 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-
-            {currentUser.role === 'admin' && (
-              <Link
-                href="/admin"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-3.5 py-2.5 rounded-xl text-amber-300 font-bold bg-amber-950/30 border border-amber-500/30"
-              >
-                Admin Control Panel
-              </Link>
-            )}
-          </div>
-
-          {/* Logout Button */}
-          <div className="pt-2 border-t border-white/10">
-            <button
-              type="button"
-              onClick={handleSignOut}
-              className="w-full flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-rose-300 bg-rose-950/30 border border-rose-800/40 hover:bg-rose-900/40 transition cursor-pointer"
+            {/* User Info Bar */}
+            <Link
+              href="/profile"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-3 p-3 rounded-2xl bg-zinc-900/80 border border-white/10 active:scale-[0.98] transition"
             >
-              <LogOut className="w-4 h-4" />
-              <span>Keluar dari Akun</span>
-            </button>
-          </div>
-        </div>
-      )}
+              <div className="w-9 h-9 rounded-full bg-violet-600/30 border border-violet-500/40 flex items-center justify-center font-bold text-xs text-violet-300">
+                {currentUser.name ? currentUser.name.substring(0, 2).toUpperCase() : 'U'}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-bold text-white truncate">{currentUser.name}</div>
+                <div className="text-[10px] text-zinc-400 truncate">{currentUser.email}</div>
+              </div>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30 uppercase">
+                {currentUser.role}
+              </span>
+            </Link>
+
+            {/* Links */}
+            <div className="space-y-1 text-xs">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`block px-3.5 py-2.5 rounded-xl transition ${
+                    link.active
+                      ? 'bg-violet-600/20 text-white font-bold border border-violet-500/30'
+                      : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+
+              {currentUser.role === 'admin' && (
+                <Link
+                  href="/admin"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-3.5 py-2.5 rounded-xl text-amber-300 font-bold bg-amber-950/30 border border-amber-500/30"
+                >
+                  Admin Control Panel
+                </Link>
+              )}
+            </div>
+
+            {/* Logout Button */}
+            <div className="pt-2 border-t border-white/10">
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="w-full flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-rose-300 bg-rose-950/30 border border-rose-800/40 hover:bg-rose-900/40 transition cursor-pointer"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Keluar dari Akun</span>
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
