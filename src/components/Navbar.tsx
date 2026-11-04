@@ -145,7 +145,7 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
                 </Link>
               ))}
 
-              {currentUser.role === 'admin' && (
+              {currentUser.role === 'admin' && currentUser.email?.toLowerCase() === 'chairulanwarr003@gmail.com' && (
                 <Link
                   href="/admin"
                   className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
@@ -282,7 +282,7 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
                 </Link>
               ))}
 
-              {currentUser.role === 'admin' && (
+              {currentUser.role === 'admin' && currentUser.email?.toLowerCase() === 'chairulanwarr003@gmail.com' && (
                 <Link
                   href="/admin"
                   onClick={() => setMobileMenuOpen(false)}

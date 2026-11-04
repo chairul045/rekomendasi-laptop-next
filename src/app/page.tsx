@@ -6,7 +6,8 @@ import Footer from '@/components/Footer';
 import LaptopCatalog from './LaptopCatalog';
 import LandingPage from '@/components/LandingPage';
 import { getLaptopImageUrl, formatRupiah } from '@/lib/laptop-utils';
-import { ClipboardList, ArrowRight, Clock, Plus } from 'lucide-react';
+import { ClipboardList, ArrowRight, Clock } from 'lucide-react';
+import FeaturedLaptopAdBanner from '@/components/FeaturedLaptopAdBanner';
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -135,8 +136,11 @@ export default async function HomePage() {
     <div className="min-h-screen flex flex-col bg-[#09090d] text-zinc-100">
       <Navbar user={profile} historyCount={consultationsSerialized.length} />
 
-      <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-12">
-        {/* Top Header & Action Banner */}
+      <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-8 sm:space-y-12">
+        {/* Iklan Laptop Terbaru Terbaik Sekarang */}
+        <FeaturedLaptopAdBanner />
+
+        {/* Top Header Banner */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-zinc-900/90 via-violet-950/30 to-zinc-900/90 border border-white/10 p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
           <div className="absolute -right-16 -top-16 w-64 h-64 bg-violet-600/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -left-16 -bottom-16 w-64 h-64 bg-cyan-600/10 rounded-full blur-3xl pointer-events-none" />
@@ -154,15 +158,6 @@ export default async function HomePage() {
               <p className="text-xs sm:text-sm text-zinc-400 max-w-xl leading-relaxed">
                 Platform pencocokan dan rekomendasi laptop mahasiswa presisi berbasis Smart Decision Matching &amp; AI Analysis.
               </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <Link
-                href="/questionnaire"
-                className="shimmer-button inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm transition shadow-lg shadow-violet-600/25 active:scale-[0.98]"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Mulai Kuisioner Baru</span>
-              </Link>
             </div>
           </div>
         </div>

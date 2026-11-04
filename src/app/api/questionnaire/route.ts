@@ -30,9 +30,10 @@ export async function POST(request: NextRequest) {
       tanggalPengisian,
     } = body;
 
-    // Validasi input ranking kriteria
-    if (!rankingKriteria || !Array.isArray(rankingKriteria) || rankingKriteria.length !== 6) {
-      return NextResponse.json({ error: 'Ranking kriteria tidak valid.' }, { status: 400 });
+    // Validasi input ranking kriteria (fallback otomatis jika tidak disediakan)
+    let finalRankingKriteria = rankingKriteria;
+    if (!finalRankingKriteria || !Array.isArray(finalRankingKriteria) || finalRankingKriteria.length !== 6) {
+      finalRankingKriteria = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6'];
     }
 
     // Validasi input budget
@@ -68,7 +69,9 @@ export async function POST(request: NextRequest) {
 
     const minPrice = BigInt(Math.max(0, numBudgetMin));
     const maxPrice = BigInt(Math.max(numBudgetMin, numBudgetMax));
-    const peruntukanText = peruntukan || 'Kuliah';
+    const peruntukanText = Array.isArray(peruntukan)
+      ? peruntukan.filter(Boolean).join(' & ') || 'Kuliah'
+      : peruntukan || 'Kuliah';
 
     // Parse tanggal pengisian secara aman
     let parsedTanggalPengisian = new Date();
@@ -86,7 +89,7 @@ export async function POST(request: NextRequest) {
         budgetMin: minPrice,
         budgetMax: maxPrice,
         peruntukan: peruntukanText,
-        rankingKriteria: rankingKriteria,
+        rankingKriteria: finalRankingKriteria,
         merekPilihan: merekPilihan || ['semua'],
         kondisiPilihan: kondisiPilihan,
         frekuensiMembawa: frekuensiMembawa || 'Rutin',
@@ -98,7 +101,7 @@ export async function POST(request: NextRequest) {
     });
 
     // 2. Hitung Bobot ROC & Ambil Kriteria DB secara paralel
-    const rocResult = calculateRocWeights(rankingKriteria);
+    const rocResult = calculateRocWeights(finalRankingKriteria);
     const rocWeightsMap: Record<string, number> = {};
 
     const criteriaDb = await prisma.kriteria.findMany();

@@ -5,159 +5,135 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from '@dnd-kit/core';
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-  arrayMove,
-  useSortable,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import {
-  GripVertical,
-  Send,
-  Calendar,
-  DollarSign,
-  Tag,
-  Laptop as LaptopIcon,
   Check,
+  Send,
+  Sparkles,
+  Sliders,
+  DollarSign,
+  Laptop as LaptopIcon,
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
-// ── Kriteria Definitions ──────────────────────────────────────────────────────
-
-const ALL_CRITERIA = [
-  {
-    code: 'C1',
-    label: 'Efisiensi Anggaran (Harga)',
-    desc: 'Laptop harga terjangkau dan sesuai budget',
-    emoji: '💰',
-    color: 'from-emerald-950/40 to-zinc-900/60 border-emerald-500/30 text-emerald-300',
-    badge: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30',
-  },
-  {
-    code: 'C2',
-    label: 'Performa Komputasi',
-    desc: 'Kecepatan prosesor & kartu grafis (GPU) untuk komputasi berat',
-    emoji: '⚡',
-    color: 'from-blue-950/40 to-zinc-900/60 border-blue-500/30 text-blue-300',
-    badge: 'bg-blue-500/20 text-blue-300 border border-blue-500/30',
-  },
-  {
-    code: 'C3',
-    label: 'Kapasitas RAM',
-    desc: 'Kelancaran multitasking dan pembukaan banyak aplikasi sekaligus',
-    emoji: '🧠',
-    color: 'from-purple-950/40 to-zinc-900/60 border-purple-500/30 text-purple-300',
-    badge: 'bg-purple-500/20 text-purple-300 border border-purple-500/30',
-  },
-  {
-    code: 'C4',
-    label: 'Kecepatan & Kapasitas Storage SSD',
-    desc: 'Waktu booting cepat dan ruang penyimpanan file perkuliahan',
-    emoji: '💾',
-    color: 'from-indigo-950/40 to-zinc-900/60 border-indigo-500/30 text-indigo-300',
-    badge: 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30',
-  },
-  {
-    code: 'C5',
-    label: 'Daya Tahan Baterai',
-    desc: 'Ketahanan pemakaian tanpa harus bergantung pada colokan charger',
-    emoji: '🔋',
-    color: 'from-amber-950/40 to-zinc-900/60 border-amber-500/30 text-amber-300',
-    badge: 'bg-amber-500/20 text-amber-300 border border-amber-500/30',
-  },
-  {
-    code: 'C6',
-    label: 'Portabilitas & Bobot Ringan',
-    desc: 'Kenyamanan dibawa ke kampus dan mobilitas harian',
-    emoji: '🎒',
-    color: 'from-pink-950/40 to-zinc-900/60 border-pink-500/30 text-pink-300',
-    badge: 'bg-pink-500/20 text-pink-300 border border-pink-500/30',
-  },
-];
-
-// Daftar brand sesuai data laptop yang diupload admin di database
-// Diperbarui otomatis saat admin menambah laptop baru (fetch dari API)
-const BRANDS_DEFAULT = ['ASUS', 'Lenovo', 'HP', 'MSI', 'Acer', 'Dell', 'Razer', 'Axioo', 'ADVAN', 'Microsoft', 'MacBook', 'INFINIX'];
-
-const PERUNTUKAN_OPTIONS = [
-  { value: 'Kuliah', label: 'Kuliah & Tugas Harian', desc: 'Office, browsing, presentasi, dan riset' },
-  { value: 'Programming', label: 'Programming & Coding', desc: 'VS Code, Docker, kompilasi, emulator' },
-  { value: 'Desain Grafis', label: 'Desain Grafis & Multimedia', desc: 'Photoshop, Illustrator, video editing' },
-  { value: 'Gaming', label: 'Gaming & Render 3D', desc: 'Game AAA, Blender, CAD, performa tinggi' },
-  { value: 'Bisnis', label: 'Bisnis & Mobilitas Tinggi', desc: 'Baterai awet, tipis, profesional' },
-];
-
-const BUDGET_PRESETS = [
-  { label: 'Rp 3 - 6 Juta', min: 3000000, max: 6000000 },
-  { label: 'Rp 6 - 10 Juta', min: 6000000, max: 10000000 },
-  { label: 'Rp 10 - 15 Juta', min: 10000000, max: 15000000 },
-  { label: 'Rp 15 - 30 Juta', min: 15000000, max: 30000000 },
-];
-
-const PERUNTUKAN_CRITERIA_PRESETS: Record<string, string[]> = {
+// ── Kriteria Standar SPK ──────────────────────────────────────────────────────
+const PERUNTUKAN_PRESETS: Record<string, string[]> = {
   Kuliah: ['C1', 'C5', 'C6', 'C3', 'C4', 'C2'],
-  Gaming: ['C2', 'C3', 'C4', 'C1', 'C5', 'C6'],
   Programming: ['C3', 'C2', 'C4', 'C5', 'C6', 'C1'],
   'Desain Grafis': ['C2', 'C3', 'C4', 'C5', 'C1', 'C6'],
+  Gaming: ['C2', 'C3', 'C4', 'C1', 'C5', 'C6'],
   Bisnis: ['C6', 'C5', 'C2', 'C3', 'C4', 'C1'],
 };
 
-const FREKUENSI_OPTIONS = [
-  { value: 'Jarang', label: 'Jarang (Banyak di Meja)', desc: 'Stasioner di kos/rumah, tidak masalah bodi besar', emoji: '🏠' },
-  { value: 'Kadang-kadang', label: 'Kadang-kadang (2-3x / minggu)', desc: 'Dibawa saat ada presentasi kelas atau kerja kelompok', emoji: '🎒' },
-  { value: 'Rutin', label: 'Rutin (Hampir Setiap Hari)', desc: 'Wajib nyaman di ransel & baterai tahan kelas perkuliahan', emoji: '🚶' },
-  { value: 'Sangat Sering', label: 'Sangat Sering (Mobilitas Tinggi)', desc: 'Ultra-ringan, dibawa ke kafe, kampus, dan kegiatan luar', emoji: '✈️' },
+// Hitung urutan prioritas kriteria otomatis berdasarkan kebutuhan & frekuensi pakai
+function computeRankingKriteria(selectedPeruntukan: string[], frekuensi: string): string[] {
+  const allCodes = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6'];
+  if (!selectedPeruntukan || selectedPeruntukan.length === 0) {
+    return PERUNTUKAN_PRESETS.Kuliah;
+  }
+
+  const scores: Record<string, number> = { C1: 0, C2: 0, C3: 0, C4: 0, C5: 0, C6: 0 };
+
+  selectedPeruntukan.forEach((p) => {
+    const preset = PERUNTUKAN_PRESETS[p] || PERUNTUKAN_PRESETS.Kuliah;
+    preset.forEach((code, idx) => {
+      scores[code] += idx;
+    });
+  });
+
+  allCodes.forEach((code) => {
+    scores[code] /= selectedPeruntukan.length;
+  });
+
+  // Jika frekuensi tinggi, naikkan prioritas baterai (C5) dan portabilitas (C6)
+  if (frekuensi.includes('Setiap') || frekuensi.includes('5 - 6')) {
+    scores['C5'] -= 0.6;
+    scores['C6'] -= 0.4;
+  }
+
+  return [...allCodes].sort((a, b) => scores[a] - scores[b]);
+}
+
+// Rekomendasi Pilihan Anggaran Populer
+const BUDGET_RECOMMENDATIONS = [
+  { label: 'Rp 3 - 6 Juta', desc: 'Hemat & Kebutuhan Dasar', min: 3000000, max: 6000000 },
+  { label: 'Rp 6 - 10 Juta', desc: 'Standar Mahasiswa (Terpopuler)', min: 6000000, max: 10000000 },
+  { label: 'Rp 10 - 15 Juta', desc: 'Performa Menengah / Koding', min: 10000000, max: 15000000 },
+  { label: 'Rp 15 - 25 Juta', desc: 'Performa Tinggi & Gaming', min: 15000000, max: 25000000 },
+  { label: '> Rp 25 Juta', desc: 'Spesifikasi Flagship / Maksimal', min: 25000000, max: 50000000 },
 ];
 
-// ── Sortable Item ─────────────────────────────────────────────────────────────
+// Opsi Kebutuhan Pemakaian (Bisa Pilih Hingga 2)
+const PERUNTUKAN_OPTIONS = [
+  {
+    value: 'Kuliah',
+    emoji: '📚',
+    title: 'Kuliah & Tugas Harian',
+    desc: 'Ketik makalah/skripsi (Word & Excel), browsing materi, Zoom kuliah online, dan presentasi.',
+  },
+  {
+    value: 'Programming',
+    emoji: '💻',
+    title: 'Programming & Koding',
+    desc: 'VS Code, web & mobile development, Python, Git, Docker, dan kompilasi software.',
+  },
+  {
+    value: 'Desain Grafis',
+    emoji: '🎨',
+    title: 'Desain Grafis & Edit Video',
+    desc: 'Photoshop, Illustrator, Canva, Figma, Premiere Pro, dan pembuatan konten kreatif.',
+  },
+  {
+    value: 'Gaming',
+    emoji: '🎮',
+    title: 'Gaming & Render 3D',
+    desc: 'Main game online lancar, simulasi, rendering 3D Blender, AutoCAD, dan grafis berat.',
+  },
+  {
+    value: 'Bisnis',
+    emoji: '💼',
+    title: 'Bisnis & Kerja Fleksibel',
+    desc: 'Baterai tahan lama, bodi tipis ringan, meeting di mana saja, dan multitasking lancar.',
+  },
+];
 
-function SortableItem({ id, index }: { id: string; index: number }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    zIndex: isDragging ? 50 : 'auto',
-  };
+// Opsi Frekuensi Pemakaian dalam Seminggu
+const FREKUENSI_PEMAKAIAN_OPTIONS = [
+  {
+    value: '1 - 2 hari seminggu',
+    emoji: '☕',
+    title: '1 - 2 Hari Seminggu',
+    desc: 'Penggunaan santai atau sesekali saat ada tugas tertentu.',
+  },
+  {
+    value: '3 - 4 hari seminggu',
+    emoji: '📖',
+    title: '3 - 4 Hari Seminggu',
+    desc: 'Penggunaan sedang beberapa hari dalam seminggu untuk kuliah dan belajar.',
+  },
+  {
+    value: '5 - 6 hari seminggu',
+    emoji: '🚀',
+    title: '5 - 6 Hari Seminggu',
+    desc: 'Hampir setiap hari untuk rutinitas kuliah, praktikum, dan mengerjakan tugas.',
+  },
+  {
+    value: 'Setiap hari (7 hari)',
+    emoji: '⚡',
+    title: 'Setiap Hari (7 Hari)',
+    desc: 'Penggunaan aktif dan intensif setiap hari dengan jam terbang tinggi.',
+  },
+];
 
-  const criteria = ALL_CRITERIA.find((c) => c.code === id);
-  if (!criteria) return null;
+// Daftar brand default (diperbarui dinamis dari database)
+const BRANDS_DEFAULT = ['ASUS', 'Lenovo', 'HP', 'MSI', 'Acer', 'Dell', 'Razer', 'Axioo', 'ADVAN', 'Microsoft', 'MacBook', 'INFINIX'];
 
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`flex items-center gap-3 p-3.5 rounded-2xl bg-gradient-to-r ${criteria.color} border backdrop-blur-md ${
-        isDragging ? 'shadow-2xl scale-[1.02] border-cyan-400' : 'hover:border-white/20'
-      } transition duration-150 cursor-grab active:cursor-grabbing select-none`}
-    >
-      <span className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs font-mono ${criteria.badge} shrink-0`}>
-        #{index + 1}
-      </span>
-      <span className="text-xl shrink-0">{criteria.emoji}</span>
-      <div className="flex-1 min-w-0">
-        <p className="font-bold text-xs sm:text-sm text-white truncate">{criteria.label}</p>
-        <p className="text-[11px] text-zinc-400 truncate">{criteria.desc}</p>
-      </div>
-      <button
-        {...attributes}
-        {...listeners}
-        type="button"
-        className="shrink-0 p-1.5 rounded-lg text-zinc-400 hover:text-white cursor-grab active:cursor-grabbing touch-none"
-        aria-label="Drag to reorder"
-      >
-        <GripVertical className="w-4 h-4" />
-      </button>
-    </div>
-  );
+// Helper format Rupiah
+function formatRupiahShort(amount: number): string {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    maximumFractionDigits: 0,
+  }).format(amount);
 }
 
 // ── Main Page Content ─────────────────────────────────────────────────────────
@@ -187,58 +163,42 @@ function QuestionnaireContent() {
   }, []);
 
   // Form State
-  const [judul, setJudul] = useState('');
-  const [tanggalPengisian, setTanggalPengisian] = useState(new Date().toISOString().split('T')[0]);
   const [budgetMin, setBudgetMin] = useState(4000000);
-  const [budgetMax, setBudgetMax] = useState(15000000);
-  const [peruntukan, setPeruntukan] = useState('Kuliah');
+  const [budgetMax, setBudgetMax] = useState(12000000);
+  const [selectedPeruntukan, setSelectedPeruntukan] = useState<string[]>(['Kuliah']);
   const [kondisiPilihan, setKondisiPilihan] = useState<'baru' | 'second' | 'keduanya'>('keduanya');
   const [selectedBrands, setSelectedBrands] = useState<string[]>(['semua']);
-  const [frekuensiMembawa, setFrekuensiMembawa] = useState('Rutin');
-  const [rankingKriteria, setRankingKriteria] = useState(ALL_CRITERIA.map((c) => c.code));
+  const [frekuensiPemakaian, setFrekuensiPemakaian] = useState('5 - 6 hari seminggu');
 
   // Validasi inline budget
   const isBudgetNegative = budgetMin < 0 || budgetMax < 0;
   const isBudgetInverted = budgetMin > budgetMax;
   const budgetError = isBudgetNegative
-    ? 'Batas minimal dan maksimal budget tidak boleh bernilai negatif.'
+    ? 'Anggaran minimal dan maksimal tidak boleh bernilai negatif.'
     : isBudgetInverted
-    ? 'Batas minimal budget tidak boleh lebih besar dari batas maksimal.'
+    ? 'Anggaran minimal tidak boleh lebih besar dari anggaran maksimal.'
     : null;
 
-  const sensors = useSensors(useSensor(PointerSensor));
-
-  const handleSelectPeruntukan = (val: string) => {
-    setPeruntukan(val);
-    if (PERUNTUKAN_CRITERIA_PRESETS[val]) {
-      setRankingKriteria(PERUNTUKAN_CRITERIA_PRESETS[val]);
-      toast.success(`Prioritas kriteria disesuaikan otomatis untuk kebutuhan ${val}!`, {
-        icon: '🎯',
-      });
+  // Toggle pilihan peruntukan (maksimal 2 pilihan)
+  const handleTogglePeruntukan = (val: string) => {
+    if (selectedPeruntukan.includes(val)) {
+      if (selectedPeruntukan.length === 1) {
+        toast('Pilih minimal 1 kebutuhan utama.', { icon: 'ℹ️' });
+        return;
+      }
+      setSelectedPeruntukan(selectedPeruntukan.filter((item) => item !== val));
+    } else {
+      if (selectedPeruntukan.length >= 2) {
+        toast('Maksimal memilih 2 kebutuhan utama agar rekomendasi tetap fokus.', {
+          icon: '💡',
+        });
+        return;
+      }
+      setSelectedPeruntukan([...selectedPeruntukan, val]);
     }
   };
 
-  const handleSelectFrekuensi = (val: string) => {
-    setFrekuensiMembawa(val);
-    // Jika mobilitas tinggi atau rutin, pastikan Baterai (C5) atau Portabilitas (C6) diperhatikan
-    if (val === 'Sangat Sering' || val === 'Rutin') {
-      toast('Mobilitas tinggi: pastikan kriteria Baterai & Portabilitas berada di posisi atas.', {
-        icon: '🎒',
-      });
-    }
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (over && active.id !== over.id) {
-      setRankingKriteria((prev) => {
-        const oldIndex = prev.indexOf(active.id as string);
-        const newIndex = prev.indexOf(over.id as string);
-        return arrayMove(prev, oldIndex, newIndex);
-      });
-    }
-  };
-
+  // Toggle filter merek
   const toggleBrand = (brand: string) => {
     if (brand === 'semua') {
       setSelectedBrands(['semua']);
@@ -263,7 +223,16 @@ function QuestionnaireContent() {
       return;
     }
 
+    if (selectedPeruntukan.length === 0) {
+      toast.error('Silakan pilih minimal 1 kebutuhan penggunaan laptop.');
+      return;
+    }
+
     setLoading(true);
+
+    // Hitung ranking kriteria otomatis secara cerdas
+    const computedRanking = computeRankingKriteria(selectedPeruntukan, frekuensiPemakaian);
+    const peruntukanText = selectedPeruntukan.join(' & ');
 
     if (isGuest) {
       try {
@@ -273,16 +242,16 @@ function QuestionnaireContent() {
           body: JSON.stringify({
             budgetMin,
             budgetMax,
-            peruntukan,
+            peruntukan: peruntukanText,
             kondisiPilihan,
             merekPilihan: selectedBrands,
-            rankingKriteria,
+            rankingKriteria: computedRanking,
           }),
         });
 
         const data = await res.json();
         if (!res.ok) {
-          toast.error(data.error || 'Gagal memproses simulasi tamu.');
+          toast.error(data.error || 'Gagal memproses rekomendasi.');
           return;
         }
 
@@ -290,12 +259,12 @@ function QuestionnaireContent() {
         setGuestResults(results);
         setShowGuestModal(true);
         if (results.length > 0) {
-          toast.success('Simulasi rekomendasi berhasil dihitung!');
+          toast.success('Rekomendasi laptop berhasil ditemukan!');
         } else {
-          toast('Tidak ada laptop yang cocok dengan filter budget ini.', { icon: 'ℹ️' });
+          toast('Tidak ada laptop yang cocok dalam rentang anggaran ini.', { icon: 'ℹ️' });
         }
       } catch {
-        toast.error('Terjadi kesalahan jaringan.');
+        toast.error('Terjadi kendala jaringan. Silakan coba beberapa saat lagi.');
       } finally {
         setLoading(false);
       }
@@ -307,28 +276,26 @@ function QuestionnaireContent() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          judul: judul || `Konsultasi ${peruntukan} (${new Date().toLocaleDateString('id-ID')})`,
-          tanggalPengisian,
           budgetMin,
           budgetMax,
-          peruntukan,
+          peruntukan: peruntukanText,
           kondisiPilihan,
           merekPilihan: selectedBrands,
-          frekuensiMembawa,
-          rankingKriteria,
+          frekuensiMembawa: frekuensiPemakaian,
+          rankingKriteria: computedRanking,
         }),
       });
 
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error || 'Gagal memproses kuisioner.');
+        toast.error(data.error || 'Gagal memproses rekomendasi.');
         return;
       }
 
-      toast.success('Pencocokan Lapmatch & analisis AI selesai!');
+      toast.success('Rekomendasi laptop terbaik berhasil dianalisis!');
       router.push(`/recommendation/${data.jawabanId}`);
     } catch {
-      toast.error('Terjadi kesalahan jaringan saat memproses kuisioner. Silakan periksa koneksi internet Anda.');
+      toast.error('Terjadi gangguan jaringan saat memproses kuisioner. Silakan periksa koneksi Anda.');
     } finally {
       setLoading(false);
     }
@@ -338,378 +305,388 @@ function QuestionnaireContent() {
     <div className="min-h-screen flex flex-col bg-[#09090d] text-zinc-100">
       <Navbar />
 
-      <main className="flex-grow max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <main className="flex-grow max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8">
         {/* Banner Mode Tamu */}
         {isGuest && (
           <div className="p-4 sm:p-5 rounded-3xl bg-amber-950/30 border border-amber-500/30 backdrop-blur-md shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="space-y-1 text-center sm:text-left">
               <div className="flex items-center justify-center sm:justify-start gap-2 text-amber-300 font-bold text-xs sm:text-sm">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
-                <span>Mode Simulasi Tanpa Akun (Tamu)</span>
+                <span>Mode Tamu (Tanpa Akun)</span>
               </div>
               <p className="text-xs text-amber-200/80 leading-relaxed">
-                Anda sedang mencoba versi pratinjau terbatas (maksimal 3 laptop). Hasil tidak akan disimpan dalam riwayat akun.
+                Kamu dapat langsung melihat pratinjau 3 rekomendasi laptop teratas. Daftar akun gratis kapan saja untuk menyimpan riwayat dan membuka analisis AI mendalam.
               </p>
             </div>
             <Link
               href="/register"
               className="px-4 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-bold text-xs whitespace-nowrap shadow-md transition"
             >
-              Daftar Akun Gratis →
+              Daftar Gratis →
             </Link>
           </div>
         )}
 
-        {/* Header */}
-        <div className="text-center sm:text-left">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono bg-gradient-to-r from-violet-950/60 to-cyan-950/60 border border-violet-500/30 text-cyan-300 mb-3 shadow-[0_0_15px_rgba(124,58,237,0.2)]">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-            <span>Kuisioner Kebutuhan & Preferensi Lapmatch</span>
+        {/* Header Bersih & Ramah Pengguna */}
+        <div className="text-center sm:text-left space-y-3">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-violet-950/60 to-cyan-950/60 border border-violet-500/30 text-cyan-300 shadow-[0_0_15px_rgba(124,58,237,0.2)]">
+            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+            <span>Pencarian Cerdas Sesuai Kebutuhan & Anggaranmu</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Kuisioner Kebutuhan{' '}
+            Temukan Laptop yang{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-300 to-cyan-400">
-              Laptop Mahasiswa
+              Paling Tepat untuk Kamu
             </span>
           </h1>
-          <p className="text-xs sm:text-sm text-zinc-300 mt-2 leading-relaxed max-w-2xl">
-            Isi preferensi penggunaan Anda. Sistem akan memproses perhitungan secara otomatis, menyaring katalog alternatif laptop, dan menyajikan rekomendasi terbaik lengkap dengan analisis <strong>AI</strong>.
+          <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed max-w-2xl">
+            Jawab 5 pertanyaan mudah di bawah ini. Sistem kami akan menyaring ratusan laptop di katalog dan memberikan rekomendasi terbaik lengkap dengan analisis keunggulannya.
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Sesi Label & Tanggal */}
-          <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md shadow-lg space-y-4">
-            <div className="grid sm:grid-cols-12 gap-4">
-              <div className="sm:col-span-8 space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-violet-400" />
-                    <span>Nama / Label Kuisioner (Opsional)</span>
-                  </label>
-                  <span className="text-[11px] text-zinc-400 font-mono">Penanda sesi riwayat</span>
-                </div>
-                <input
-                  type="text"
-                  value={judul}
-                  onChange={(e) => setJudul(e.target.value)}
-                  placeholder="Contoh: Kebutuhan Skripsi, Laptop Editing Video, atau Kuliah Harian"
-                  className="w-full px-4 py-2.5 rounded-xl bg-zinc-950/90 border border-white/10 text-zinc-100 placeholder-zinc-500 text-xs sm:text-sm focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition"
-                />
-              </div>
-
-              <div className="sm:col-span-4 space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
-                    <Calendar className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>Tanggal Pengisian</span>
-                  </label>
-                  <span className="text-[11px] text-cyan-400 font-mono">WIB</span>
-                </div>
-                <input
-                  type="date"
-                  value={tanggalPengisian}
-                  onChange={(e) => setTanggalPengisian(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950/90 border border-white/10 text-zinc-100 font-mono text-xs sm:text-sm focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* 1. Rentang Anggaran (Budget) */}
-          <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md space-y-4 shadow-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-mono font-bold text-zinc-300">
+          {/* 1. Anggaran (Budget) */}
+          <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md space-y-5 shadow-lg">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div className="flex items-center gap-2.5">
+                <span className="w-7 h-7 rounded-xl bg-violet-600/20 border border-violet-500/30 flex items-center justify-center text-xs font-bold text-violet-300">
                   1
                 </span>
-                <label className="text-sm font-semibold text-white">Rentang Anggaran (Budget)</label>
+                <label className="text-base font-bold text-white">
+                  Berapa anggaran (budget) yang kamu siapkan?
+                </label>
               </div>
-              <span className="text-[11px] font-mono text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-800/40">
-                Fungsi: Filter Data
+              <span className="text-xs text-zinc-400">
+                Pilih rekomendasi cepat atau atur bebas
               </span>
             </div>
-            <p className="text-xs text-zinc-400">
-              Tentukan batas minimal dan maksimal harga laptop yang akan diikutsertakan dalam sistem pencocokan Lapmatch.
-            </p>
 
-            {/* Presets */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {BUDGET_PRESETS.map((p) => (
-                <button
-                  key={p.label}
-                  type="button"
-                  onClick={() => {
-                    setBudgetMin(p.min);
-                    setBudgetMax(p.max);
-                  }}
-                  className={`py-2 px-3 rounded-xl border text-xs font-medium transition text-center cursor-pointer ${
-                    budgetMin === p.min && budgetMax === p.max
-                      ? 'bg-gradient-to-r from-emerald-600/30 to-cyan-600/30 border-emerald-500/50 text-white font-bold'
-                      : 'border-zinc-800 bg-zinc-950/60 hover:border-zinc-600 text-zinc-300'
-                  }`}
-                >
-                  {p.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-              <div>
-                <label className="text-xs text-zinc-400 block mb-1">Batas Minimal (Rp)</label>
-                <input
-                  type="number"
-                  value={budgetMin}
-                  onChange={(e) => setBudgetMin(Number(e.target.value))}
-                  step="500000"
-                  min="0"
-                  className={`w-full px-3.5 py-2.5 rounded-xl bg-zinc-950/90 border font-mono text-sm focus:outline-none transition ${
-                    budgetError ? 'border-rose-500/80 text-rose-200 focus:border-rose-400' : 'border-zinc-800 text-zinc-100 focus:border-cyan-400'
-                  }`}
-                />
-              </div>
-              <div>
-                <label className="text-xs text-zinc-400 block mb-1">Batas Maksimal (Rp)</label>
-                <input
-                  type="number"
-                  value={budgetMax}
-                  onChange={(e) => setBudgetMax(Number(e.target.value))}
-                  step="500000"
-                  min="0"
-                  className={`w-full px-3.5 py-2.5 rounded-xl bg-zinc-950/90 border font-mono text-sm focus:outline-none transition ${
-                    budgetError ? 'border-rose-500/80 text-rose-200 focus:border-rose-400' : 'border-zinc-800 text-zinc-100 focus:border-cyan-400'
-                  }`}
-                />
+            {/* Bagian Atas: Rekomendasi Pilihan Anggaran */}
+            <div className="space-y-2">
+              <span className="text-xs font-semibold text-zinc-400 block">
+                💡 Rekomendasi Pilihan Anggaran Cepat:
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                {BUDGET_RECOMMENDATIONS.map((preset) => {
+                  const isSelected = budgetMin === preset.min && budgetMax === preset.max;
+                  return (
+                    <button
+                      key={preset.label}
+                      type="button"
+                      onClick={() => {
+                        setBudgetMin(preset.min);
+                        setBudgetMax(preset.max);
+                      }}
+                      className={`p-3 rounded-2xl border text-left transition cursor-pointer flex flex-col justify-between ${
+                        isSelected
+                          ? 'bg-gradient-to-br from-emerald-950/50 via-cyan-950/40 to-zinc-950 border-emerald-500/60 shadow-[0_0_20px_rgba(16,185,129,0.2)]'
+                          : 'border-zinc-800 bg-zinc-950/60 hover:border-zinc-700 text-zinc-400'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className={`text-sm font-bold ${isSelected ? 'text-white' : 'text-zinc-200'}`}>
+                          {preset.label}
+                        </span>
+                        {isSelected && (
+                          <div className="w-4 h-4 rounded-full bg-emerald-400 text-zinc-950 flex items-center justify-center">
+                            <Check className="w-2.5 h-2.5 stroke-[3]" />
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-[11px] text-zinc-400 mt-1">
+                        {preset.desc}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {budgetError && (
-              <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
-                <span className="font-bold">⚠️</span>
-                <span>{budgetError}</span>
+            {/* Bagian Bawah: Bebas Memilih Anggaran */}
+            <div className="pt-2 border-t border-zinc-800/80 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-zinc-300 flex items-center gap-1.5">
+                  <Sliders className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Atau Bebas Menentukan Rentang Anggaran Sendiri:</span>
+                </span>
+                <span className="text-xs font-mono text-cyan-300 font-semibold">
+                  {formatRupiahShort(budgetMin)} – {formatRupiahShort(budgetMax)}
+                </span>
               </div>
-            )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs text-zinc-400 block font-medium">
+                    Anggaran Minimal (Dari)
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-500">
+                      Rp
+                    </span>
+                    <input
+                      type="number"
+                      value={budgetMin}
+                      onChange={(e) => setBudgetMin(Number(e.target.value))}
+                      step="500000"
+                      min="0"
+                      className={`w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-zinc-950/90 border font-mono text-sm focus:outline-none transition ${
+                        budgetError ? 'border-rose-500/80 text-rose-200 focus:border-rose-400' : 'border-zinc-800 text-zinc-100 focus:border-cyan-400'
+                      }`}
+                    />
+                  </div>
+                  <span className="text-[11px] text-zinc-500 block">
+                    {formatRupiahShort(budgetMin)}
+                  </span>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs text-zinc-400 block font-medium">
+                    Anggaran Maksimal (Sampai)
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-500">
+                      Rp
+                    </span>
+                    <input
+                      type="number"
+                      value={budgetMax}
+                      onChange={(e) => setBudgetMax(Number(e.target.value))}
+                      step="500000"
+                      min="0"
+                      className={`w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-zinc-950/90 border font-mono text-sm focus:outline-none transition ${
+                        budgetError ? 'border-rose-500/80 text-rose-200 focus:border-rose-400' : 'border-zinc-800 text-zinc-100 focus:border-cyan-400'
+                      }`}
+                    />
+                  </div>
+                  <span className="text-[11px] text-zinc-500 block">
+                    {formatRupiahShort(budgetMax)}
+                  </span>
+                </div>
+              </div>
+
+              {budgetError && (
+                <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+                  <span className="font-bold">⚠️</span>
+                  <span>{budgetError}</span>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* 2. Peruntukan Pemakaian */}
+          {/* 2. Peruntukan Pemakaian (Bisa Pilih Hingga 2) */}
           <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md space-y-4 shadow-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-mono font-bold text-zinc-300">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div className="flex items-center gap-2.5">
+                <span className="w-7 h-7 rounded-xl bg-violet-600/20 border border-violet-500/30 flex items-center justify-center text-xs font-bold text-violet-300">
                   2
                 </span>
-                <label className="text-sm font-semibold text-white">Peruntukan Pemakaian Utama</label>
+                <label className="text-base font-bold text-white">
+                  Untuk apa saja laptop ini akan kamu gunakan?
+                </label>
               </div>
-              <span className="text-[11px] font-mono text-zinc-400 bg-zinc-800/60 px-2 py-0.5 rounded border border-zinc-700/50">
-                Fungsi: Label & AI Persona
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-cyan-300 bg-cyan-950/50 px-2.5 py-1 rounded-full border border-cyan-800/50">
+                <span>Pilih 1 atau 2 kebutuhan ({selectedPeruntukan.length}/2)</span>
               </span>
             </div>
+            <p className="text-xs text-zinc-400 leading-relaxed">
+              Kamu bisa memilih maksimal <strong>2 pilihan</strong> jika laptop dipakai untuk beberapa kebutuhan sekaligus (misalnya untuk kuliah dan sesekali main game).
+            </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {PERUNTUKAN_OPTIONS.map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => handleSelectPeruntukan(opt.value)}
-                  className={`p-4 rounded-2xl border text-left transition cursor-pointer flex items-start gap-3 ${
-                    peruntukan === opt.value
-                      ? 'bg-gradient-to-br from-violet-950/60 to-indigo-950/40 border-violet-500/50 text-white shadow-[0_0_20px_rgba(124,58,237,0.2)]'
-                      : 'border-zinc-800 bg-zinc-950/50 hover:border-zinc-700 text-zinc-400'
-                  }`}
-                >
-                  <div
-                    className={`w-5 h-5 rounded-full border flex items-center justify-center mt-0.5 shrink-0 ${
-                      peruntukan === opt.value
-                        ? 'border-cyan-400 bg-cyan-400 text-zinc-950'
-                        : 'border-zinc-600'
+              {PERUNTUKAN_OPTIONS.map((opt) => {
+                const isSelected = selectedPeruntukan.includes(opt.value);
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => handleTogglePeruntukan(opt.value)}
+                    className={`p-4 rounded-2xl border text-left transition cursor-pointer flex items-start gap-3.5 relative overflow-hidden ${
+                      isSelected
+                        ? 'bg-gradient-to-br from-violet-950/70 via-indigo-950/50 to-zinc-950 border-violet-500/60 text-white shadow-[0_0_20px_rgba(124,58,237,0.25)] ring-1 ring-violet-500/40'
+                        : 'border-zinc-800 bg-zinc-950/50 hover:border-zinc-700 text-zinc-400'
                     }`}
                   >
-                    {peruntukan === opt.value && <Check className="w-3 h-3 stroke-[3]" />}
-                  </div>
-                  <div>
-                    <div className="text-xs sm:text-sm font-bold text-white">{opt.label}</div>
-                    <div className="text-[11px] text-zinc-400 mt-0.5">{opt.desc}</div>
-                  </div>
-                </button>
-              ))}
+                    <span className="text-2xl shrink-0 mt-0.5">{opt.emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <span className={`text-sm font-bold ${isSelected ? 'text-white' : 'text-zinc-200'}`}>
+                          {opt.title}
+                        </span>
+                        <div
+                          className={`w-5 h-5 rounded-lg border flex items-center justify-center shrink-0 transition ${
+                            isSelected
+                              ? 'border-cyan-400 bg-cyan-400 text-zinc-950'
+                              : 'border-zinc-700 bg-zinc-900/60'
+                          }`}
+                        >
+                          {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
+                        </div>
+                      </div>
+                      <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
+                        {opt.desc}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           {/* 3. Kondisi Laptop */}
           <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md space-y-4 shadow-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-mono font-bold text-zinc-300">
-                  3
-                </span>
-                <label className="text-sm font-semibold text-white">Kondisi Laptop yang Diinginkan</label>
-              </div>
+            <div className="flex items-center gap-2.5">
+              <span className="w-7 h-7 rounded-xl bg-violet-600/20 border border-violet-500/30 flex items-center justify-center text-xs font-bold text-violet-300">
+                3
+              </span>
+              <label className="text-base font-bold text-white">
+                Kondisi laptop seperti apa yang kamu inginkan?
+              </label>
             </div>
+            <p className="text-xs text-zinc-400">
+              Pilih apakah kamu mencari laptop baru bergaransi resmi atau laptop bekas (second) yang lebih hemat.
+            </p>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {[
-                { value: 'keduanya', label: 'Semua Kondisi', sub: 'Baru & Second' },
-                { value: 'baru', label: 'Hanya Baru', sub: 'Garansi Resmi' },
-                { value: 'second', label: 'Hanya Second', sub: 'Harga Lebih Hemat' },
-              ].map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => setKondisiPilihan(opt.value as 'baru' | 'second' | 'keduanya')}
-                  className={`p-3.5 rounded-2xl border text-center transition cursor-pointer ${
-                    kondisiPilihan === opt.value
-                      ? 'bg-gradient-to-r from-violet-600 to-indigo-600 border-violet-500/50 text-white font-bold shadow-[0_0_20px_rgba(124,58,237,0.3)]'
-                      : 'border-zinc-800 bg-zinc-950/60 hover:border-zinc-700 text-zinc-400'
-                  }`}
-                >
-                  <div className="text-xs sm:text-sm font-bold">{opt.label}</div>
-                  <div className="text-[10px] text-zinc-300 opacity-80 mt-0.5">{opt.sub}</div>
-                </button>
-              ))}
+                {
+                  value: 'keduanya',
+                  label: '✨ Bebas (Baru & Second)',
+                  sub: 'Tampilkan laptop baru maupun second terbaik yang masuk anggaran',
+                },
+                {
+                  value: 'baru',
+                  label: '📦 Hanya Baru',
+                  sub: 'Kondisi segel dengan garansi resmi distributor',
+                },
+                {
+                  value: 'second',
+                  label: '🔄 Hanya Bekas / Second',
+                  sub: 'Spesifikasi lebih tinggi dengan harga yang jauh lebih hemat',
+                },
+              ].map((opt) => {
+                const isSelected = kondisiPilihan === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setKondisiPilihan(opt.value as 'baru' | 'second' | 'keduanya')}
+                    className={`p-4 rounded-2xl border text-center transition cursor-pointer flex flex-col justify-between ${
+                      isSelected
+                        ? 'bg-gradient-to-r from-violet-600 to-indigo-600 border-violet-500/60 text-white font-bold shadow-[0_0_20px_rgba(124,58,237,0.3)]'
+                        : 'border-zinc-800 bg-zinc-950/60 hover:border-zinc-700 text-zinc-400'
+                    }`}
+                  >
+                    <div className="text-sm font-bold">{opt.label}</div>
+                    <div className="text-[11px] text-zinc-300/80 mt-1.5 leading-relaxed">
+                      {opt.sub}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* 4. Filter Merek */}
+          {/* 4. Filter Merek Laptop */}
           <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md space-y-4 shadow-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-mono font-bold text-zinc-300">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+              <div className="flex items-center gap-2.5">
+                <span className="w-7 h-7 rounded-xl bg-violet-600/20 border border-violet-500/30 flex items-center justify-center text-xs font-bold text-violet-300">
                   4
                 </span>
-                <label className="text-sm font-semibold text-white">Filter Merek Pilihan</label>
+                <label className="text-base font-bold text-white">
+                  Apakah ada merek laptop tertentu yang kamu sukai?
+                </label>
               </div>
-              <span className="text-[11px] font-mono text-zinc-400">Bisa pilih beberapa</span>
+              <span className="text-xs text-zinc-400">Bisa pilih beberapa merek</span>
             </div>
+            <p className="text-xs text-zinc-400">
+              Pilih merek favoritmu, atau biarkan <strong>&quot;Semua Merek&quot;</strong> agar pilihan laptop yang dianalisis semakin beragam dan optimal.
+            </p>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 pt-1">
               <button
                 type="button"
                 onClick={() => toggleBrand('semua')}
-                className={`px-3.5 py-2 rounded-xl border text-xs font-semibold transition cursor-pointer ${
+                className={`px-4 py-2.5 rounded-xl border text-xs font-bold transition cursor-pointer ${
                   selectedBrands.includes('semua')
                     ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-sm'
                     : 'border-zinc-800 bg-zinc-950/60 text-zinc-400 hover:border-zinc-600'
                 }`}
               >
-                ✨ Semua Merek
+                ✨ Semua Merek (Rekomendasi)
               </button>
-              {brands.map((brand) => (
-                <button
-                  key={brand}
-                  type="button"
-                  onClick={() => toggleBrand(brand)}
-                  className={`px-3.5 py-2 rounded-xl border text-xs font-semibold transition cursor-pointer ${
-                    selectedBrands.includes(brand)
-                      ? 'bg-violet-600/30 text-violet-300 border-violet-500/50 shadow-sm'
-                      : 'border-zinc-800 bg-zinc-950/60 text-zinc-400 hover:border-zinc-600'
-                  }`}
-                >
-                  {brand}
-                </button>
-              ))}
+              {brands.map((brand) => {
+                const isSelected = selectedBrands.includes(brand);
+                return (
+                  <button
+                    key={brand}
+                    type="button"
+                    onClick={() => toggleBrand(brand)}
+                    className={`px-3.5 py-2.5 rounded-xl border text-xs font-semibold transition cursor-pointer ${
+                      isSelected
+                        ? 'bg-violet-600/30 text-violet-300 border-violet-500/50 shadow-sm'
+                        : 'border-zinc-800 bg-zinc-950/60 text-zinc-400 hover:border-zinc-600'
+                    }`}
+                  >
+                    {brand}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* 5. Frekuensi Membawa Laptop */}
+          {/* 5. Frekuensi Pemakaian dalam Seminggu */}
           <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md space-y-4 shadow-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-mono font-bold text-zinc-300">
-                  5
-                </span>
-                <label className="text-sm font-semibold text-white">Frekuensi Membawa Laptop (Mobilitas)</label>
-              </div>
-              <span className="text-[11px] font-mono text-amber-400 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/40">
-                Fungsi: Portabilitas & Baterai
+            <div className="flex items-center gap-2.5">
+              <span className="w-7 h-7 rounded-xl bg-violet-600/20 border border-violet-500/30 flex items-center justify-center text-xs font-bold text-violet-300">
+                5
               </span>
+              <label className="text-base font-bold text-white">
+                Dalam seminggu, seberapa sering laptop akan kamu pakai?
+              </label>
             </div>
             <p className="text-xs text-zinc-400">
-              Menyesuaikan rekomendasi berdasarkan seberapa sering Anda bepergian bersama laptop.
+              Ini membantu kami menilai seberapa penting daya tahan baterai dan kemudahan membawa laptop (bobot ringan) untuk keseharianmu.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {FREKUENSI_OPTIONS.map((f) => (
-                <button
-                  key={f.value}
-                  type="button"
-                  onClick={() => handleSelectFrekuensi(f.value)}
-                  className={`p-3.5 rounded-2xl border text-left transition cursor-pointer flex items-start gap-3 ${
-                    frekuensiMembawa === f.value
-                      ? 'bg-gradient-to-br from-amber-950/60 to-orange-950/40 border-amber-500/50 text-white shadow-[0_0_20px_rgba(245,158,11,0.2)]'
-                      : 'border-zinc-800 bg-zinc-950/50 hover:border-zinc-700 text-zinc-400'
-                  }`}
-                >
-                  <span className="text-xl shrink-0 mt-0.5">{f.emoji}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs sm:text-sm font-bold text-white">{f.label}</div>
-                    <div className="text-[11px] text-zinc-400 mt-0.5">{f.desc}</div>
-                  </div>
-                  {frekuensiMembawa === f.value && (
-                    <div className="w-5 h-5 rounded-full bg-amber-400 text-zinc-950 flex items-center justify-center shrink-0">
-                      <Check className="w-3 h-3 stroke-[3]" />
+              {FREKUENSI_PEMAKAIAN_OPTIONS.map((f) => {
+                const isSelected = frekuensiPemakaian === f.value;
+                return (
+                  <button
+                    key={f.value}
+                    type="button"
+                    onClick={() => setFrekuensiPemakaian(f.value)}
+                    className={`p-4 rounded-2xl border text-left transition cursor-pointer flex items-start gap-3.5 ${
+                      isSelected
+                        ? 'bg-gradient-to-br from-amber-950/60 to-orange-950/40 border-amber-500/50 text-white shadow-[0_0_20px_rgba(245,158,11,0.2)]'
+                        : 'border-zinc-800 bg-zinc-950/50 hover:border-zinc-700 text-zinc-400'
+                    }`}
+                  >
+                    <span className="text-2xl shrink-0 mt-0.5">{f.emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <span className={`text-sm font-bold ${isSelected ? 'text-white' : 'text-zinc-200'}`}>
+                          {f.title}
+                        </span>
+                        {isSelected && (
+                          <div className="w-4 h-4 rounded-full bg-amber-400 text-zinc-950 flex items-center justify-center shrink-0">
+                            <Check className="w-2.5 h-2.5 stroke-[3]" />
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
+                        {f.desc}
+                      </p>
                     </div>
-                  )}
-                </button>
-              ))}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* 6. Urutan Prioritas Kriteria (ROC Weighting) */}
-          <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md space-y-4 shadow-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-mono font-bold text-zinc-300">
-                  6
-                </span>
-                <label className="text-sm font-semibold text-white">
-                  Prioritas Kriteria Keputusan (Metode ROC)
-                </label>
-              </div>
-              <span className="text-[11px] font-mono text-cyan-400 bg-cyan-950/40 px-2 py-0.5 rounded border border-cyan-800/40">
-                Drag & Drop
-              </span>
-            </div>
-            <p className="text-xs text-zinc-400 leading-relaxed">
-              Tarik dan geser kartu kriteria dari <strong>paling penting (#1 di atas)</strong> hingga{' '}
-              <strong>kurang penting (#6 di bawah)</strong>. Bobot matematis ROC akan dihitung secara transparan.
-            </p>
-
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={rankingKriteria} strategy={verticalListSortingStrategy}>
-                <div className="space-y-2.5">
-                  {rankingKriteria.map((code, index) => (
-                    <SortableItem key={code} id={code} index={index} />
-                  ))}
-                </div>
-              </SortableContext>
-            </DndContext>
-
-            {/* Live ROC Weights Calculation Preview */}
-            <div className="mt-4 p-4 rounded-2xl bg-zinc-950/80 border border-white/5 space-y-2">
-              <span className="text-[11px] font-mono text-zinc-400 block mb-1">
-                Kalkulasi Bobot ROC (Rank Order Centroid):
-              </span>
-              <div className="grid grid-cols-2 sm:grid-cols-6 gap-2 text-center">
-                {rankingKriteria.map((code, index) => {
-                  const k = 6;
-                  let sum = 0;
-                  for (let j = index + 1; j <= k; j++) sum += 1 / j;
-                  const weightPct = ((sum / k) * 100).toFixed(1);
-                  const crit = ALL_CRITERIA.find((c) => c.code === code);
-
-                  return (
-                    <div key={code} className="p-2 rounded-xl bg-zinc-900/60 border border-white/5">
-                      <div className="text-[10px] font-mono text-zinc-500">#{index + 1} {crit?.code}</div>
-                      <div className="text-xs font-bold text-cyan-300 font-mono mt-0.5">{weightPct}%</div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <div className="pt-4">
+          {/* Tombol Submit */}
+          <div className="pt-2">
             <button
               type="submit"
               disabled={loading}
@@ -718,11 +695,11 @@ function QuestionnaireContent() {
               {loading ? (
                 <>
                   <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Menganalisis Kecocokan Lapmatch & AI...</span>
+                  <span>Sedang Mencocokkan Laptop Terbaik untuk Kamu...</span>
                 </>
               ) : (
                 <>
-                  <span>Temukan Rekomendasi Laptop Terbaik</span>
+                  <span>Lihat Rekomendasi Laptop untuk Saya</span>
                   <Send className="w-4 h-4" />
                 </>
               )}
@@ -741,10 +718,10 @@ function QuestionnaireContent() {
               <div className="flex items-center justify-between border-b border-white/10 pb-4">
                 <div>
                   <span className="text-[11px] font-mono text-cyan-400 font-semibold uppercase tracking-wider">
-                    Hasil Pratinjau Terbatas (Tamu)
+                    Hasil Pratinjau Cepat (Mode Tamu)
                   </span>
                   <h2 className="text-xl sm:text-2xl font-extrabold text-white">
-                    3 Rekomendasi Teratas untuk Anda
+                    3 Rekomendasi Laptop Teratas untuk Kamu
                   </h2>
                 </div>
                 <button
@@ -792,7 +769,7 @@ function QuestionnaireContent() {
                   <div className="p-6 rounded-2xl bg-zinc-950/70 border border-white/10 text-center space-y-2">
                     <p className="text-sm font-bold text-white">Tidak Ada Laptop yang Cocok</p>
                     <p className="text-xs text-zinc-400 max-w-sm mx-auto">
-                      Tidak ditemukan laptop dalam rentang budget Rp {budgetMin.toLocaleString('id-ID')} - {budgetMax.toLocaleString('id-ID')}. Coba naikkan batas maksimal budget atau pilih Semua Merek.
+                      Tidak ditemukan laptop dalam rentang budget {formatRupiahShort(budgetMin)} - {formatRupiahShort(budgetMax)}. Coba naikkan batas anggaran atau pilih opsi Semua Merek.
                     </p>
                   </div>
                 )}
@@ -803,10 +780,10 @@ function QuestionnaireContent() {
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="space-y-1">
                     <h3 className="text-sm font-bold text-white">
-                      Ingin Menyimpan Hasil & Buka Analisis AI Mendalam?
+                      Ingin Menyimpan Hasil & Buka Analisis AI Lengkap?
                     </h3>
                     <p className="text-xs text-zinc-300">
-                      Daftar akun Lapmatch secara gratis untuk melihat perbandingan matriks lengkap, penjelasan AI, dan melacak riwayat konsultasi laptop Anda.
+                      Daftar akun gratis untuk melihat alasan rekomendasi AI untuk setiap laptop, membandingkan spesifikasi langsung, dan menyimpan riwayat konsultasimu.
                     </p>
                   </div>
                   <Link
@@ -834,7 +811,7 @@ export default function QuestionnairePage() {
         <div className="min-h-screen bg-[#09090d] text-zinc-100 flex items-center justify-center">
           <div className="flex items-center gap-3 text-sm font-medium">
             <span className="w-5 h-5 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
-            <span>Memuat Kuisioner Lapmatch...</span>
+            <span>Memuat formulir rekomendasi...</span>
           </div>
         </div>
       }

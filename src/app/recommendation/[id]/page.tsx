@@ -580,7 +580,7 @@ export default function RecommendationPage() {
               </span>
             </div>
             <div className="p-3 rounded-2xl bg-zinc-950/70 border border-zinc-800">
-              <span className="text-[10px] text-zinc-500 block mb-0.5 font-mono">Peruntukan (Label)</span>
+              <span className="text-[10px] text-zinc-500 block mb-0.5 font-mono">Kebutuhan Utama</span>
               <span className="font-bold text-white">{jawaban.peruntukan}</span>
             </div>
             <div className="p-3 rounded-2xl bg-zinc-950/70 border border-zinc-800">
@@ -594,7 +594,7 @@ export default function RecommendationPage() {
               </span>
             </div>
             <div className="p-3 rounded-2xl bg-zinc-950/70 border border-zinc-800">
-              <span className="text-[10px] text-zinc-500 block mb-0.5 font-mono">Frekuensi Bawa</span>
+              <span className="text-[10px] text-zinc-500 block mb-0.5 font-mono">Frekuensi Pemakaian</span>
               <span className="font-bold text-white">{jawaban.frekuensiMembawa ?? 'Rutin'}</span>
             </div>
           </div>

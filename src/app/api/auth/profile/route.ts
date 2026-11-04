@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import prisma from '@/lib/prisma';
+import { isSuperAdminEmail, sanitizeUserRole } from '@/lib/auth-constants';
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,14 +20,29 @@ export async function GET(request: NextRequest) {
 
     // Auto-create profile if missing (first login after Supabase signup)
     if (!profile) {
+      const assignedRole = sanitizeUserRole(user.email, user.user_metadata?.role);
       profile = await prisma.user.create({
         data: {
           id: user.id,
           name: user.user_metadata?.name ?? user.email?.split('@')[0] ?? 'User',
           email: user.email!,
-          role: user.user_metadata?.role ?? 'mahasiswa',
+          role: assignedRole,
         },
       });
+    } else {
+      // Pastikan validitas role: hanya email resmi chairulanwarr003@gmail.com yang boleh jadi admin
+      const isOfficialAdmin = isSuperAdminEmail(profile.email);
+      if (isOfficialAdmin && profile.role !== 'admin') {
+        profile = await prisma.user.update({
+          where: { id: profile.id },
+          data: { role: 'admin' },
+        });
+      } else if (!isOfficialAdmin && profile.role === 'admin') {
+        profile = await prisma.user.update({
+          where: { id: profile.id },
+          data: { role: 'mahasiswa' },
+        });
+      }
     }
 
     // Stats: total konsultasi & laptop direkomendasikan
@@ -124,16 +140,26 @@ export async function PATCH(request: NextRequest) {
 
     if (role && typeof role === 'string' && role.trim().length > 0) {
       const current = await prisma.user.findUnique({ where: { id: user.id } });
-      if (current && current.role !== 'admin') {
-        const formattedRole = role.trim().toLowerCase();
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { role: formattedRole },
-        });
-        await supabase.auth.updateUser({
-          data: { role: formattedRole },
-        });
+      const isOfficialAdmin = isSuperAdminEmail(user.email || current?.email);
+      const formattedRole = role.trim().toLowerCase();
+
+      if (formattedRole === 'admin' && !isOfficialAdmin) {
+        return NextResponse.json(
+          { error: 'Akses ditolak. Role admin hanya dapat dimiliki oleh administrator resmi.' },
+          { status: 403 }
+        );
       }
+
+      // Administrator resmi tetap admin; pengguna lain disanitasi
+      const safeRole = isOfficialAdmin ? 'admin' : sanitizeUserRole(user.email, formattedRole);
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { role: safeRole },
+      });
+      await supabase.auth.updateUser({
+        data: { role: safeRole },
+      });
     }
 
     if (password) {

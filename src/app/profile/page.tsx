@@ -204,6 +204,15 @@ export default function ProfilePage() {
       setEditingRole(false);
       return;
     }
+
+    const normalizedTarget = targetRole.trim().toLowerCase();
+    if (normalizedTarget === 'admin' && profile?.email.toLowerCase() !== 'chairulanwarr003@gmail.com') {
+      toast.error('Role Administrator hanya dapat dimiliki oleh akun resmi (chairulanwarr003@gmail.com).');
+      setEditingRole(false);
+      setCustomRoleInput('');
+      return;
+    }
+
     setSavingRole(true);
     try {
       const res = await fetch('/api/auth/profile', {

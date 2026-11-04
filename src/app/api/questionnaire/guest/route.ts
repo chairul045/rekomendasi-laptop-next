@@ -16,6 +16,14 @@ export async function POST(request: NextRequest) {
       kondisiPilihan = 'keduanya',
     } = body;
 
+    const peruntukanText = Array.isArray(peruntukan)
+      ? peruntukan.filter(Boolean).join(' & ') || 'Kuliah'
+      : peruntukan || 'Kuliah';
+
+    const validRanking = Array.isArray(rankingKriteria) && rankingKriteria.length === 6
+      ? rankingKriteria
+      : ['C1', 'C2', 'C3', 'C4', 'C5', 'C6'];
+
     const minPrice = BigInt(Math.max(0, Number(budgetMin) || 0));
     const maxPrice = BigInt(Math.max(Number(budgetMin) || 0, Number(budgetMax) || 50000000));
 
@@ -80,7 +88,7 @@ export async function POST(request: NextRequest) {
     }));
 
     // Hitung bobot ROC
-    const rocResult = calculateRocWeights(rankingKriteria);
+    const rocResult = calculateRocWeights(validRanking);
     const rocWeightsMap: Record<string, number> = {};
     for (const [code, val] of Object.entries(rocResult)) {
       rocWeightsMap[code] = val.bobot;
@@ -94,7 +102,7 @@ export async function POST(request: NextRequest) {
       laptopData,
       rocWeightsMap,
       criteriaTypes,
-      peruntukan
+      peruntukanText
     );
 
     // Ambil maksimal 3 teratas untuk versi pratinjau tamu (terbatas)

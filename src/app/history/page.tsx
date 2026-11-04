@@ -321,7 +321,7 @@ export default function HistoryPage() {
                         🏷️ {item.kondisiPilihan}
                       </span>
                       <span className="px-2.5 py-1 rounded bg-zinc-950 text-zinc-300 border border-zinc-800 text-xs">
-                        🎒 {item.frekuensiMembawa ?? 'Rutin'}
+                        📅 {item.frekuensiMembawa ?? 'Rutin'}
                       </span>
                     </div>
                   </div>

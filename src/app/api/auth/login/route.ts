@@ -4,6 +4,7 @@ import { createServerClient } from '@supabase/ssr';
 import { checkRateLimit, recordFailedAttempt, resetRateLimit } from '@/lib/rate-limit';
 import { createAdminClient } from '@/lib/supabase/admin';
 import prisma from '@/lib/prisma';
+import { sanitizeUserRole, isSuperAdminEmail } from '@/lib/auth-constants';
 
 export async function POST(request: NextRequest) {
   // Tangkap IP klien untuk proteksi rate limiting
@@ -126,6 +127,7 @@ export async function POST(request: NextRequest) {
     // 8. Sinkronisasi User Profile ke Prisma Database
     try {
       const user = authData.user;
+      const safeRole = sanitizeUserRole(user.email || normalizedEmail, user.user_metadata?.role);
       const existing = await prisma.user.findUnique({ where: { id: user.id } });
       if (!existing) {
         await prisma.user.create({
@@ -133,9 +135,23 @@ export async function POST(request: NextRequest) {
             id: user.id,
             name: user.user_metadata?.name || user.email?.split('@')[0] || 'User',
             email: user.email || normalizedEmail,
-            role: user.user_metadata?.role || 'mahasiswa',
+            role: safeRole,
           },
         });
+      } else {
+        // Jaga agar hanya admin resmi yang memiliki role admin
+        const isOfficialAdmin = isSuperAdminEmail(existing.email);
+        if (isOfficialAdmin && existing.role !== 'admin') {
+          await prisma.user.update({
+            where: { id: existing.id },
+            data: { role: 'admin' },
+          });
+        } else if (!isOfficialAdmin && existing.role === 'admin') {
+          await prisma.user.update({
+            where: { id: existing.id },
+            data: { role: 'mahasiswa' },
+          });
+        }
       }
     } catch {
       // Abaikan jika prisma sync ada kendala non-kritis

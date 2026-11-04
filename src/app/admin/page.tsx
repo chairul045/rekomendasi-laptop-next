@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import prisma from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import AdminLaptopManager from './AdminLaptopManager';
+import { isSuperAdminEmail } from '@/lib/auth-constants';
 
 export default async function AdminPage() {
   const supabase = await createClient();
@@ -13,7 +14,7 @@ export default async function AdminPage() {
   if (!user) redirect('/login');
 
   const profile = await prisma.user.findUnique({ where: { id: user.id } });
-  if (!profile || profile.role !== 'admin') {
+  if (!profile || profile.role !== 'admin' || !isSuperAdminEmail(profile.email)) {
     redirect('/');
   }
 

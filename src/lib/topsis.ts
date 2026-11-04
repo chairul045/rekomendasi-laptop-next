@@ -86,12 +86,21 @@ export function getCategoryImputedSpecs(category?: string | null): { batteryHour
  */
 export function estimatePerformanceScore(laptop: LaptopData, peruntukan?: string): number {
   if (laptop.performaKomposit != null && laptop.performaKomposit > 0) {
-    if (peruntukan === 'Gaming' && (laptop.vgaScore || laptop.processorScore)) {
+    const p = peruntukan || '';
+    const hasGaming = p.includes('Gaming');
+    const hasDesain = p.includes('Desain Grafis');
+
+    if (hasGaming && hasDesain && (laptop.vgaScore || laptop.processorScore)) {
+      const vga = laptop.vgaScore ?? 45;
+      const proc = laptop.processorScore ?? laptop.performaKomposit;
+      return Math.round(vga * 0.55 + proc * 0.45);
+    }
+    if (hasGaming && (laptop.vgaScore || laptop.processorScore)) {
       const vga = laptop.vgaScore ?? 45;
       const proc = laptop.processorScore ?? laptop.performaKomposit;
       return Math.round(vga * 0.65 + proc * 0.35);
     }
-    if (peruntukan === 'Desain Grafis' && (laptop.vgaScore || laptop.processorScore)) {
+    if (hasDesain && (laptop.vgaScore || laptop.processorScore)) {
       const vga = laptop.vgaScore ?? 45;
       const proc = laptop.processorScore ?? laptop.performaKomposit;
       return Math.round(vga * 0.45 + proc * 0.55);

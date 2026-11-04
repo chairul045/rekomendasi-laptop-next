@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient as createServerClient } from '@/lib/supabase/server';
+import { sanitizeUserRole } from '@/lib/auth-constants';
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,12 +24,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const userRole =
-      typeof role === 'string' && role.trim().length > 0
-        ? role.trim().toLowerCase()
-        : 'mahasiswa';
-
     const normalizedEmail = email.trim().toLowerCase();
+    const userRole = sanitizeUserRole(normalizedEmail, role);
     const adminClient = createAdminClient();
 
     let authUserId: string | null = null;

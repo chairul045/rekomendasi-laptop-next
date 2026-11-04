@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { sanitizeUserRole } from '@/lib/auth-constants';
 
 export async function POST(request: NextRequest) {
   try {
@@ -47,6 +48,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Pastikan user ada di database PostgreSQL Prisma
+    const safeRole = sanitizeUserRole(targetUser.email, targetUser.user_metadata?.role);
     await prisma.user.upsert({
       where: { email: targetUser.email! },
       update: {},
@@ -54,7 +56,7 @@ export async function POST(request: NextRequest) {
         id: targetUser.id,
         name: targetUser.user_metadata?.name || normalizedEmail.split('@')[0],
         email: targetUser.email!,
-        role: targetUser.user_metadata?.role || 'mahasiswa',
+        role: safeRole,
       },
     });
 
