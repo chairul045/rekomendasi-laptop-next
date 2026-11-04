@@ -6,8 +6,9 @@ import Footer from '@/components/Footer';
 import LaptopCatalog from './LaptopCatalog';
 import LandingPage from '@/components/LandingPage';
 import { getLaptopImageUrl, formatRupiah } from '@/lib/laptop-utils';
-import { ClipboardList, ArrowRight, Clock } from 'lucide-react';
+import { ClipboardList, ArrowRight, Clock, Wrench } from 'lucide-react';
 import FeaturedLaptopAdBanner from '@/components/FeaturedLaptopAdBanner';
+import { getActiveBanners } from '@/lib/banner-store';
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -132,13 +133,15 @@ export default async function HomePage() {
   const latestSession = consultationsSerialized[0];
   const latestBest = latestSession?.hasilTopsis[0]?.laptop;
 
+  const activeBanners = getActiveBanners();
+
   return (
     <div className="min-h-screen flex flex-col bg-[#09090d] text-zinc-100">
       <Navbar user={profile} historyCount={consultationsSerialized.length} />
 
       <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-8 sm:space-y-12">
-        {/* Iklan Laptop Terbaru Terbaik Sekarang */}
-        <FeaturedLaptopAdBanner />
+        {/* Iklan Slider Laptop Terbaru & Terbaik (Multi-Slide, Editable by Admin) */}
+        <FeaturedLaptopAdBanner initialBanners={activeBanners} userEmail={profile.email} />
 
         {/* Top Header Banner */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-zinc-900/90 via-violet-950/30 to-zinc-900/90 border border-white/10 p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
@@ -162,93 +165,36 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Stats Overview Cards */}
-        <div className="grid sm:grid-cols-3 gap-4 sm:gap-6">
-          <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md relative overflow-hidden group hover:border-violet-500/40 transition duration-300 card-interactive shadow-lg">
-            <div className="flex items-center justify-between text-xs text-zinc-400 mb-3">
-              <span className="font-mono uppercase text-[11px] tracking-wider text-zinc-400">
-                Total Sesi Kuisioner
+        {/* Toko Service Laptop Feature Banner */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-violet-950/40 via-zinc-900/90 to-cyan-950/40 border border-white/10 p-6 sm:p-8 backdrop-blur-xl shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6 group hover:border-violet-500/40 transition">
+          <div className="space-y-2 max-w-2xl">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                <Wrench className="w-3.5 h-3.5" />
+                <span>Fitur Baru: Lapmatch Care Service Hub</span>
               </span>
-              <div className="w-8 h-8 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 group-hover:scale-110 transition-transform">
-                <ClipboardList className="w-4 h-4" />
-              </div>
+              <span className="text-xs text-zinc-400 font-mono hidden sm:inline">
+                Terverifikasi di Berbagai Kota
+              </span>
             </div>
-            <div className="text-3xl sm:text-4xl font-black text-white font-mono">
-              {consultationsSerialized.length}
-            </div>
-            <p className="text-[11px] text-zinc-500 mt-2 font-mono flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
-              <span>Riwayat pencocokan Lapmatch tersimpan</span>
+            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              Laptop Lemot, Panas, Layar Rusak, atau Butuh Upgrade SSD &amp; RAM?
+            </h2>
+            <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+              Temukan rekomendasi toko servis laptop terpercaya di kota Anda dengan simulasi diagnosa kerusakan cepat, estimasi biaya transparan, dan garansi pengerjaan 90 hari.
             </p>
           </div>
 
-          <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md relative overflow-hidden group hover:border-cyan-500/40 transition duration-300 card-interactive shadow-lg">
-            <div className="flex items-center justify-between text-xs text-zinc-400 mb-3">
-              <span className="font-mono uppercase text-[11px] tracking-wider text-zinc-400">
-                Rekomendasi Terakhir
-              </span>
-              <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
-                <Clock className="w-4 h-4" />
-              </div>
-            </div>
-            {latestBest ? (
-              <div className="flex items-center gap-3">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={getLaptopImageUrl(latestBest.brand, latestBest.name, latestBest.imageUrl)}
-                  alt={latestBest.name}
-                  className="w-12 h-12 rounded-xl object-cover border border-white/10 flex-shrink-0 group-hover:scale-105 transition-transform"
-                  loading="lazy"
-                />
-                <div className="min-w-0">
-                  <div className="text-sm font-bold text-white truncate group-hover:text-cyan-300 transition">
-                    {latestBest.name}
-                  </div>
-                  <div className="text-xs font-mono text-emerald-400 font-bold">
-                    {formatRupiah(latestBest.price)}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <div className="text-base font-semibold text-zinc-400">Belum ada kuisioner</div>
-                <p className="text-[11px] text-zinc-500 mt-2 font-mono">
-                  Silakan isi formulir kuisioner baru
-                </p>
-              </div>
-            )}
+          <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
+            <Link
+              href="/service-laptop"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-bold text-xs sm:text-sm transition shadow-lg shadow-violet-600/25 active:scale-95"
+            >
+              <Wrench className="w-4 h-4" />
+              <span>Buka Toko Servis Laptop</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
-
-          <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md relative overflow-hidden group hover:border-emerald-500/40 transition duration-300 card-interactive shadow-lg">
-            <div className="flex items-center justify-between text-xs text-zinc-400 mb-3">
-              <span className="font-mono uppercase text-[11px] tracking-wider text-zinc-400">
-                Algoritma Pencocokan
-              </span>
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-            </div>
-            <div className="text-xl sm:text-2xl font-black text-emerald-400 font-mono">
-              Lapmatch AI
-            </div>
-            <p className="text-[11px] text-zinc-400 mt-2 flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-[10px] text-zinc-300 font-mono">
-                Kategori Baru
-              </span>
-              <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-[10px] text-amber-300 font-mono">
-                Kategori Second
-              </span>
-            </p>
-          </div>
-        </div>
-
-        {/* 6 Kriteria Badges */}
-        <div className="flex flex-wrap items-center justify-center gap-2 py-2">
-          <span className="text-xs text-zinc-400 font-mono">Kriteria Keputusan:</span>
-          <span className="px-3 py-1 rounded-xl text-xs font-mono bg-violet-950/40 text-violet-300 border border-violet-800/40">💰 C1: Harga</span>
-          <span className="px-3 py-1 rounded-xl text-xs font-mono bg-indigo-950/40 text-indigo-300 border border-indigo-800/40">⚡ C2: Performa</span>
-          <span className="px-3 py-1 rounded-xl text-xs font-mono bg-cyan-950/40 text-cyan-300 border border-cyan-800/40">🧠 C3: RAM</span>
-          <span className="px-3 py-1 rounded-xl text-xs font-mono bg-emerald-950/40 text-emerald-300 border border-emerald-800/40">💾 C4: Storage SSD</span>
-          <span className="px-3 py-1 rounded-xl text-xs font-mono bg-amber-950/40 text-amber-300 border border-amber-800/40">🔋 C5: Baterai</span>
-          <span className="px-3 py-1 rounded-xl text-xs font-mono bg-pink-950/40 text-pink-300 border border-pink-800/40">🎒 C6: Portabilitas</span>
         </div>
 
         {/* Catalog Showcase with Images */}

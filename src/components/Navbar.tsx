@@ -83,6 +83,7 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
       active: pathname.startsWith('/history') || pathname.startsWith('/recommendation'),
       badge: historyCount > 0 ? historyCount : null,
     },
+    { href: '/service-laptop', label: 'Servis Laptop', active: pathname === '/service-laptop' },
     { href: '/tentang-metode', label: 'Metode SPK', active: pathname === '/tentang-metode' },
     { href: '/profile', label: 'Profil Saya', active: pathname === '/profile' },
   ];
@@ -213,6 +214,12 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
             </>
           ) : (
             <div className="flex items-center gap-2">
+              <Link
+                href="/service-laptop"
+                className="hidden sm:inline-flex text-xs font-medium text-cyan-400 hover:text-cyan-300 px-3 py-1.5 rounded-xl hover:bg-cyan-950/20 transition"
+              >
+                Servis Laptop
+              </Link>
               <Link
                 href="/tentang-metode"
                 className="hidden sm:inline-flex text-xs font-medium text-zinc-400 hover:text-white px-3 py-1.5 rounded-xl hover:bg-white/[0.06] transition"

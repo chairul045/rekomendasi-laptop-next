@@ -54,6 +54,13 @@ export default function Footer() {
 
             <nav className="flex items-center gap-4 flex-wrap" aria-label="Footer Navigasi">
               <Link
+                href="/service-laptop"
+                className="hover:text-white transition py-2 px-1 min-h-[44px] inline-flex items-center text-emerald-400/90 hover:text-emerald-300"
+              >
+                Toko Servis Laptop
+              </Link>
+              <span className="text-zinc-600">&bull;</span>
+              <Link
                 href="/tentang-metode"
                 className="hover:text-white transition py-2 px-1 min-h-[44px] inline-flex items-center text-cyan-400/90 hover:text-cyan-300"
               >
