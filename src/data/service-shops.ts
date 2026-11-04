@@ -106,7 +106,244 @@ export const POPULAR_PROBLEMS: ServiceProblem[] = [
   },
 ];
 
+export function diagnoseCustomProblem(description: string, brand?: string): ServiceProblem {
+  const text = (description + ' ' + (brand || '')).toLowerCase();
+
+  if (
+    text.includes('panas') ||
+    text.includes('hangat') ||
+    text.includes('kipas') ||
+    text.includes('berisik') ||
+    text.includes('thermal') ||
+    text.includes('pasta') ||
+    text.includes('overheat') ||
+    text.includes('mati sendiri') ||
+    text.includes('mati mendadak')
+  ) {
+    return {
+      id: 'custom-thermal',
+      symptom: description,
+      category: 'Sistem Pendingin & Thermal Overheat',
+      possibleCauses: [
+        'Thermal paste processor/GPU sudah kering mengeras',
+        'Sirip heatsink dan lubang pembuangan tersumbat gumpalan debu',
+        'Kipas pendingin kotor atau putaran RPM melemah',
+      ],
+      recommendedSolution:
+        'Deep Cleaning sistem pendingin & ganti thermal paste konduktivitas tinggi (Arctic MX-4/Thermal Grizzly).',
+      estimatedCostRange: 'Rp 75.000 - Rp 150.000',
+      urgency: 'Sedang',
+    };
+  }
+
+  if (
+    text.includes('mati') ||
+    text.includes('matot') ||
+    text.includes('konslet') ||
+    text.includes('gak nyala') ||
+    text.includes('tidak nyala') ||
+    text.includes('air') ||
+    text.includes('tumpah') ||
+    text.includes('ic') ||
+    text.includes('motherboard') ||
+    text.includes('bau gosong') ||
+    text.includes('asap')
+  ) {
+    return {
+      id: 'custom-power',
+      symptom: description,
+      category: 'Motherboard, Power IC & Korsleting',
+      possibleCauses: [
+        'Konsleting pada jalur power supply 19V / 3.3V / 5V',
+        'IC Power / MOSFET terbakar akibat lonjakan arus atau adaptor rusak',
+        'Korosi jalur tembaga motherboard akibat kelembapan / tumpahan cairan',
+      ],
+      recommendedSolution:
+        'Pemeriksaan skematik motherboard, injeksi tegangan, perbaikan jalur putus, dan micro-soldering IC.',
+      estimatedCostRange: 'Rp 350.000 - Rp 850.000',
+      urgency: 'Kritis',
+    };
+  }
+
+  if (
+    text.includes('layar') ||
+    text.includes('lcd') ||
+    text.includes('garis') ||
+    text.includes('retak') ||
+    text.includes('pecah') ||
+    text.includes('flicker') ||
+    text.includes('kedip') ||
+    text.includes('blank') ||
+    text.includes('gelap') ||
+    text.includes('bintik')
+  ) {
+    return {
+      id: 'custom-lcd',
+      symptom: description,
+      category: 'Layar LCD & Kabel Fleksibel',
+      possibleCauses: [
+        'Panel LCD rusak/retak akibat tekanan atau benturan',
+        'Kabel fleksibel eDP terjepit di engsel laptop',
+        'Komponen backlight atau inverter LED mati',
+      ],
+      recommendedSolution: 'Ganti panel LCD original bergaransi baru atau perbaikan kabel fleksibel engsel.',
+      estimatedCostRange: 'Rp 650.000 - Rp 1.450.000',
+      urgency: 'Kritis',
+    };
+  }
+
+  if (
+    text.includes('baterai') ||
+    text.includes('battery') ||
+    text.includes('drop') ||
+    text.includes('bocor') ||
+    text.includes('kembung') ||
+    text.includes('colok terus') ||
+    text.includes('charger') ||
+    text.includes('ngecas')
+  ) {
+    return {
+      id: 'custom-battery',
+      symptom: description,
+      category: 'Baterai & Sistem Pengisian Daya',
+      possibleCauses: [
+        'Kesehatan baterai (battery health) sudah di bawah 50%',
+        'Cell baterai membengkak dan kehilangan kapasitas simpan daya',
+        'Port colokan charging (DC Jack / USB-C) longgar atau pin bengkok',
+      ],
+      recommendedSolution: 'Penggantian unit baterai baru original / OEM grade A+ bergaransi 3-6 bulan.',
+      estimatedCostRange: 'Rp 350.000 - Rp 750.000',
+      urgency: 'Sedang',
+    };
+  }
+
+  if (
+    text.includes('lemot') ||
+    text.includes('lambat') ||
+    text.includes('lelet') ||
+    text.includes('hang') ||
+    text.includes('not responding') ||
+    text.includes('hardisk') ||
+    text.includes('hdd') ||
+    text.includes('ssd') ||
+    text.includes('ram') ||
+    text.includes('penuh') ||
+    text.includes('loading')
+  ) {
+    return {
+      id: 'custom-storage',
+      symptom: description,
+      category: 'Upgrade Kecepatan Storage & RAM',
+      possibleCauses: [
+        'Masih menggunakan Hard Disk Drive (HDD) mekanik yang lambat',
+        'Kapasitas RAM penuh akibat aplikasi kuliah/browsing modern',
+        'File sampah cache sistem dan penumpukan aplikasi startup',
+      ],
+      recommendedSolution:
+        'Upgrade ke SSD M.2 NVMe PCIe / SATA SSD + Tambah RAM 8GB/16GB dual-channel (laptop terasa 5x lebih cepat).',
+      estimatedCostRange: 'Rp 250.000 - Rp 650.000 (termasuk unit SSD/RAM)',
+      urgency: 'Ringan',
+    };
+  }
+
+  if (
+    text.includes('keyboard') ||
+    text.includes('tombol') ||
+    text.includes('ngetik sendiri') ||
+    text.includes('macet') ||
+    text.includes('touchpad') ||
+    text.includes('kursor')
+  ) {
+    return {
+      id: 'custom-keyboard',
+      symptom: description,
+      category: 'Keyboard & Input Device',
+      possibleCauses: [
+        'Jalur membran sirkuit keyboard korslet / kemasukan debu',
+        'Keycaps patah atau switch karet mengeras',
+      ],
+      recommendedSolution: 'Ganti keyboard laptop original baru (tersedia tipe tanam maupun modular).',
+      estimatedCostRange: 'Rp 175.000 - Rp 350.000',
+      urgency: 'Ringan',
+    };
+  }
+
+  if (
+    text.includes('engsel') ||
+    text.includes('casing') ||
+    text.includes('baut') ||
+    text.includes('patah') ||
+    text.includes('mangap') ||
+    text.includes('renggang')
+  ) {
+    return {
+      id: 'custom-hinge',
+      symptom: description,
+      category: 'Struktur Engsel & Casing Body',
+      possibleCauses: [
+        'Dudukan baut engsel plastik pecah akibat engsel terlalu kencang',
+        'Laptop pernah terbentur atau dibuka paksa dari satu sisi',
+      ],
+      recommendedSolution: 'Rekonstruksi dudukan engsel dengan lem resin baja & kalibrasi kelenturan engsel agar awet.',
+      estimatedCostRange: 'Rp 150.000 - Rp 300.000',
+      urgency: 'Sedang',
+    };
+  }
+
+  // General fallback
+  return {
+    id: 'custom-general',
+    symptom: description,
+    category: 'Pemeriksaan Kerusakan Menyeluruh (General Checkup)',
+    possibleCauses: [
+      'Kemungkinan gangguan software/driver atau degradasi komponen hardware internal',
+      'Perlu pengecekan fisik langsung oleh teknisi menggunakan multimeter & software diagnostik',
+    ],
+    recommendedSolution:
+      'Pemeriksaan komponen secara gratis oleh teknisi mitra untuk memastikan letak kendala sebelum tindakan perbaikan.',
+    estimatedCostRange: 'Mulai Rp 50.000 (Pengecekan Awal Gratis)',
+    urgency: 'Sedang',
+  };
+}
+
 export const SERVICE_SHOPS: ServiceShop[] = [
+  // ── PALEMBANG ─────────────────────────────────────────────────────────────
+  {
+    id: 'shop-palembang-1',
+    name: 'Palembang Laptop Specialist & Care Center',
+    city: 'Palembang',
+    area: 'PTC Mall & R. Sukamto',
+    rating: 4.9,
+    reviewCount: 320,
+    phone: '081271889922',
+    whatsapp: '6281271889922',
+    address: 'Ruko PTC Mall Blok B No. 15, Jl. R. Sukamto No. 8, 8 Ilir, Kec. Ilir Timur II, Kota Palembang, Sumatera Selatan 30114',
+    openHours: 'Setiap Hari: 09.30 - 21.00 WIB',
+    isVerified: true,
+    specialties: ['Mati Total & IC Power', 'Ganti LCD Express 1 Jam', 'Cleaning Thermal Paste', 'Upgrade SSD NVMe & RAM', 'Garansi Servis 90 Hari'],
+    startingPrice: 50000,
+    imageUrl: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=600&auto=format&fit=crop&q=80',
+    mapsUrl: 'https://maps.google.com/?q=PTC+Mall+Palembang',
+  },
+  {
+    id: 'shop-palembang-2',
+    name: 'Wong Kito Laptop & Mac Specialist Palembang',
+    city: 'Palembang',
+    area: 'Bukit Besar & UNSRI Area',
+    rating: 4.9,
+    reviewCount: 265,
+    phone: '082188776655',
+    whatsapp: '6282188776655',
+    address: 'Jl. Srijaya Negara No. 42 (Dekat Gerbang UNSRI Bukit), Bukit Lama, Kec. Ilir Barat I, Kota Palembang, Sumatera Selatan 30139',
+    openHours: 'Senin - Sabtu: 09.00 - 20.30 WIB',
+    isVerified: true,
+    specialties: ['Spesialis Apple MacBook & Windows', 'Diskon Servis Khusus Mahasiswa', 'Ganti Keyboard & Baterai Tanam', 'Cek Kerusakan Gratis Tanpa Biaya'],
+    startingPrice: 50000,
+    imageUrl: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=600&auto=format&fit=crop&q=80',
+    mapsUrl: 'https://maps.google.com/?q=Srijaya+Negara+Unsri+Palembang',
+  },
+
+  // ── KOTA LAINNYA ──────────────────────────────────────────────────────────
   {
     id: 'shop-1',
     name: 'Lapmatch Partner: FixLaptop Express Center',

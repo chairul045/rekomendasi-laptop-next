@@ -384,6 +384,7 @@ export default function RecommendationPage() {
   const [comparingLaptops, setComparingLaptops] = useState<LaptopDetailItem[]>([]);
   const [showCompareModal, setShowCompareModal] = useState(false);
   const [showTopsisModal, setShowTopsisModal] = useState(false);
+  const [showRocGuide, setShowRocGuide] = useState(false);
 
   // Feedback State
   const [rating, setRating] = useState<number>(5);
@@ -601,45 +602,149 @@ export default function RecommendationPage() {
         </div>
 
         {/* Transparansi Perhitungan Bobot ROC */}
-        <div className="p-5 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md space-y-3">
-          <div className="flex items-center justify-between mb-1">
-            <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-amber-400" />
-              <span>Transparansi Bobot ROC (Rank Order Centroid)</span>
-            </h3>
-            <button
-              type="button"
-              onClick={() => setShowTopsisModal(true)}
-              className="text-xs text-cyan-300 hover:text-cyan-200 underline font-mono flex items-center gap-1"
-            >
-              <span>Lihat Matriks Lengkap TOPSIS</span>
-              <span>→</span>
-            </button>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-6 gap-2 text-center text-xs">
-            {jawaban.bobotHasil.map((b) => (
-              <div key={b.id} className="p-3 rounded-2xl bg-zinc-950/70 border border-zinc-800">
-                <div className="text-[10px] font-mono text-zinc-400 flex items-center justify-between mb-1">
-                  <span>#{b.prioritas}</span>
-                  <span
-                    className={`text-[9px] px-1 py-0.2 rounded font-mono uppercase ${
-                      b.kriteria.tipe === 'cost'
-                        ? 'bg-amber-950/50 text-amber-300'
-                        : 'bg-emerald-950/50 text-emerald-300'
+        {(() => {
+          const sortedBobot = [...jawaban.bobotHasil].sort((a, b) => a.prioritas - b.prioritas);
+          const topPriority = sortedBobot.find((b) => b.prioritas === 1) || sortedBobot[0];
+
+          return (
+            <div className="p-6 rounded-3xl bg-[#0e0e15]/90 border border-white/10 backdrop-blur-md space-y-4 shadow-xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+                <div>
+                  <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-amber-400" />
+                    <span>Transparansi Bobot ROC (Rank Order Centroid)</span>
+                  </h3>
+                  <p className="text-[11px] text-zinc-400 mt-0.5">
+                    Bagaimana tingkat kepentingan kriteria Anda dikonversi menjadi bobot persentase matematis.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowRocGuide(!showRocGuide)}
+                    className="text-xs text-amber-300 hover:text-amber-200 bg-amber-950/40 border border-amber-800/40 px-3 py-1.5 rounded-xl font-mono flex items-center gap-1.5 transition cursor-pointer"
+                  >
+                    <span>💡 {showRocGuide ? 'Tutup Penjelasan' : 'Kenapa Bobotnya Berbeda?'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowTopsisModal(true)}
+                    className="text-xs text-cyan-300 hover:text-cyan-200 bg-cyan-950/40 border border-cyan-800/40 px-3 py-1.5 rounded-xl font-mono flex items-center gap-1 transition cursor-pointer"
+                  >
+                    <span>Matriks TOPSIS</span>
+                    <span>→</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Grid 6 Kriteria & Bobot */}
+              <div className="grid grid-cols-2 sm:grid-cols-6 gap-2.5 text-center text-xs">
+                {sortedBobot.map((b) => (
+                  <div
+                    key={b.id}
+                    className={`p-3 rounded-2xl border transition ${
+                      b.prioritas === 1
+                        ? 'bg-gradient-to-b from-amber-500/15 to-zinc-950/90 border-amber-500/50 shadow-lg shadow-amber-500/10 ring-1 ring-amber-500/30'
+                        : 'bg-zinc-950/70 border-zinc-800'
                     }`}
                   >
-                    {b.kriteria.tipe}
-                  </span>
-                </div>
-                <div className="text-xs font-bold text-white truncate">{b.kriteria.nama}</div>
-                <div className="text-base font-extrabold text-cyan-300 font-mono mt-1">
-                  {(b.bobot * 100).toFixed(1)}%
-                </div>
-                <span className="text-[10px] text-zinc-500 font-mono">w = {b.bobot.toFixed(4)}</span>
+                    <div className="text-[10px] font-mono text-zinc-400 flex items-center justify-between mb-1">
+                      <span className={b.prioritas === 1 ? 'font-black text-amber-300' : ''}>
+                        Prioritas #{b.prioritas}
+                      </span>
+                      <span
+                        className={`text-[9px] px-1 py-0.2 rounded font-mono uppercase ${
+                          b.kriteria.tipe === 'cost'
+                            ? 'bg-amber-950/50 text-amber-300'
+                            : 'bg-emerald-950/50 text-emerald-300'
+                        }`}
+                      >
+                        {b.kriteria.tipe}
+                      </span>
+                    </div>
+                    <div className="text-xs font-bold text-white truncate" title={b.kriteria.nama}>
+                      {b.kriteria.nama}
+                    </div>
+                    <div
+                      className={`text-base font-extrabold font-mono mt-1 ${
+                        b.prioritas === 1 ? 'text-amber-300' : 'text-cyan-300'
+                      }`}
+                    >
+                      {(b.bobot * 100).toFixed(1)}%
+                    </div>
+                    <span className="text-[10px] text-zinc-500 font-mono">w = {b.bobot.toFixed(4)}</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
+
+              {/* Penjelasan Intuitif Sederhana (Highlight Prioritas 1) */}
+              {topPriority && (
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-violet-950/40 via-zinc-950 to-cyan-950/30 border border-violet-500/20 text-xs space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">💡</span>
+                    <h4 className="font-bold text-white text-xs sm:text-sm">
+                      Mengapa &ldquo;{topPriority.kriteria.nama}&rdquo; Berbobot Paling Besar ({(topPriority.bobot * 100).toFixed(1)}%)?
+                    </h4>
+                  </div>
+                  <p className="text-zinc-300 leading-relaxed text-[11px] sm:text-xs">
+                    Kriteria <strong className="text-cyan-300">{topPriority.kriteria.nama}</strong> memperoleh porsi bobot paling besar yaitu <strong className="text-emerald-400">{(topPriority.bobot * 100).toFixed(1)}%</strong> karena kriteria ini berada di <strong className="text-amber-300">Peringkat #1 (Prioritas Utama)</strong> berdasarkan preferensi kuesioner Anda.
+                    Metode ilmiah <strong className="text-white">Rank Order Centroid (ROC)</strong> memastikan kriteria peringkat pertama memiliki pengaruh paling dominan dalam menyaring laptop terbaik, disusul prioritas #2 (~24.2%), #3 (~15.8%), hingga kriteria terendah (~2.8%).
+                  </p>
+                </div>
+              )}
+
+              {/* Expandable Panduan Lengkap ROC */}
+              {showRocGuide && (
+                <div className="p-4 rounded-2xl bg-black/60 border border-amber-500/30 space-y-3 text-xs animate-in fade-in">
+                  <h4 className="font-bold text-white flex items-center gap-1.5 text-xs sm:text-sm text-amber-300">
+                    <span>📚 Cara Kerja Perhitungan Bobot ROC (Rank Order Centroid)</span>
+                  </h4>
+                  <p className="text-zinc-300 leading-relaxed text-[11px] sm:text-xs">
+                    Metode ROC digunakan agar penentuan bobot kriteria tidak dilakukan secara subjektif atau tebak-tebakan. Ketika Anda mengurutkan 6 kriteria dari yang paling penting ke yang paling rendah, metode ROC membagi total bobot 100% secara terstandarisasi menggunakan rumus titik berat (*centroid*):
+                  </p>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 font-mono text-[11px]">
+                    <div className="p-2.5 rounded-xl bg-zinc-950 border border-white/5">
+                      <span className="text-amber-300 font-bold block">Prioritas #1: 40.83%</span>
+                      <span className="text-zinc-400 text-[10px]">Penentu utama perankingan</span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-zinc-950 border border-white/5">
+                      <span className="text-cyan-300 font-bold block">Prioritas #2: 24.17%</span>
+                      <span className="text-zinc-400 text-[10px]">Pembeda kedua terkuat</span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-zinc-950 border border-white/5">
+                      <span className="text-zinc-300 font-bold block">Prioritas #3: 15.83%</span>
+                      <span className="text-zinc-400 text-[10px]">Pertimbangan penyeimbang</span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-zinc-950 border border-white/5">
+                      <span className="text-zinc-400 font-bold block">Prioritas #4: 10.28%</span>
+                      <span className="text-zinc-400 text-[10px]">Faktor pendukung</span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-zinc-950 border border-white/5">
+                      <span className="text-zinc-400 font-bold block">Prioritas #5: 6.11%</span>
+                      <span className="text-zinc-400 text-[10px]">Pengaruh kecil</span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-zinc-950 border border-white/5">
+                      <span className="text-zinc-500 font-bold block">Prioritas #6: 2.78%</span>
+                      <span className="text-zinc-400 text-[10px]">Toleransi tertinggi</span>
+                    </div>
+                  </div>
+
+                  <div className="pt-1 flex items-center justify-between text-[11px]">
+                    <span className="text-zinc-400">Total akumulasi seluruh bobot = 100.00%</span>
+                    <Link
+                      href="/tentang-metode"
+                      className="text-cyan-400 hover:underline flex items-center gap-1"
+                    >
+                      <span>Pelajari Landasan Teori Ilmiah Lengkap</span>
+                      <span>→</span>
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* Tabs: Baru vs Second */}
         <div className="space-y-6">

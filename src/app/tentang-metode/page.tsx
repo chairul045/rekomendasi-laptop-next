@@ -124,6 +124,30 @@ export default function TentangMetodePage() {
                 </tbody>
               </table>
             </div>
+
+            {/* Ilustrasi Mudah Dipahami: Kasus Baterai 40.83% */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-violet-950/40 via-zinc-950 to-cyan-950/30 border border-violet-500/20 space-y-2 mt-4 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="text-base">💡</span>
+                <h4 className="font-bold text-white text-sm">
+                  Contoh Mudah: Mengapa Kriteria Baterai Bisa Berbobot ~40.8%?
+                </h4>
+              </div>
+              <p className="text-zinc-300 leading-relaxed text-xs">
+                Bayangkan Anda adalah mahasiswa yang sering kuliah di kafe atau ruang kelas tanpa colokan, lalu Anda menempatkan <strong className="text-cyan-300">Daya Tahan Baterai</strong> di <strong className="text-amber-300">Prioritas #1</strong>.
+              </p>
+              <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1.5 text-zinc-300">
+                <p>
+                  1. <strong>Mengapa harus ~40.8%?</strong> Agar preferensi nomor 1 Anda tidak terkalahkan oleh kriteria pelengkap lainnya. Bobot 40.83% memberi sinyal kuat kepada algoritma bahwa daya tahan baterai adalah penentu utama.
+                </p>
+                <p>
+                  2. <strong>Apa dampaknya pada laptop yang direkomendasikan?</strong> Laptop dengan baterai tahan 10–12 jam (seperti MacBook Air atau ZenBook) akan langsung melesat ke peringkat teratas, mengungguli laptop tebal bertenaga tinggi yang baterainya hanya bertahan 3 jam.
+                </p>
+                <p>
+                  3. <strong>Bagaimana dengan kriteria lainnya?</strong> Kriteria kedua (misal: Harga) memegang 24.17% sebagai filter penyaring kedua, kriteria ketiga (misal: RAM) memegang 15.83%, dan seterusnya sampai kriteria terakhir (hanya 2.78%) yang sifatnya hanya bonus pelengkap.
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 
