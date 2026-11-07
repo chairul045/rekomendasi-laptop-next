@@ -1,8 +1,8 @@
-// app/admin/page.tsx - Halaman Admin: Manajemen Laptop
+// src/app/admin/page.tsx - Halaman Dashboard Admin Terpusat Lapmatch
 import { createClient } from '@/lib/supabase/server';
 import prisma from '@/lib/prisma';
 import { redirect } from 'next/navigation';
-import AdminLaptopManager from './AdminLaptopManager';
+import AdminDashboardLayout from './AdminDashboardLayout';
 import { isSuperAdminEmail } from '@/lib/auth-constants';
 
 export default async function AdminPage() {
@@ -11,7 +11,7 @@ export default async function AdminPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect('/login');
+  if (!user) redirect('/login?callbackUrl=/admin');
 
   const profile = await prisma.user.findUnique({ where: { id: user.id } });
   if (!profile || profile.role !== 'admin' || !isSuperAdminEmail(profile.email)) {
@@ -33,7 +33,7 @@ export default async function AdminPage() {
   }));
 
   return (
-    <AdminLaptopManager
+    <AdminDashboardLayout
       initialLaptops={laptopsSerialized}
       stats={{ totalUsers, totalConsultations, totalLaptops: laptops.length }}
       adminName={profile.name}

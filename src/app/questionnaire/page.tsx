@@ -159,13 +159,63 @@ function QuestionnaireContent() {
   const [showExplanation, setShowExplanation] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Check Supabase authentication status
+  // Check authentication status across API profile & Supabase client
   useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getSession().then(({ data }) => {
-      setCurrentUser(data.session?.user ?? null);
-      setCheckingAuth(false);
-    });
+    let isMounted = true;
+
+    async function checkAuth() {
+      try {
+        // Cek via API profile yang membaca SSR cookies secara akurat
+        const res = await fetch('/api/auth/profile');
+        if (res.ok) {
+          const profile = await res.json();
+          if (profile && profile.id) {
+            if (isMounted) {
+              setCurrentUser(profile);
+              setCheckingAuth(false);
+              return;
+            }
+          }
+        }
+      } catch {
+        // Lanjutkan fallback ke supabase client
+      }
+
+      // Fallback ke Supabase auth client
+      try {
+        const supabase = createClient();
+        const { data: userData } = await supabase.auth.getUser();
+        if (userData?.user) {
+          if (isMounted) {
+            setCurrentUser(userData.user);
+            setCheckingAuth(false);
+            return;
+          }
+        }
+
+        const { data: sessionData } = await supabase.auth.getSession();
+        if (sessionData?.session?.user) {
+          if (isMounted) {
+            setCurrentUser(sessionData.session.user);
+            setCheckingAuth(false);
+            return;
+          }
+        }
+      } catch {
+        // Abaikan error
+      }
+
+      if (isMounted) {
+        setCurrentUser(null);
+        setCheckingAuth(false);
+      }
+    }
+
+    checkAuth();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Brand list diambil dinamis dari database
@@ -299,7 +349,7 @@ function QuestionnaireContent() {
   if (checkingAuth) {
     return (
       <div className="min-h-screen flex flex-col bg-[#09090d] text-zinc-100">
-        <Navbar />
+        <Navbar user={null} />
         <main className="flex-grow flex items-center justify-center p-8">
           <div className="flex items-center gap-3 text-sm text-zinc-400">
             <span className="w-5 h-5 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
@@ -316,7 +366,7 @@ function QuestionnaireContent() {
   if (!currentUser || showExplanation) {
     return (
       <div className="min-h-screen flex flex-col bg-[#09090d] text-zinc-100">
-        <Navbar />
+        <Navbar user={currentUser} />
 
         <main className="flex-grow max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-10">
           {/* Tombol kembali ke formulir jika user sudah login */}
@@ -514,7 +564,7 @@ function QuestionnaireContent() {
   // === TAMPILAN FORMULIR KUESIONER (Bagi User yang Sudah Login) ===
   return (
     <div className="min-h-screen flex flex-col bg-[#09090d] text-zinc-100">
-      <Navbar />
+      <Navbar user={currentUser} />
 
       <main className="flex-grow max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8">
         {/* Header Bersih & Ramah Pengguna dengan Tombol Lihat Penjelasan */}

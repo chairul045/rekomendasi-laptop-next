@@ -18,11 +18,8 @@ import {
   Filter,
   FileSpreadsheet,
 } from 'lucide-react';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import { getLaptopImageUrl, formatRupiah } from '@/lib/laptop-utils';
 import ImportLaptopModal from './ImportLaptopModal';
-import AdminBannerManager from './AdminBannerManager';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -418,17 +415,6 @@ export default function AdminLaptopManager({
   const [editTarget, setEditTarget] = useState<LaptopItem | undefined>(undefined);
   const [showImportModal, setShowImportModal] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<'laptops' | 'banners'>('laptops');
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('tab') === 'banners') {
-        setActiveTab('banners');
-      }
-    }
-  }, []);
-
   const filtered = useMemo(() => {
     return laptops.filter((laptop) => {
       const matchSearch =
@@ -463,77 +449,44 @@ export default function AdminLaptopManager({
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#09090d] text-zinc-100">
-      <Navbar />
-
-      <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* Navigation Tabs */}
-        <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-zinc-900/80 border border-white/10 w-fit">
-          <button
-            type="button"
-            onClick={() => setActiveTab('laptops')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
-              activeTab === 'laptops'
-                ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md shadow-violet-600/30'
-                : 'text-zinc-400 hover:text-white'
-            }`}
-          >
-            <Database className="w-3.5 h-3.5" />
-            <span>Data Laptop Alternatif</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('banners')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
-              activeTab === 'banners'
-                ? 'bg-gradient-to-r from-cyan-600 to-teal-600 text-white shadow-md shadow-cyan-600/30'
-                : 'text-zinc-400 hover:text-white'
-            }`}
-          >
-            <BarChart3 className="w-3.5 h-3.5" />
-            <span>Kelola Iklan Slider Dashboard</span>
-          </button>
+    <div className="space-y-6">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md shadow-2xl">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+            <span className="font-mono text-xs text-cyan-300 font-bold uppercase tracking-wider">
+              Katalog Alternatif SPK
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            Manajemen Data Laptop Alternatif
+          </h1>
+          <p className="text-xs sm:text-sm text-zinc-400">
+            Kelola katalog data laptop untuk algoritma pencocokan cerdas TOPSIS &amp; ROC Lapmatch.
+          </p>
         </div>
 
-        {activeTab === 'banners' ? (
-          <AdminBannerManager />
-        ) : (
-          <>
-            {/* Top Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md shadow-2xl">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                  <span className="font-mono text-xs text-amber-300">Admin Control Panel</span>
-                </div>
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                  Manajemen Data Laptop Alternatif
-                </h1>
-                <p className="text-xs sm:text-sm text-zinc-400">
-                  Kelola katalog data laptop untuk algoritma pencocokan cerdas Lapmatch.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2.5">
-                <button
-                  onClick={() => setShowImportModal(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm transition shadow-lg shadow-emerald-600/25 active:scale-[0.98] cursor-pointer"
-                >
-                  <FileSpreadsheet className="w-4 h-4" />
-                  <span>Import Excel / CSV</span>
-                </button>
-                <button
-                  onClick={() => {
-                    setEditTarget(undefined);
-                    setModalMode('create');
-                  }}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm transition shadow-lg shadow-violet-600/25 active:scale-[0.98] cursor-pointer"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Tambah Laptop Baru</span>
-                </button>
-              </div>
-            </div>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            onClick={() => setShowImportModal(true)}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm transition shadow-lg shadow-emerald-600/25 active:scale-[0.98] cursor-pointer"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            <span>Import Excel / CSV</span>
+          </button>
+          <button
+            onClick={() => {
+              setEditTarget(undefined);
+              setModalMode('create');
+            }}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm transition shadow-lg shadow-violet-600/25 active:scale-[0.98] cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Tambah Laptop Baru</span>
+          </button>
+        </div>
+      </div>
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -709,30 +662,25 @@ export default function AdminLaptopManager({
             </table>
           </div>
         </div>
-      </>
-    )}
-  </main>
 
-      <Footer />
+        {/* Modal Tambah/Edit Manual */}
+        {modalMode && (
+          <LaptopFormModal
+            mode={modalMode}
+            initial={editTarget}
+            onClose={() => setModalMode(null)}
+            onSaved={handleSaved}
+          />
+        )}
 
-      {/* Modal Tambah/Edit Manual */}
-      {modalMode && (
-        <LaptopFormModal
-          mode={modalMode}
-          initial={editTarget}
-          onClose={() => setModalMode(null)}
-          onSaved={handleSaved}
+        {/* Modal Import Bulk Excel/CSV */}
+        <ImportLaptopModal
+          isOpen={showImportModal}
+          onClose={() => setShowImportModal(false)}
+          onImportSuccess={(latestLaptops) => {
+            setLaptops(latestLaptops);
+          }}
         />
-      )}
-
-      {/* Modal Import Bulk Excel/CSV */}
-      <ImportLaptopModal
-        isOpen={showImportModal}
-        onClose={() => setShowImportModal(false)}
-        onImportSuccess={(latestLaptops) => {
-          setLaptops(latestLaptops);
-        }}
-      />
-    </div>
-  );
-}
+      </div>
+    );
+  }
