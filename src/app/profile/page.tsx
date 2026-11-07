@@ -134,7 +134,7 @@ export default function ProfilePage() {
         throw new Error(err.error || 'Gagal menghapus akun');
       }
       toast.success('Akun Anda telah berhasil dihapus.');
-      window.location.href = '/login';
+      window.location.href = '/';
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Terjadi kesalahan saat menghapus akun.';
       toast.error(msg);
@@ -277,7 +277,7 @@ export default function ProfilePage() {
     try {
       await fetch('/api/auth/signout', { method: 'POST' });
     } finally {
-      window.location.href = '/login';
+      window.location.href = '/';
     }
   };
 

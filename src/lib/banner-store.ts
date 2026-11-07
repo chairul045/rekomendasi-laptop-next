@@ -116,6 +116,7 @@ const DATA_FILE = path.join(DATA_DIR, 'banners.json');
 
 // Memory cache fallback in case file system has temporary read/write restrictions
 let memoryBanners: BannerAd[] = [...DEFAULT_BANNERS];
+let isLoaded = false;
 
 function ensureFileExists() {
   try {
@@ -132,6 +133,10 @@ function ensureFileExists() {
 }
 
 export function getAllBanners(): BannerAd[] {
+  if (isLoaded && memoryBanners.length > 0) {
+    return memoryBanners.sort((a, b) => a.sortOrder - b.sortOrder);
+  }
+
   ensureFileExists();
   try {
     if (fs.existsSync(DATA_FILE)) {
@@ -139,12 +144,14 @@ export function getAllBanners(): BannerAd[] {
       const parsed = JSON.parse(content);
       if (Array.isArray(parsed) && parsed.length > 0) {
         memoryBanners = parsed;
+        isLoaded = true;
         return parsed.sort((a, b) => a.sortOrder - b.sortOrder);
       }
     }
   } catch (err) {
     console.warn('Error reading banners.json, falling back to cache:', err);
   }
+  isLoaded = true;
   return memoryBanners.sort((a, b) => a.sortOrder - b.sortOrder);
 }
 

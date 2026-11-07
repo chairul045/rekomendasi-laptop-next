@@ -26,10 +26,15 @@ import {
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import dynamic from 'next/dynamic';
 import { getLaptopImageUrl, formatRupiah, getMarketplaceLinks, formatTanggal } from '@/lib/laptop-utils';
-import LaptopDetailModal, { LaptopDetailItem } from '@/components/LaptopDetailModal';
-import LaptopCompareModal from '@/components/LaptopCompareModal';
-import TopsisStepByStepModal, { TopsisCalculationData } from '@/components/TopsisStepByStepModal';
+import type { LaptopDetailItem } from '@/components/LaptopDetailModal';
+import type { TopsisCalculationData } from '@/components/TopsisStepByStepModal';
+
+// Lazy-loaded modals to minimize initial bundle size and speed up page load
+const LaptopDetailModal = dynamic(() => import('@/components/LaptopDetailModal'), { ssr: false });
+const LaptopCompareModal = dynamic(() => import('@/components/LaptopCompareModal'), { ssr: false });
+const TopsisStepByStepModal = dynamic(() => import('@/components/TopsisStepByStepModal'), { ssr: false });
 
 interface LaptopData {
   id: number;

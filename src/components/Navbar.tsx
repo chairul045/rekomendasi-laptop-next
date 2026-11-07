@@ -74,7 +74,7 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
         localStorage.clear();
         sessionStorage.clear();
       } catch {}
-      window.location.href = '/login';
+      window.location.href = '/';
     }
   };
 

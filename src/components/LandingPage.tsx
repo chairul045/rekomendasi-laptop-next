@@ -21,7 +21,22 @@ import {
 import Navbar from './Navbar';
 import Footer from './Footer';
 import LaptopCatalog, { LaptopCatalogItem } from '@/app/LaptopCatalog';
-import PerspectiveTunnelHero from '@/components/ui/perspective-tunnel-hero';
+import dynamic from 'next/dynamic';
+
+const PerspectiveTunnelHero = dynamic(
+  () => import('@/components/ui/perspective-tunnel-hero'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[400px] w-full rounded-3xl bg-zinc-950/50 border border-white/5 flex items-center justify-center">
+        <div className="flex items-center gap-2 text-xs font-mono text-zinc-500">
+          <span className="w-3 h-3 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
+          <span>Memuat 3D Visualizer...</span>
+        </div>
+      </div>
+    ),
+  }
+);
 
 const containerVariants = {
   hidden: { opacity: 0 },

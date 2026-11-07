@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getLaptopImageUrl, formatRupiah, getMarketplaceLinks } from '@/lib/laptop-utils';
 import {
@@ -16,13 +17,17 @@ import {
   Heart,
   Star,
   MessageSquare,
+  ChevronDown,
 } from 'lucide-react';
-import LaptopDetailModal, { LaptopDetailItem } from '@/components/LaptopDetailModal';
-import LaptopCompareModal from '@/components/LaptopCompareModal';
-import LaptopReviewModal from '@/components/LaptopReviewModal';
+import type { LaptopDetailItem } from '@/components/LaptopDetailModal';
 import { useAuthPrompt } from '@/components/auth/AuthPromptModal';
 import { createClient } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
+
+// Lazy load modals - only fetched when opened
+const LaptopDetailModal = dynamic(() => import('@/components/LaptopDetailModal'), { ssr: false });
+const LaptopCompareModal = dynamic(() => import('@/components/LaptopCompareModal'), { ssr: false });
+const LaptopReviewModal = dynamic(() => import('@/components/LaptopReviewModal'), { ssr: false });
 
 export interface LaptopCatalogItem {
   id: number;
@@ -76,6 +81,14 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
   const [comparingLaptops, setComparingLaptops] = useState<LaptopDetailItem[]>([]);
   const [showCompareModal, setShowCompareModal] = useState(false);
   const [reviewTargetLaptop, setReviewTargetLaptop] = useState<{ id: number; name: string; brand: string } | null>(null);
+
+  // Pagination / Performance optimization - render in chunks of 16
+  const [visibleCount, setVisibleCount] = useState(16);
+
+  // Reset pagination when any filter changes
+  useEffect(() => {
+    setVisibleCount(16);
+  }, [activeCategory, search, selectedBrand, priceRange, selectedCondition, sortBy]);
 
   // Fetch current user & load stored favorites
   useEffect(() => {
@@ -201,6 +214,11 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
         return (b.performaKomposit ?? 0) - (a.performaKomposit ?? 0);
       });
   }, [laptops, activeCategory, search, selectedBrand, priceRange, selectedCondition, sortBy, favorites]);
+
+  // Slice displayed items for instant rendering and high frame-rate scrolling
+  const displayedLaptops = useMemo(() => {
+    return filteredAndSorted.slice(0, visibleCount);
+  }, [filteredAndSorted, visibleCount]);
 
   const handleToggleCompare = (laptop: LaptopCatalogItem) => {
     const exists = comparingLaptops.some((l) => l.id === laptop.id);
@@ -428,19 +446,15 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
 
       {/* Laptop Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-        {filteredAndSorted.map((laptop) => {
+        {displayedLaptops.map((laptop) => {
           const imgUrl = getLaptopImageUrl(laptop.brand, laptop.name, laptop.imageUrl);
           const links = getMarketplaceLinks(laptop.brand, laptop.name, laptop.price);
           const isComparing = comparingLaptops.some((l) => l.id === laptop.id);
           const isFav = favorites.includes(laptop.id);
 
           return (
-            <motion.div
+            <div
               key={laptop.id}
-              layout
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.2 }}
               className={`group rounded-3xl bg-[#0e0e15]/90 border backdrop-blur-md overflow-hidden flex flex-col justify-between hover:border-violet-500/50 hover:shadow-xl hover:shadow-violet-950/20 transition-all duration-300 ${
                 isComparing ? 'border-cyan-500/60 ring-1 ring-cyan-500/30' : 'border-white/10'
               }`}
@@ -587,10 +601,31 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
                   </a>
                 </div>
               </div>
-            </motion.div>
+            </div>
           );
         })}
       </div>
+
+      {/* Load More Pagination Button */}
+      {visibleCount < filteredAndSorted.length && (
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
+          <button
+            type="button"
+            onClick={() => setVisibleCount((prev) => Math.min(prev + 16, filteredAndSorted.length))}
+            className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs transition shadow-lg shadow-violet-600/25 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+          >
+            <span>Muat Lebih Banyak (+16 Laptop)</span>
+            <ChevronDown className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setVisibleCount(filteredAndSorted.length)}
+            className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/10 text-xs font-semibold transition cursor-pointer"
+          >
+            Tampilkan Semua ({filteredAndSorted.length})
+          </button>
+        </div>
+      )}
 
       {filteredAndSorted.length === 0 && (
         <div className="text-center py-16 rounded-3xl bg-[#0e0e15]/80 border border-white/10 space-y-3">

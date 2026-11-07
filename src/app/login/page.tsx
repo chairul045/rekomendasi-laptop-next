@@ -101,7 +101,7 @@ export default function LoginPage() {
         sessionStorage.clear();
       } catch {}
       setActiveUserEmail(null);
-      window.location.href = '/login';
+      window.location.href = '/';
     }
   };
 

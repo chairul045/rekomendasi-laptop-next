@@ -1,7 +1,22 @@
 import type { Metadata } from 'next';
+import { Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import { AuthPromptProvider } from '@/components/auth/AuthPromptModal';
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  variable: '--font-sans',
+  display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-mono',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Lapmatch - Smart Laptop Matching & Recommendation',
@@ -15,21 +30,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" className="dark h-full">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="min-h-full flex flex-col bg-[#09090d] text-zinc-100 antialiased selection:bg-violet-500 selection:text-white relative">
-        {/* Ambient 21st.dev colorful glow backdrops */}
+    <html lang="id" className={`dark h-full ${plusJakartaSans.variable} ${jetbrainsMono.variable}`}>
+      <body className="min-h-full flex flex-col bg-[#09090d] text-zinc-100 antialiased selection:bg-violet-500 selection:text-white relative font-sans">
+        {/* Ambient background decoration */}
         <div className="fixed inset-0 pointer-events-none bg-grid-pattern opacity-80 z-0" />
-        <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[850px] h-[400px] bg-gradient-to-b from-violet-600/15 via-indigo-600/10 to-transparent blur-[120px] pointer-events-none z-0 animate-pulse-glow" />
-        <div className="fixed top-20 right-0 w-[500px] h-[350px] bg-gradient-to-bl from-cyan-500/15 via-blue-600/10 to-transparent blur-[110px] pointer-events-none z-0 animate-float-slow" />
-        <div className="fixed top-60 left-0 w-[450px] h-[350px] bg-gradient-to-tr from-pink-500/10 via-purple-600/10 to-transparent blur-[110px] pointer-events-none z-0 animate-float-reverse" />
+        <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[850px] h-[400px] bg-gradient-to-b from-violet-600/15 via-indigo-600/10 to-transparent blur-[120px] pointer-events-none z-0" />
+        <div className="fixed top-20 right-0 w-[500px] h-[350px] bg-gradient-to-bl from-cyan-500/15 via-blue-600/10 to-transparent blur-[110px] pointer-events-none z-0" />
+        <div className="fixed top-60 left-0 w-[450px] h-[350px] bg-gradient-to-tr from-pink-500/10 via-purple-600/10 to-transparent blur-[110px] pointer-events-none z-0" />
 
         <div className="relative z-10 flex flex-col min-h-screen">
           <AuthPromptProvider>
