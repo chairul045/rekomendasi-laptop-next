@@ -137,17 +137,19 @@ export default function LandingPage({ previewLaptops = [] }: { previewLaptops?: 
                   href="/questionnaire"
                   className="shimmer-button w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-extrabold text-sm transition shadow-xl shadow-violet-600/30"
                 >
+                  <Sparkles className="w-4 h-4 text-cyan-300" />
                   <span>Mulai Konsultasi Gratis</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </motion.div>
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
-                <Link
-                  href="/login"
+                <a
+                  href="#katalog"
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/10 font-bold text-sm transition shadow-sm"
                 >
-                  <span>Masuk ke Akun</span>
-                </Link>
+                  <Laptop className="w-4 h-4 text-cyan-400" />
+                  <span>Eksplorasi Katalog</span>
+                </a>
               </motion.div>
             </motion.div>
 

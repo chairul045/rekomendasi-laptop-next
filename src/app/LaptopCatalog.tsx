@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getLaptopImageUrl, formatRupiah, getMarketplaceLinks } from '@/lib/laptop-utils';
 import {
@@ -13,9 +13,15 @@ import {
   Info,
   X,
   SlidersHorizontal,
+  Heart,
+  Star,
+  MessageSquare,
 } from 'lucide-react';
 import LaptopDetailModal, { LaptopDetailItem } from '@/components/LaptopDetailModal';
 import LaptopCompareModal from '@/components/LaptopCompareModal';
+import LaptopReviewModal from '@/components/LaptopReviewModal';
+import { useAuthPrompt } from '@/components/auth/AuthPromptModal';
+import { createClient } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
 
 export interface LaptopCatalogItem {
@@ -52,24 +58,89 @@ const BRANDS = [
 ];
 
 export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[] }) {
-  const [activeCategory, setActiveCategory] = useState<'all' | 'gaming' | 'portable' | 'budget'>('all');
+  const { openAuthPrompt } = useAuthPrompt();
+  const [currentUser, setCurrentUser] = useState<{ id: string; email?: string } | null>(null);
+
+  const [activeCategory, setActiveCategory] = useState<'all' | 'gaming' | 'portable' | 'budget' | 'favorites'>('all');
   const [search, setSearch] = useState('');
   const [selectedBrand, setSelectedBrand] = useState('Semua Merek');
   const [priceRange, setPriceRange] = useState<'all' | 'under7' | '7to12' | '12to20' | 'above20'>('all');
   const [selectedCondition, setSelectedCondition] = useState<'all' | 'baru' | 'second'>('all');
   const [sortBy, setSortBy] = useState<'recommended' | 'priceAsc' | 'priceDesc' | 'ramDesc' | 'batteryDesc' | 'weightAsc'>('recommended');
 
+  // Favorites state
+  const [favorites, setFavorites] = useState<number[]>([]);
+
   // Modals & Comparison State
   const [selectedDetailLaptop, setSelectedDetailLaptop] = useState<LaptopDetailItem | null>(null);
   const [comparingLaptops, setComparingLaptops] = useState<LaptopDetailItem[]>([]);
   const [showCompareModal, setShowCompareModal] = useState(false);
+  const [reviewTargetLaptop, setReviewTargetLaptop] = useState<{ id: number; name: string; brand: string } | null>(null);
+
+  // Fetch current user & load stored favorites
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data }) => {
+      const u = data.session?.user;
+      if (u) {
+        setCurrentUser({ id: u.id, email: u.email });
+        try {
+          const stored = localStorage.getItem(`lapmatch_favs_${u.id}`);
+          if (stored) {
+            setFavorites(JSON.parse(stored));
+          }
+        } catch {}
+      }
+    });
+  }, []);
+
+  const handleToggleFavorite = (laptopId: number, laptopName: string) => {
+    if (!currentUser) {
+      openAuthPrompt({
+        title: 'Masuk Diperlukan',
+        message: 'Silakan login terlebih dahulu untuk menggunakan fitur ini.',
+        featureName: 'Menyimpan laptop ke daftar favorit',
+        returnUrl: typeof window !== 'undefined' ? window.location.pathname : '/',
+      });
+      return;
+    }
+
+    const isFav = favorites.includes(laptopId);
+    let updated: number[];
+    if (isFav) {
+      updated = favorites.filter((id) => id !== laptopId);
+      toast('Laptop dihapus dari favorit', { icon: '🤍' });
+    } else {
+      updated = [...favorites, laptopId];
+      toast.success(`${laptopName} ditambahkan ke favorit! ❤️`);
+    }
+    setFavorites(updated);
+    try {
+      localStorage.setItem(`lapmatch_favs_${currentUser.id}`, JSON.stringify(updated));
+    } catch {}
+  };
+
+  const handleOpenReview = (laptop: { id: number; name: string; brand: string }) => {
+    if (!currentUser) {
+      openAuthPrompt({
+        title: 'Masuk Diperlukan',
+        message: 'Silakan login terlebih dahulu untuk menggunakan fitur ini.',
+        featureName: 'Memberikan rating & ulasan laptop',
+        returnUrl: typeof window !== 'undefined' ? window.location.pathname : '/',
+      });
+      return;
+    }
+    setReviewTargetLaptop(laptop);
+  };
 
   // Filter & Sort calculation
   const filteredAndSorted = useMemo(() => {
     return laptops
       .filter((laptop) => {
         // Category Tab Filter
-        if (activeCategory === 'gaming') {
+        if (activeCategory === 'favorites') {
+          if (!favorites.includes(laptop.id)) return false;
+        } else if (activeCategory === 'gaming') {
           const name = laptop.name.toLowerCase();
           const cat = (laptop.category ?? '').toLowerCase();
           const isGaming =
@@ -129,7 +200,7 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
         // Default recommended: by performance score desc, then price asc
         return (b.performaKomposit ?? 0) - (a.performaKomposit ?? 0);
       });
-  }, [laptops, activeCategory, search, selectedBrand, priceRange, selectedCondition, sortBy]);
+  }, [laptops, activeCategory, search, selectedBrand, priceRange, selectedCondition, sortBy, favorites]);
 
   const handleToggleCompare = (laptop: LaptopCatalogItem) => {
     const exists = comparingLaptops.some((l) => l.id === laptop.id);
@@ -164,7 +235,7 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
     sortBy !== 'recommended';
 
   return (
-    <div className="space-y-6">
+    <div id="katalog" className="space-y-6">
       {/* Catalog Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-5">
         <div>
@@ -176,7 +247,7 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
             Eksplorasi Katalog & Perbandingan Laptop
           </h2>
           <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-            Gunakan filter cerdas untuk menemukan spesifikasi ideal atau pilih beberapa laptop untuk dibandingkan.
+            Jelajahi spesifikasi, filter harga & performa, simpan favorit, atau bandingkan beberapa laptop sekaligus secara bebas.
           </p>
         </div>
 
@@ -226,6 +297,29 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
           >
             💰 Budget &lt; 7Jt
           </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (!currentUser) {
+                openAuthPrompt({
+                  title: 'Masuk Diperlukan',
+                  message: 'Silakan login terlebih dahulu untuk menggunakan fitur ini.',
+                  featureName: 'Melihat daftar laptop favorit',
+                  returnUrl: typeof window !== 'undefined' ? window.location.pathname : '/',
+                });
+                return;
+              }
+              setActiveCategory('favorites');
+            }}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition cursor-pointer flex items-center gap-1.5 ${
+              activeCategory === 'favorites'
+                ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 shadow-sm'
+                : 'text-zinc-400 hover:text-rose-300'
+            }`}
+          >
+            <Heart className={`w-3.5 h-3.5 ${activeCategory === 'favorites' ? 'fill-rose-400' : ''}`} />
+            <span>Favorit ({favorites.length})</span>
+          </button>
         </div>
       </div>
 
@@ -258,26 +352,13 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
             <select
               value={selectedBrand}
               onChange={(e) => setSelectedBrand(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-2xl bg-zinc-950/80 border border-white/10 text-xs text-zinc-200 focus:outline-none focus:border-violet-500 transition cursor-pointer"
+              className="w-full px-3 py-2.5 rounded-2xl bg-zinc-950/80 border border-white/10 text-xs text-zinc-200 focus:outline-none focus:border-violet-500 transition cursor-pointer"
             >
-              {BRANDS.map((b) => (
-                <option key={b} value={b} className="bg-zinc-950 text-white">
-                  {b}
+              {BRANDS.map((brand) => (
+                <option key={brand} value={brand} className="bg-zinc-900 text-white">
+                  {brand}
                 </option>
               ))}
-            </select>
-          </div>
-
-          {/* Condition Filter */}
-          <div>
-            <select
-              value={selectedCondition}
-              onChange={(e) => setSelectedCondition(e.target.value as typeof selectedCondition)}
-              className="w-full px-3.5 py-2.5 rounded-2xl bg-zinc-950/80 border border-white/10 text-xs text-zinc-200 focus:outline-none focus:border-violet-500 transition cursor-pointer"
-            >
-              <option value="all" className="bg-zinc-950 text-white">Baru &amp; Second</option>
-              <option value="baru" className="bg-zinc-950 text-white">✨ Laptop Baru</option>
-              <option value="second" className="bg-zinc-950 text-white">♻️ Laptop Second</option>
             </select>
           </div>
 
@@ -285,68 +366,82 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
           <div>
             <select
               value={priceRange}
-              onChange={(e) => setPriceRange(e.target.value as typeof priceRange)}
-              className="w-full px-3.5 py-2.5 rounded-2xl bg-zinc-950/80 border border-white/10 text-xs text-zinc-200 focus:outline-none focus:border-violet-500 transition cursor-pointer"
+              onChange={(e) => setPriceRange(e.target.value as any)}
+              className="w-full px-3 py-2.5 rounded-2xl bg-zinc-950/80 border border-white/10 text-xs text-zinc-200 focus:outline-none focus:border-violet-500 transition cursor-pointer"
             >
-              <option value="all" className="bg-zinc-950 text-white">Semua Rentang Harga</option>
-              <option value="under7" className="bg-zinc-950 text-white">&lt; Rp 7 Juta</option>
-              <option value="7to12" className="bg-zinc-950 text-white">Rp 7 - 12 Juta</option>
-              <option value="12to20" className="bg-zinc-950 text-white">Rp 12 - 20 Juta</option>
-              <option value="above20" className="bg-zinc-950 text-white">&gt; Rp 20 Juta</option>
+              <option value="all" className="bg-zinc-900 text-white">Semua Rentang Harga</option>
+              <option value="under7" className="bg-zinc-900 text-white">&lt; Rp 7 Juta</option>
+              <option value="7to12" className="bg-zinc-900 text-white">Rp 7 - 12 Juta</option>
+              <option value="12to20" className="bg-zinc-900 text-white">Rp 12 - 20 Juta</option>
+              <option value="above20" className="bg-zinc-900 text-white">&gt; Rp 20 Juta</option>
             </select>
           </div>
 
-          {/* Sort Selector */}
+          {/* Condition Filter */}
+          <div>
+            <select
+              value={selectedCondition}
+              onChange={(e) => setSelectedCondition(e.target.value as any)}
+              className="w-full px-3 py-2.5 rounded-2xl bg-zinc-950/80 border border-white/10 text-xs text-zinc-200 focus:outline-none focus:border-violet-500 transition cursor-pointer"
+            >
+              <option value="all" className="bg-zinc-900 text-white">Semua Kondisi</option>
+              <option value="baru" className="bg-zinc-900 text-white">Baru Saja</option>
+              <option value="second" className="bg-zinc-900 text-white">Second (Bekas)</option>
+            </select>
+          </div>
+
+          {/* Sort By Filter */}
           <div>
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-              className="w-full px-3.5 py-2.5 rounded-2xl bg-zinc-950/80 border border-white/10 text-xs text-zinc-200 focus:outline-none focus:border-violet-500 transition cursor-pointer"
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="w-full px-3 py-2.5 rounded-2xl bg-zinc-950/80 border border-white/10 text-xs text-zinc-200 focus:outline-none focus:border-violet-500 transition cursor-pointer"
             >
-              <option value="recommended" className="bg-zinc-950 text-white">Urut: Rekomendasi</option>
-              <option value="priceAsc" className="bg-zinc-950 text-white">Harga: Termurah</option>
-              <option value="priceDesc" className="bg-zinc-950 text-white">Harga: Tertinggi</option>
-              <option value="ramDesc" className="bg-zinc-950 text-white">RAM: Terbesar</option>
-              <option value="batteryDesc" className="bg-zinc-950 text-white">Baterai: Terlama</option>
-              <option value="weightAsc" className="bg-zinc-950 text-white">Bobot: Teringan</option>
+              <option value="recommended" className="bg-zinc-900 text-white">Performa Terbaik</option>
+              <option value="priceAsc" className="bg-zinc-900 text-white">Harga: Termurah</option>
+              <option value="priceDesc" className="bg-zinc-900 text-white">Harga: Tertinggi</option>
+              <option value="ramDesc" className="bg-zinc-900 text-white">RAM: Terbesar</option>
+              <option value="batteryDesc" className="bg-zinc-900 text-white">Baterai: Terlama</option>
+              <option value="weightAsc" className="bg-zinc-900 text-white">Bobot: Teringan</option>
             </select>
           </div>
         </div>
 
-        {/* Active Filter Badges & Reset Button */}
+        {/* Status Bar */}
         <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/5 text-xs">
-          <div className="text-zinc-400 font-mono text-[11px] flex items-center gap-1.5">
-            <span>Ditemukan:</span>
-            <span className="text-cyan-300 font-bold">{filteredAndSorted.length}</span>
-            <span>dari {laptops.length} laptop</span>
-          </div>
+          <span className="text-zinc-400">
+            Menampilkan <strong className="text-white">{filteredAndSorted.length}</strong> dari{' '}
+            {laptops.length} laptop tersedia
+          </span>
 
           {hasActiveFilters && (
             <button
               type="button"
               onClick={handleResetFilters}
-              className="text-[11px] text-rose-400 hover:text-rose-300 flex items-center gap-1 font-mono transition cursor-pointer"
+              className="text-violet-400 hover:text-violet-300 font-semibold transition cursor-pointer"
             >
-              <X className="w-3 h-3" />
-              <span>Reset Semua Filter</span>
+              Reset Semua Filter
             </button>
           )}
         </div>
       </div>
 
-      {/* Laptop Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Laptop Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
         {filteredAndSorted.map((laptop) => {
           const imgUrl = getLaptopImageUrl(laptop.brand, laptop.name, laptop.imageUrl);
           const links = getMarketplaceLinks(laptop.brand, laptop.name, laptop.price);
-          const isComparing = comparingLaptops.some((c) => c.id === laptop.id);
+          const isComparing = comparingLaptops.some((l) => l.id === laptop.id);
+          const isFav = favorites.includes(laptop.id);
 
           return (
             <motion.div
               key={laptop.id}
-              whileHover={{ y: -6 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
-              className={`rounded-3xl bg-[#0e0e15]/90 border transition-colors duration-300 overflow-hidden backdrop-blur-xl flex flex-col justify-between shadow-lg group hover:border-violet-500/50 hover:shadow-2xl hover:shadow-violet-600/10 ${
+              layout
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.2 }}
+              className={`group rounded-3xl bg-[#0e0e15]/90 border backdrop-blur-md overflow-hidden flex flex-col justify-between hover:border-violet-500/50 hover:shadow-xl hover:shadow-violet-950/20 transition-all duration-300 ${
                 isComparing ? 'border-cyan-500/60 ring-1 ring-cyan-500/30' : 'border-white/10'
               }`}
             >
@@ -375,18 +470,30 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
                   </div>
                 </div>
 
-                {/* Laptop Image */}
-                <div
-                  onClick={() => setSelectedDetailLaptop(laptop as unknown as LaptopDetailItem)}
-                  className="w-full h-40 rounded-2xl bg-zinc-950 overflow-hidden flex items-center justify-center p-3 border border-white/5 group-hover:border-violet-500/30 transition cursor-pointer"
-                >
+                {/* Laptop Image with Heart Favorite Button */}
+                <div className="relative w-full h-40 rounded-2xl bg-zinc-950 overflow-hidden flex items-center justify-center p-3 border border-white/5 group-hover:border-violet-500/30 transition">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
+                    onClick={() => setSelectedDetailLaptop(laptop as unknown as LaptopDetailItem)}
                     src={imgUrl}
                     alt={laptop.name}
-                    className="max-h-full max-w-full object-contain group-hover:scale-105 transition duration-300"
+                    className="max-h-full max-w-full object-contain group-hover:scale-105 transition duration-300 cursor-pointer"
                     loading="lazy"
                   />
+
+                  {/* Favorite Heart Button (Shopee Style) */}
+                  <button
+                    type="button"
+                    onClick={() => handleToggleFavorite(laptop.id, laptop.name)}
+                    className={`absolute top-2 right-2 p-2 rounded-xl backdrop-blur-md transition-all cursor-pointer ${
+                      isFav
+                        ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 shadow-[0_0_12px_rgba(244,63,94,0.3)]'
+                        : 'bg-zinc-900/70 hover:bg-zinc-800 text-zinc-400 hover:text-rose-400 border border-white/10'
+                    }`}
+                    title={isFav ? 'Hapus dari favorit' : 'Tambah ke favorit'}
+                  >
+                    <Heart className={`w-4 h-4 ${isFav ? 'fill-rose-500 text-rose-500' : ''}`} />
+                  </button>
                 </div>
 
                 {/* Title & Price */}
@@ -406,33 +513,45 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div className="p-2 rounded-xl bg-zinc-950/70 border border-white/5">
                     <span className="text-xs text-zinc-500 block font-mono">RAM</span>
-                    <span className="font-bold text-zinc-200 text-xs">{laptop.ramGb != null ? `${laptop.ramGb} GB` : 'Data belum tersedia'}</span>
+                    <span className="font-bold text-zinc-200 text-xs">{laptop.ramGb != null ? `${laptop.ramGb} GB` : 'Tersedia'}</span>
                   </div>
                   <div className="p-2 rounded-xl bg-zinc-950/70 border border-white/5">
                     <span className="text-xs text-zinc-500 block font-mono">SSD</span>
-                    <span className="font-bold text-zinc-200 text-xs">{laptop.storageGb != null ? `${laptop.storageGb} GB` : 'Data belum tersedia'}</span>
+                    <span className="font-bold text-zinc-200 text-xs">{laptop.storageGb != null ? `${laptop.storageGb} GB` : 'Tersedia'}</span>
                   </div>
                   <div className="p-2 rounded-xl bg-zinc-950/70 border border-white/5">
                     <span className="text-xs text-zinc-500 block font-mono">Baterai</span>
-                    <span className="font-bold text-zinc-200 text-xs">{laptop.batteryHours != null ? `${laptop.batteryHours} Jam` : 'Data belum tersedia'}</span>
+                    <span className="font-bold text-zinc-200 text-xs">{laptop.batteryHours != null ? `${laptop.batteryHours} Jam` : 'Standar'}</span>
                   </div>
                   <div className="p-2 rounded-xl bg-zinc-950/70 border border-white/5">
                     <span className="text-xs text-zinc-500 block font-mono">Bobot</span>
-                    <span className="font-bold text-zinc-200 text-xs">{laptop.weightKg != null ? `${laptop.weightKg} kg` : 'Data belum tersedia'}</span>
+                    <span className="font-bold text-zinc-200 text-xs">{laptop.weightKg != null ? `${laptop.weightKg} kg` : 'Standar'}</span>
                   </div>
                 </div>
               </div>
 
               {/* Card Footer Actions */}
-              <div className="p-4 bg-zinc-950/60 border-t border-white/5 flex items-center justify-between gap-2 text-xs">
-                <button
-                  type="button"
-                  onClick={() => setSelectedDetailLaptop(laptop as unknown as LaptopDetailItem)}
-                  className="px-2.5 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/10 text-[11px] font-medium transition flex items-center gap-1 cursor-pointer"
-                >
-                  <Info className="w-3 h-3 text-cyan-400" />
-                  <span>Spek</span>
-                </button>
+              <div className="p-4 bg-zinc-950/60 border-t border-white/5 flex items-center justify-between gap-1.5 text-xs">
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedDetailLaptop(laptop as unknown as LaptopDetailItem)}
+                    className="px-2.5 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/10 text-[11px] font-medium transition flex items-center gap-1 cursor-pointer"
+                  >
+                    <Info className="w-3 h-3 text-cyan-400" />
+                    <span>Spek</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleOpenReview(laptop)}
+                    className="px-2.5 py-1.5 rounded-xl bg-zinc-900 hover:bg-amber-950/30 text-zinc-400 hover:text-amber-300 border border-white/10 hover:border-amber-500/30 text-[11px] font-medium transition flex items-center gap-1 cursor-pointer"
+                    title="Beri Ulasan atau Rating"
+                  >
+                    <Star className="w-3 h-3 text-amber-400" />
+                    <span className="hidden sm:inline">Ulas</span>
+                  </button>
+                </div>
 
                 <button
                   type="button"
@@ -479,7 +598,7 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
           <button
             type="button"
             onClick={handleResetFilters}
-            className="px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold transition"
+            className="px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold transition cursor-pointer"
           >
             Reset Filter
           </button>
@@ -533,6 +652,9 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
             ? comparingLaptops.some((c) => c.id === selectedDetailLaptop.id)
             : false
         }
+        isFavorite={selectedDetailLaptop ? favorites.includes(selectedDetailLaptop.id) : false}
+        onToggleFavorite={(laptop) => handleToggleFavorite(laptop.id, laptop.name)}
+        onOpenReview={(laptop) => handleOpenReview(laptop)}
       />
 
       {/* Laptop Compare Modal */}
@@ -542,6 +664,14 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
           onClose={() => setShowCompareModal(false)}
           onRemove={(id) => setComparingLaptops(comparingLaptops.filter((l) => l.id !== id))}
           onClear={() => setComparingLaptops([])}
+        />
+      )}
+
+      {/* Review Modal */}
+      {reviewTargetLaptop && (
+        <LaptopReviewModal
+          laptop={reviewTargetLaptop}
+          onClose={() => setReviewTargetLaptop(null)}
         />
       )}
     </div>

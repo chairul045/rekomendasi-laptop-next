@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ExternalLink, Cpu, HardDrive, Battery, Gauge, Monitor, ShieldCheck, Sparkles, Scale } from 'lucide-react';
+import { X, ExternalLink, Cpu, HardDrive, Battery, Gauge, Monitor, ShieldCheck, Sparkles, Scale, Heart, Star } from 'lucide-react';
 import { getLaptopImageUrl, formatRupiah, getMarketplaceLinks } from '@/lib/laptop-utils';
 
 export interface LaptopDetailItem {
@@ -28,6 +28,9 @@ interface LaptopDetailModalProps {
   onClose: () => void;
   onCompare?: (laptop: LaptopDetailItem) => void;
   isComparing?: boolean;
+  onToggleFavorite?: (laptop: LaptopDetailItem) => void;
+  isFavorite?: boolean;
+  onOpenReview?: (laptop: LaptopDetailItem) => void;
 }
 
 export default function LaptopDetailModal({
@@ -35,6 +38,9 @@ export default function LaptopDetailModal({
   onClose,
   onCompare,
   isComparing,
+  onToggleFavorite,
+  isFavorite = false,
+  onOpenReview,
 }: LaptopDetailModalProps) {
   if (!laptop) return null;
 
@@ -62,15 +68,32 @@ export default function LaptopDetailModal({
         {/* Glow Header Accent */}
         <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-400" />
 
-        {/* Close Button */}
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-white/10 transition"
-          aria-label="Tutup modal"
-        >
-          <X className="w-5 h-5" />
-        </button>
+        {/* Action Controls (Favorite & Close) */}
+        <div className="absolute top-5 right-5 flex items-center gap-2">
+          {onToggleFavorite && (
+            <button
+              type="button"
+              onClick={() => onToggleFavorite(laptop)}
+              className={`p-2 rounded-xl border transition cursor-pointer ${
+                isFavorite
+                  ? 'bg-rose-500/20 text-rose-400 border-rose-500/40 shadow-[0_0_12px_rgba(244,63,94,0.3)]'
+                  : 'bg-zinc-900/80 hover:bg-zinc-800 text-zinc-400 hover:text-rose-400 border-white/10'
+              }`}
+              title={isFavorite ? 'Hapus dari favorit' : 'Tambah ke favorit'}
+            >
+              <Heart className={`w-5 h-5 ${isFavorite ? 'fill-rose-500 text-rose-500' : ''}`} />
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-white/10 transition cursor-pointer"
+            aria-label="Tutup modal"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
 
         {/* Top Info Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 pb-6 border-b border-white/10">
@@ -255,19 +278,32 @@ export default function LaptopDetailModal({
             </a>
           </div>
 
-          {onCompare && (
-            <button
-              type="button"
-              onClick={() => onCompare(laptop)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${
-                isComparing
-                  ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30'
-                  : 'bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-md'
-              }`}
-            >
-              {isComparing ? 'Batalkan Komparasi' : '➕ Tambah ke Komparasi'}
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            {onOpenReview && (
+              <button
+                type="button"
+                onClick={() => onOpenReview(laptop)}
+                className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 transition flex items-center gap-1.5 cursor-pointer"
+              >
+                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                <span>Beri Ulasan</span>
+              </button>
+            )}
+
+            {onCompare && (
+              <button
+                type="button"
+                onClick={() => onCompare(laptop)}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${
+                  isComparing
+                    ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30'
+                    : 'bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-md'
+                }`}
+              >
+                {isComparing ? 'Batalkan Komparasi' : '➕ Tambah ke Komparasi'}
+              </button>
+            )}
+          </div>
         </div>
         </motion.div>
       </motion.div>

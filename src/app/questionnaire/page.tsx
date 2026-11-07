@@ -11,9 +11,20 @@ import {
   Sliders,
   DollarSign,
   Laptop as LaptopIcon,
+  ArrowRight,
+  ShieldCheck,
+  CheckCircle2,
+  GraduationCap,
+  Info,
+  HelpCircle,
+  BookOpen,
+  Cpu,
+  Zap,
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { createClient } from '@/lib/supabase/client';
+import { useAuthPrompt } from '@/components/auth/AuthPromptModal';
 
 // ── Kriteria Standar SPK ──────────────────────────────────────────────────────
 const PERUNTUKAN_PRESETS: Record<string, string[]> = {
@@ -141,11 +152,21 @@ function formatRupiahShort(amount: number): string {
 function QuestionnaireContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const isGuest = searchParams.get('guest') === 'true';
+  const { openAuthPrompt } = useAuthPrompt();
 
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [showExplanation, setShowExplanation] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [guestResults, setGuestResults] = useState<any[] | null>(null);
-  const [showGuestModal, setShowGuestModal] = useState(false);
+
+  // Check Supabase authentication status
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data }) => {
+      setCurrentUser(data.session?.user ?? null);
+      setCheckingAuth(false);
+    });
+  }, []);
 
   // Brand list diambil dinamis dari database
   const [brands, setBrands] = useState<string[]>(BRANDS_DEFAULT);
@@ -234,40 +255,14 @@ function QuestionnaireContent() {
     const computedRanking = computeRankingKriteria(selectedPeruntukan, frekuensiPemakaian);
     const peruntukanText = selectedPeruntukan.join(' & ');
 
-    if (isGuest) {
-      try {
-        const res = await fetch('/api/questionnaire/guest', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            budgetMin,
-            budgetMax,
-            peruntukan: peruntukanText,
-            kondisiPilihan,
-            merekPilihan: selectedBrands,
-            rankingKriteria: computedRanking,
-          }),
-        });
-
-        const data = await res.json();
-        if (!res.ok) {
-          toast.error(data.error || 'Gagal memproses rekomendasi.');
-          return;
-        }
-
-        const results = data.previewResults || [];
-        setGuestResults(results);
-        setShowGuestModal(true);
-        if (results.length > 0) {
-          toast.success('Rekomendasi laptop berhasil ditemukan!');
-        } else {
-          toast('Tidak ada laptop yang cocok dalam rentang anggaran ini.', { icon: 'ℹ️' });
-        }
-      } catch {
-        toast.error('Terjadi kendala jaringan. Silakan coba beberapa saat lagi.');
-      } finally {
-        setLoading(false);
-      }
+    if (!currentUser) {
+      setLoading(false);
+      openAuthPrompt({
+        title: 'Masuk Akun untuk Memulai Kuesioner',
+        message: 'Silakan login terlebih dahulu untuk menggunakan fitur ini.',
+        featureName: 'Memulai kuesioner rekomendasi laptop',
+        returnUrl: '/questionnaire',
+      });
       return;
     }
 
@@ -301,47 +296,253 @@ function QuestionnaireContent() {
     }
   };
 
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen flex flex-col bg-[#09090d] text-zinc-100">
+        <Navbar />
+        <main className="flex-grow flex items-center justify-center p-8">
+          <div className="flex items-center gap-3 text-sm text-zinc-400">
+            <span className="w-5 h-5 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
+            <span>Memeriksa status akun...</span>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // === TAMPILAN PENJELASAN KUESIONER (Bisa dilihat siapa saja, Shopee style) ===
+  // Khusus pengunjung tanpa login: boleh melihat halaman penjelasan, wajib login saat menekan "Mulai Kuesioner"
+  if (!currentUser || showExplanation) {
+    return (
+      <div className="min-h-screen flex flex-col bg-[#09090d] text-zinc-100">
+        <Navbar />
+
+        <main className="flex-grow max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-10">
+          {/* Tombol kembali ke formulir jika user sudah login */}
+          {currentUser && showExplanation && (
+            <div>
+              <button
+                type="button"
+                onClick={() => setShowExplanation(false)}
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-semibold border border-white/10 transition cursor-pointer"
+              >
+                ← Kembali ke Pengisian Formulir
+              </button>
+            </div>
+          )}
+
+          {/* Hero Header Penjelasan */}
+          <div className="text-center space-y-4 max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-violet-950/70 via-indigo-950/60 to-cyan-950/70 border border-violet-500/30 text-cyan-300 shadow-lg shadow-violet-500/10">
+              <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+              <span>Panduan &amp; Penjelasan Kuesioner Rekomendasi SPK</span>
+            </div>
+
+            <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+              Kuesioner Cerdas Pemilihan Laptop Kuliah Berbasis{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-300 to-cyan-300">
+                Metode Ilmiah &amp; AI
+              </span>
+            </h1>
+
+            <p className="text-sm sm:text-base text-zinc-400 leading-relaxed">
+              Selamat datang di sistem pendukung keputusan Lapmatch. Pengunjung dapat membaca panduan dan alur evaluasi di bawah ini. Anda hanya perlu menjawab 5 parameter mudah untuk menemukan laptop terbaik sesuai kebutuhan dan anggaran Anda.
+            </p>
+          </div>
+
+          {/* 5 Parameter yang Digunakan dalam Kuesioner */}
+          <div className="space-y-4">
+            <div className="text-center sm:text-left">
+              <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">
+                Parameter Evaluasi
+              </span>
+              <h2 className="text-xl sm:text-2xl font-black text-white mt-1">
+                5 Pertanyaan Kunci dalam Kuesioner
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-5 rounded-3xl bg-[#0e0e15]/90 border border-white/10 space-y-3 hover:border-violet-500/40 transition">
+                <div className="w-10 h-10 rounded-2xl bg-violet-600/20 border border-violet-500/30 flex items-center justify-center text-violet-300 font-bold font-mono">
+                  1
+                </div>
+                <h3 className="text-sm font-bold text-white">Rentang Anggaran (Budget)</h3>
+                <p className="text-xs text-zinc-400 leading-relaxed">
+                  Menentukan rentang dana minimal dan maksimal yang realistis, dari budget hemat hingga laptop performa flagship.
+                </p>
+              </div>
+
+              <div className="p-5 rounded-3xl bg-[#0e0e15]/90 border border-white/10 space-y-3 hover:border-violet-500/40 transition">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-300 font-bold font-mono">
+                  2
+                </div>
+                <h3 className="text-sm font-bold text-white">Kebutuhan Perkuliahan</h3>
+                <p className="text-xs text-zinc-400 leading-relaxed">
+                  Pilih fokus aktivitas: Kuliah Harian, Pemrograman/Koding, Desain Grafis/Video, Gaming, atau Bisnis/Mobilitas.
+                </p>
+              </div>
+
+              <div className="p-5 rounded-3xl bg-[#0e0e15]/90 border border-white/10 space-y-3 hover:border-violet-500/40 transition">
+                <div className="w-10 h-10 rounded-2xl bg-cyan-600/20 border border-cyan-500/30 flex items-center justify-center text-cyan-300 font-bold font-mono">
+                  3
+                </div>
+                <h3 className="text-sm font-bold text-white">Pilihan Kondisi Unit</h3>
+                <p className="text-xs text-zinc-400 leading-relaxed">
+                  Evaluasi laptop baru resmi bergaransi, laptop second berkinerja tinggi, atau komparasi objektif keduanya sekaligus.
+                </p>
+              </div>
+
+              <div className="p-5 rounded-3xl bg-[#0e0e15]/90 border border-white/10 space-y-3 hover:border-violet-500/40 transition">
+                <div className="w-10 h-10 rounded-2xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-300 font-bold font-mono">
+                  4
+                </div>
+                <h3 className="text-sm font-bold text-white">Preferensi Brand</h3>
+                <p className="text-xs text-zinc-400 leading-relaxed">
+                  Pilih merek tertentu (ASUS, Lenovo, HP, Acer, Apple, dll.) atau pilih semua brand untuk pilihan terlengkap.
+                </p>
+              </div>
+
+              <div className="p-5 rounded-3xl bg-[#0e0e15]/90 border border-white/10 space-y-3 hover:border-violet-500/40 transition md:col-span-2">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-300 font-bold font-mono">
+                  5
+                </div>
+                <h3 className="text-sm font-bold text-white">Pembobotan ROC &amp; Algoritma TOPSIS</h3>
+                <p className="text-xs text-zinc-400 leading-relaxed">
+                  Secara cerdas memprioritaskan 6 kriteria teknis (Harga, CPU, GPU, RAM, SSD, Baterai, Bobot) dan menghitung nilai kedekatan terhadap solusi ideal positif (kinerja terbaik).
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Keunggulan Hasil yang Didapatkan */}
+          <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-violet-950/40 via-zinc-950 to-cyan-950/30 border border-white/10 space-y-4">
+            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-cyan-400" />
+              <span>Apa yang Akan Anda Dapatkan Setelah Mengisi Kuesioner?</span>
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-zinc-300">
+              <div className="flex items-start gap-2.5 p-3 rounded-2xl bg-zinc-900/60 border border-white/5">
+                <span className="text-cyan-400 font-bold">✓</span>
+                <span><strong>Ranking Alternatif Objektif:</strong> Urutan laptop nomor 1 sampai seterusnya dengan skor matematis Nilai Vi.</span>
+              </div>
+              <div className="flex items-start gap-2.5 p-3 rounded-2xl bg-zinc-900/60 border border-white/5">
+                <span className="text-cyan-400 font-bold">✓</span>
+                <span><strong>Analisis Naratif Gemini AI:</strong> Penjelasan mendalam tentang mengapa laptop tersebut paling cocok untuk jurusan kuliah Anda.</span>
+              </div>
+              <div className="flex items-start gap-2.5 p-3 rounded-2xl bg-zinc-900/60 border border-white/5">
+                <span className="text-cyan-400 font-bold">✓</span>
+                <span><strong>Simpan Riwayat &amp; Unduh PDF:</strong> Konsultasi tersimpan aman di akun Anda dan dapat dicetak sebagai lampiran tugas/skripsi.</span>
+              </div>
+              <div className="flex items-start gap-2.5 p-3 rounded-2xl bg-zinc-900/60 border border-white/5">
+                <span className="text-cyan-400 font-bold">✓</span>
+                <span><strong>Tautan Resmi Marketplace:</strong> Cek langsung ketersediaan dan harga di Shopee &amp; Tokopedia resmi.</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Call to Action Box - Tombol Mulai Kuesioner (Shopee Concept) */}
+          <div className="p-8 sm:p-10 rounded-3xl bg-[#0e0e15] border border-violet-500/30 text-center space-y-6 shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-400" />
+
+            <div className="space-y-2 max-w-xl mx-auto">
+              <h3 className="text-2xl sm:text-3xl font-black text-white">
+                Siap Memulai Kuesioner Rekomendasi?
+              </h3>
+              <p className="text-xs sm:text-sm text-zinc-400">
+                {!currentUser
+                  ? 'Pengunjung wajib masuk atau mendaftar akun terlebih dahulu sebelum memulai agar riwayat preferensi dan hasil rekomendasi Anda dapat disimpan secara aman.'
+                  : 'Klik tombol di bawah untuk langsung mengisi 5 preferensi kriteria dan mendapatkan rekomendasi laptop kuliah terbaik.'}
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  if (!currentUser) {
+                    openAuthPrompt({
+                      title: 'Masuk Akun untuk Memulai Kuesioner',
+                      message: 'Silakan login terlebih dahulu untuk menggunakan fitur ini.',
+                      featureName: 'Memulai kuesioner rekomendasi laptop',
+                      returnUrl: '/questionnaire',
+                    });
+                  } else {
+                    setShowExplanation(false);
+                  }
+                }}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-2xl bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-extrabold text-sm sm:text-base shadow-xl shadow-violet-600/30 transition transform active:scale-95 cursor-pointer"
+              >
+                <Sparkles className="w-5 h-5 text-cyan-300" />
+                <span>Mulai Kuesioner Sekarang</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+
+              <Link
+                href="/#katalog"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/10 text-xs sm:text-sm font-bold transition"
+              >
+                Jelajahi Katalog Laptop Dahulu
+              </Link>
+            </div>
+
+            {!currentUser && (
+              <div className="pt-2 flex items-center justify-center gap-4 text-xs text-zinc-400">
+                <Link
+                  href="/login?callbackUrl=%2Fquestionnaire"
+                  className="text-cyan-400 hover:text-cyan-300 hover:underline"
+                >
+                  Sudah punya akun? Masuk
+                </Link>
+                <span>•</span>
+                <Link
+                  href="/register?callbackUrl=%2Fquestionnaire"
+                  className="text-violet-400 hover:text-violet-300 hover:underline"
+                >
+                  Belum punya akun? Daftar gratis
+                </Link>
+              </div>
+            )}
+          </div>
+        </main>
+
+        <Footer />
+      </div>
+    );
+  }
+
+  // === TAMPILAN FORMULIR KUESIONER (Bagi User yang Sudah Login) ===
   return (
     <div className="min-h-screen flex flex-col bg-[#09090d] text-zinc-100">
       <Navbar />
 
       <main className="flex-grow max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8">
-        {/* Banner Mode Tamu */}
-        {isGuest && (
-          <div className="p-4 sm:p-5 rounded-3xl bg-amber-950/30 border border-amber-500/30 backdrop-blur-md shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="space-y-1 text-center sm:text-left">
-              <div className="flex items-center justify-center sm:justify-start gap-2 text-amber-300 font-bold text-xs sm:text-sm">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
-                <span>Mode Tamu (Tanpa Akun)</span>
-              </div>
-              <p className="text-xs text-amber-200/80 leading-relaxed">
-                Kamu dapat langsung melihat pratinjau 3 rekomendasi laptop teratas. Daftar akun gratis kapan saja untuk menyimpan riwayat dan membuka analisis AI mendalam.
-              </p>
+        {/* Header Bersih & Ramah Pengguna dengan Tombol Lihat Penjelasan */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-violet-950/60 to-cyan-950/60 border border-violet-500/30 text-cyan-300 shadow-[0_0_15px_rgba(124,58,237,0.2)]">
+              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Pencarian Cerdas Sesuai Kebutuhan &amp; Anggaranmu</span>
             </div>
-            <Link
-              href="/register"
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-bold text-xs whitespace-nowrap shadow-md transition"
-            >
-              Daftar Gratis →
-            </Link>
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
+              Temukan Laptop yang{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-300 to-cyan-400">
+                Paling Tepat untuk Kamu
+              </span>
+            </h1>
+            <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed max-w-2xl">
+              Jawab 5 pertanyaan mudah di bawah ini. Algoritma kami akan menyaring ratusan laptop di katalog dan memberikan rekomendasi terbaik lengkap dengan analisis keunggulannya.
+            </p>
           </div>
-        )}
 
-        {/* Header Bersih & Ramah Pengguna */}
-        <div className="text-center sm:text-left space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-violet-950/60 to-cyan-950/60 border border-violet-500/30 text-cyan-300 shadow-[0_0_15px_rgba(124,58,237,0.2)]">
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Pencarian Cerdas Sesuai Kebutuhan & Anggaranmu</span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Temukan Laptop yang{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-300 to-cyan-400">
-              Paling Tepat untuk Kamu
-            </span>
-          </h1>
-          <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed max-w-2xl">
-            Jawab 5 pertanyaan mudah di bawah ini. Sistem kami akan menyaring ratusan laptop di katalog dan memberikan rekomendasi terbaik lengkap dengan analisis keunggulannya.
-          </p>
+          <button
+            type="button"
+            onClick={() => setShowExplanation(true)}
+            className="self-start sm:self-center px-3.5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/10 text-xs font-semibold transition flex items-center gap-1.5 shrink-0 cursor-pointer"
+          >
+            <Info className="w-3.5 h-3.5 text-cyan-400" />
+            <span>Baca Penjelasan Kuesioner</span>
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -706,97 +907,6 @@ function QuestionnaireContent() {
             </button>
           </div>
         </form>
-
-        {/* Modal Hasil Pratinjau Terbatas Tamu */}
-        {showGuestModal && guestResults && (
-          <div
-            role="dialog"
-            aria-modal="true"
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in"
-          >
-            <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-8 rounded-3xl bg-[#0e0e15] border border-white/10 shadow-2xl space-y-6">
-              <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                <div>
-                  <span className="text-[11px] font-mono text-cyan-400 font-semibold uppercase tracking-wider">
-                    Hasil Pratinjau Cepat (Mode Tamu)
-                  </span>
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-white">
-                    3 Rekomendasi Laptop Teratas untuk Kamu
-                  </h2>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowGuestModal(false)}
-                  className="text-zinc-400 hover:text-white p-2 rounded-xl hover:bg-white/5 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                >
-                  ✕
-                </button>
-              </div>
-
-              {/* Daftar 3 Laptop atau Empty State */}
-              <div className="space-y-3">
-                {guestResults.length > 0 ? (
-                  guestResults.map((item, idx) => (
-                    <div
-                      key={item.laptop?.id || idx}
-                      className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-zinc-950/70 border border-white/10"
-                    >
-                      <div className="flex items-center gap-3.5 w-full sm:w-auto">
-                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-cyan-500 text-white font-mono font-bold flex items-center justify-center text-sm shrink-0">
-                          #{item.peringkat}
-                        </div>
-                        <div className="min-w-0">
-                          <h3 className="text-sm font-bold text-white truncate">
-                            {item.laptop?.name}
-                          </h3>
-                          <p className="text-xs text-zinc-400">
-                            {item.laptop?.brand} &bull; RAM {item.laptop?.ramGb ?? '—'}GB &bull; SSD {item.laptop?.storageGb ?? '—'}GB
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="text-right w-full sm:w-auto flex sm:flex-col justify-between items-center sm:items-end">
-                        <div className="text-sm font-extrabold text-cyan-300">
-                          Rp {Number(item.laptop?.price).toLocaleString('id-ID')}
-                        </div>
-                        <span className="text-xs font-mono text-zinc-400">
-                          Skor Kecocokan: {(item.skor * 100).toFixed(1)}%
-                        </span>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="p-6 rounded-2xl bg-zinc-950/70 border border-white/10 text-center space-y-2">
-                    <p className="text-sm font-bold text-white">Tidak Ada Laptop yang Cocok</p>
-                    <p className="text-xs text-zinc-400 max-w-sm mx-auto">
-                      Tidak ditemukan laptop dalam rentang budget {formatRupiahShort(budgetMin)} - {formatRupiahShort(budgetMax)}. Coba naikkan batas anggaran atau pilih opsi Semua Merek.
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Ajakan Mendaftar Akun */}
-              <div className="p-5 rounded-2xl bg-gradient-to-r from-violet-950/50 via-indigo-950/40 to-cyan-950/50 border border-cyan-500/30 space-y-3 text-center sm:text-left">
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div className="space-y-1">
-                    <h3 className="text-sm font-bold text-white">
-                      Ingin Menyimpan Hasil & Buka Analisis AI Lengkap?
-                    </h3>
-                    <p className="text-xs text-zinc-300">
-                      Daftar akun gratis untuk melihat alasan rekomendasi AI untuk setiap laptop, membandingkan spesifikasi langsung, dan menyimpan riwayat konsultasimu.
-                    </p>
-                  </div>
-                  <Link
-                    href="/register"
-                    className="min-h-[44px] px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 text-white font-bold text-xs shadow-lg hover:scale-105 transition shrink-0 flex items-center justify-center"
-                  >
-                    Daftar Sekarang →
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </main>
 
       <Footer />

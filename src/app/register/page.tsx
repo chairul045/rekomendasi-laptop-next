@@ -108,9 +108,18 @@ export default function RegisterPage() {
   const [customRole, setCustomRole] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [callbackUrl, setCallbackUrl] = useState<string>('/');
 
   useEffect(() => {
     document.title = 'Daftar Akun - Lapmatch';
+
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const cb = searchParams.get('callbackUrl') || searchParams.get('redirect');
+      if (cb && cb.startsWith('/') && !cb.startsWith('//')) {
+        setCallbackUrl(cb);
+      }
+    }
 
     const checkSession = async () => {
       const supabase = createClient();
@@ -202,10 +211,10 @@ export default function RegisterPage() {
 
       if (!signInError) {
         toast.success(`Pendaftaran berhasil sebagai ${finalRole}! Mengalihkan... 👋`);
-        window.location.href = '/';
+        window.location.href = callbackUrl;
       } else {
         toast.success('Akun berhasil dibuat! Silakan masuk.');
-        router.push('/login');
+        router.push(callbackUrl !== '/' ? `/login?callbackUrl=${encodeURIComponent(callbackUrl)}` : '/login');
       }
     } catch {
       setFormError('Terjadi kesalahan jaringan. Silakan coba lagi.');
@@ -511,7 +520,7 @@ export default function RegisterPage() {
               <p>
                 Sudah memiliki akun?{' '}
                 <Link
-                  href="/login"
+                  href={callbackUrl !== '/' ? `/login?callbackUrl=${encodeURIComponent(callbackUrl)}` : '/login'}
                   className="text-cyan-300 hover:text-cyan-200 font-semibold ml-1 underline decoration-cyan-500/50 underline-offset-4 min-h-[44px] inline-flex items-center"
                 >
                   Masuk di sini

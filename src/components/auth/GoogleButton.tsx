@@ -9,18 +9,24 @@ interface GoogleButtonProps {
   label?: string;
   onError?: (errMessage: string) => void;
   disabled?: boolean;
+  callbackUrl?: string;
 }
 
 export default function GoogleButton({
   label = 'Masuk dengan Google',
   onError,
   disabled = false,
+  callbackUrl = '/',
 }: GoogleButtonProps) {
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [quickEmail, setQuickEmail] = useState('');
   const [quickLoading, setQuickLoading] = useState(false);
   const [quickError, setQuickError] = useState<string | null>(null);
+
+  const safeCallbackUrl = callbackUrl && callbackUrl.startsWith('/') && !callbackUrl.startsWith('//')
+    ? callbackUrl
+    : '/';
 
   const handleGoogleOAuth = async () => {
     try {
@@ -31,7 +37,7 @@ export default function GoogleButton({
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${origin}/auth/callback`,
+          redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(safeCallbackUrl)}`,
         },
       });
 
@@ -70,7 +76,7 @@ export default function GoogleButton({
         return;
       }
 
-      window.location.href = '/';
+      window.location.href = safeCallbackUrl;
     } catch {
       setQuickError('Terjadi kesalahan jaringan.');
       setQuickLoading(false);

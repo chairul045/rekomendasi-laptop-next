@@ -37,7 +37,7 @@ export default async function HomePage() {
       imageUrl: true,
     },
     orderBy: [{ performaKomposit: 'desc' }, { price: 'asc' }],
-    take: 24,
+    take: 150,
   });
 
   const laptops = laptopsRaw.map((l) => ({

@@ -151,7 +151,7 @@ export default function ProfilePage() {
       const res = await fetch('/api/auth/profile');
       if (!res.ok) {
         if (res.status === 401) {
-          router.push('/login');
+          window.location.href = '/login?callbackUrl=/profile';
           return;
         }
         throw new Error('Gagal memuat profil');

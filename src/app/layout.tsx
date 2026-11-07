@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
+import { AuthPromptProvider } from '@/components/auth/AuthPromptModal';
 
 export const metadata: Metadata = {
   title: 'Lapmatch - Smart Laptop Matching & Recommendation',
@@ -31,7 +32,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="fixed top-60 left-0 w-[450px] h-[350px] bg-gradient-to-tr from-pink-500/10 via-purple-600/10 to-transparent blur-[110px] pointer-events-none z-0 animate-float-reverse" />
 
         <div className="relative z-10 flex flex-col min-h-screen">
-          {children}
+          <AuthPromptProvider>
+            {children}
+          </AuthPromptProvider>
         </div>
 
         <Toaster

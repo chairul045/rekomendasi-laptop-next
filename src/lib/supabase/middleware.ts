@@ -38,27 +38,25 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
-  // Rute publik yang dapat diakses siapa saja
-  const publicRoutes = [
-    '/login',
-    '/register',
-    '/forgot-password',
-    '/reset-password',
-    '/auth/callback',
-    '/logout',
-    '/tentang',
-    '/kebijakan-privasi',
-    '/syarat-penggunaan',
+  // Rute yang wajib login (Protected Routes ala Shopee)
+  // Pengunjung bebas menjelajahi Beranda (/), Katalog, Servis Laptop, Metode SPK, dan Penjelasan Kuesioner
+  const protectedRoutes = [
+    '/profile',
+    '/history',
+    '/recommendation',
+    '/admin',
   ];
 
-  const isPublicRoute = publicRoutes.some((r) => pathname.startsWith(r));
-  const isGuestQuestionnaire =
-    pathname === '/questionnaire' && searchParams.get('guest') === 'true';
+  const isProtectedRoute = protectedRoutes.some((r) => pathname.startsWith(r));
 
-  // Belum login & mencoba mengakses rute terproteksi → redirect ke /login
-  if (!user && !isPublicRoute && !isGuestQuestionnaire) {
+  // Belum login & mencoba mengakses rute terproteksi → redirect ke /login dengan callbackUrl
+  if (!user && isProtectedRoute) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = '/login';
+    const currentQuery = searchParams.toString();
+    const callbackTarget = pathname + (currentQuery ? `?${currentQuery}` : '');
+    loginUrl.searchParams.set('callbackUrl', callbackTarget);
+
     const redirectResponse = NextResponse.redirect(loginUrl);
     supabaseResponse.cookies.getAll().forEach((c) => {
       redirectResponse.cookies.set(c.name, c.value, c);
@@ -70,9 +68,19 @@ export async function updateSession(request: NextRequest) {
   const isSwitchingAccount = searchParams.get('switch') === 'true' || searchParams.get('logout') === 'true';
   const authOnlyPages = ['/login', '/register'];
   if (user && authOnlyPages.some((r) => pathname.startsWith(r)) && !isSwitchingAccount) {
-    const homeUrl = request.nextUrl.clone();
-    homeUrl.pathname = '/';
-    const redirectResponse = NextResponse.redirect(homeUrl);
+    const callbackUrl = searchParams.get('callbackUrl') || searchParams.get('redirect') || '/';
+    const targetUrl = request.nextUrl.clone();
+    // Cegah open redirect: pastikan hanya path lokal yang valid
+    if (callbackUrl.startsWith('/') && !callbackUrl.startsWith('//')) {
+      const [targetPath, targetSearch] = callbackUrl.split('?');
+      targetUrl.pathname = targetPath;
+      targetUrl.search = targetSearch ? `?${targetSearch}` : '';
+    } else {
+      targetUrl.pathname = '/';
+      targetUrl.search = '';
+    }
+
+    const redirectResponse = NextResponse.redirect(targetUrl);
     supabaseResponse.cookies.getAll().forEach((c) => {
       redirectResponse.cookies.set(c.name, c.value, c);
     });

@@ -44,13 +44,19 @@ export default function LoginPage() {
   const [contactModalOpen, setContactModalOpen] = useState(false);
   const [activeUserEmail, setActiveUserEmail] = useState<string | null>(null);
 
+  const [callbackUrl, setCallbackUrl] = useState<string>('/');
+
   // Set document title untuk Bahasa Indonesia yang konsisten
   useEffect(() => {
     document.title = 'Masuk - Lapmatch';
 
-    // Cek error dari URL params atau hash (dari redirect Google / Supabase)
+    // Cek error & callbackUrl dari URL params atau hash
     if (typeof window !== 'undefined') {
       const searchParams = new URLSearchParams(window.location.search);
+      const cb = searchParams.get('callbackUrl') || searchParams.get('redirect');
+      if (cb && cb.startsWith('/') && !cb.startsWith('//')) {
+        setCallbackUrl(cb);
+      }
       const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
       const errorMsg =
         searchParams.get('error_description') ||
@@ -139,9 +145,9 @@ export default function LoginPage() {
         return;
       }
 
-      setSuccessMessage('Login berhasil! Mengalihkan ke dashboard...');
+      setSuccessMessage('Login berhasil! Mengalihkan...');
       setTimeout(() => {
-        window.location.href = '/';
+        window.location.href = callbackUrl;
       }, 600);
     } catch {
       setErrorMessage(
@@ -226,18 +232,19 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Tombol Akses Tanpa Akun (Tamu) */}
+            {/* Jelajahi Lapmatch Tanpa Login (Mode Pengunjung Ala Shopee) */}
             <div className="pt-2">
               <Link
-                href="/questionnaire?guest=true"
-                className="inline-flex flex-col items-start gap-1 p-3 rounded-2xl border border-white/10 hover:border-cyan-500/40 bg-white/[0.02] hover:bg-white/[0.05] transition-all min-h-[44px]"
+                href="/"
+                className="inline-flex flex-col items-start gap-1 p-3.5 rounded-2xl border border-white/10 hover:border-cyan-500/40 bg-white/[0.02] hover:bg-white/[0.05] transition-all min-h-[44px] group"
               >
-                <div className="flex items-center gap-2 text-xs font-semibold text-zinc-300 hover:text-cyan-300">
-                  <span>Coba dulu tanpa akun (Versi Terbatas)</span>
+                <div className="flex items-center gap-2 text-xs font-semibold text-zinc-300 group-hover:text-cyan-300 transition">
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Jelajahi Beranda &amp; Katalog Laptop (Mode Tamu)</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </div>
-                <span className="text-xs text-zinc-400">
-                  *Pratinjau maks 3 laptop, riwayat sesi tidak tersimpan di database.
+                <span className="text-[11px] text-zinc-400">
+                  Cari &amp; bandingkan spesifikasi laptop, gunakan filter, dan lihat toko servis tanpa wajib login.
                 </span>
               </Link>
             </div>
@@ -305,6 +312,7 @@ export default function LoginPage() {
                   <GoogleButton
                     label="Masuk dengan Google"
                     disabled={loading}
+                    callbackUrl={callbackUrl}
                     onError={(err) => setErrorMessage(err)}
                   />
 
@@ -383,7 +391,7 @@ export default function LoginPage() {
                   <p>
                     Belum memiliki akun?{' '}
                     <Link
-                      href="/register"
+                      href={callbackUrl !== '/' ? `/register?callbackUrl=${encodeURIComponent(callbackUrl)}` : '/register'}
                       className="text-cyan-300 hover:text-cyan-200 font-semibold underline decoration-cyan-500/50 underline-offset-4 ml-1 min-h-[44px] inline-flex items-center"
                     >
                       Daftar Akun Baru

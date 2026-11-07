@@ -73,6 +73,10 @@ export default function HistoryPage() {
       params.set('page', page.toString());
 
       const res = await fetch(`/api/history?${params.toString()}`);
+      if (res.status === 401) {
+        window.location.href = '/login?callbackUrl=/history';
+        return;
+      }
       if (!res.ok) {
         throw new Error('Gagal memuat riwayat');
       }
