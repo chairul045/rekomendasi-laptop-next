@@ -54,7 +54,11 @@ export default function AdminDashboardLayout({
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get('tab');
       if (tabParam) {
-        setActiveTab(tabParam);
+        if (tabParam === 'banner' || tabParam === 'banners') {
+          setActiveTab('banners');
+        } else {
+          setActiveTab(tabParam);
+        }
       }
     }
   }, []);
@@ -115,7 +119,7 @@ export default function AdminDashboardLayout({
           </div>
           {navMenuItems.map((item) => {
             const Icon = item.icon;
-            const isActive = activeTab === item.id;
+            const isActive = activeTab === item.id || (item.id === 'banners' && activeTab === 'banner');
 
             return (
               <button
@@ -235,7 +239,7 @@ export default function AdminDashboardLayout({
 
           {activeTab === 'reviews' && <AdminReviewManager />}
 
-          {activeTab === 'banners' && <AdminBannerManager />}
+          {(activeTab === 'banners' || activeTab === 'banner') && <AdminBannerManager />}
 
           {activeTab === 'reports' && <AdminReportsManager />}
 
@@ -269,7 +273,7 @@ export default function AdminDashboardLayout({
             <nav className="flex-1 space-y-1.5 overflow-y-auto">
               {navMenuItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = activeTab === item.id;
+                const isActive = activeTab === item.id || (item.id === 'banners' && activeTab === 'banner');
 
                 return (
                   <button
