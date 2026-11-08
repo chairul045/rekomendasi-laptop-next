@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
       authUserId = authData.user.id;
       // Pastikan email_confirm benar-benar aktif
       if (!authData.user.email_confirmed_at) {
-        await adminClient.auth.admin.updateUserById(authUserId, { email_confirm: true });
+        await adminClient.auth.admin.updateUserById(authData.user.id, { email_confirm: true });
       }
     }
 
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
       if (fallbackData?.user) {
         authUserId = fallbackData.user.id;
         // Langsung konfirmasi via adminClient
-        await adminClient.auth.admin.updateUserById(authUserId, { email_confirm: true });
+        await adminClient.auth.admin.updateUserById(fallbackData.user.id, { email_confirm: true });
       }
     }
 

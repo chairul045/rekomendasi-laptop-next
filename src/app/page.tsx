@@ -11,53 +11,80 @@ import FeaturedLaptopAdBanner from '@/components/FeaturedLaptopAdBanner';
 import { getActiveBanners } from '@/lib/banner-store';
 
 export default async function HomePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user: { id: string; email?: string; user_metadata?: Record<string, unknown> } | null = null;
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase.auth.getUser();
+    user = data?.user ?? null;
+  } catch (err) {
+    console.warn('[HomePage] Auth check failed:', err);
+  }
 
   // Fetch preview laptops for both guest landing and logged-in dashboard
-  const laptopsRaw = await prisma.laptop.findMany({
-    select: {
-      id: true,
-      name: true,
-      brand: true,
-      price: true,
-      ramGb: true,
-      storageGb: true,
-      batteryHours: true,
-      weightKg: true,
-      performaKomposit: true,
-      processorScore: true,
-      vgaScore: true,
-      displaySize: true,
-      mobilityScore: true,
-      condition: true,
-      category: true,
-      imageUrl: true,
-    },
-    orderBy: [{ performaKomposit: 'desc' }, { price: 'asc' }],
-    take: 150,
-  });
+  let laptops: {
+    id: number;
+    name: string;
+    brand: string;
+    price: string;
+    ramGb: number | null;
+    storageGb: number | null;
+    batteryHours: number | null;
+    weightKg: number | null;
+    performaKomposit: number | null;
+    processorScore: number | null;
+    vgaScore: number | null;
+    displaySize: number | null;
+    mobilityScore: number | null;
+    condition: string;
+    category: string | null;
+    imageUrl: string | null;
+  }[] = [];
 
-  const laptops = laptopsRaw.map((l) => ({
-    id: l.id,
-    name: l.name,
-    brand: l.brand,
-    price: l.price.toString(),
-    ramGb: l.ramGb,
-    storageGb: l.storageGb,
-    batteryHours: l.batteryHours,
-    weightKg: l.weightKg,
-    performaKomposit: l.performaKomposit,
-    processorScore: l.processorScore,
-    vgaScore: l.vgaScore,
-    displaySize: l.displaySize,
-    mobilityScore: l.mobilityScore,
-    condition: l.condition,
-    category: l.category,
-    imageUrl: l.imageUrl,
-  }));
+  try {
+    const laptopsRaw = await prisma.laptop.findMany({
+      select: {
+        id: true,
+        name: true,
+        brand: true,
+        price: true,
+        ramGb: true,
+        storageGb: true,
+        batteryHours: true,
+        weightKg: true,
+        performaKomposit: true,
+        processorScore: true,
+        vgaScore: true,
+        displaySize: true,
+        mobilityScore: true,
+        condition: true,
+        category: true,
+        imageUrl: true,
+      },
+      orderBy: [{ performaKomposit: 'desc' }, { price: 'asc' }],
+      take: 150,
+    });
+
+    laptops = laptopsRaw.map((l) => ({
+      id: l.id,
+      name: l.name,
+      brand: l.brand,
+      price: l.price.toString(),
+      ramGb: l.ramGb,
+      storageGb: l.storageGb,
+      batteryHours: l.batteryHours,
+      weightKg: l.weightKg,
+      performaKomposit: l.performaKomposit,
+      processorScore: l.processorScore,
+      vgaScore: l.vgaScore,
+      displaySize: l.displaySize,
+      mobilityScore: l.mobilityScore,
+      condition: l.condition,
+      category: l.category,
+      imageUrl: l.imageUrl,
+    }));
+  } catch (err) {
+    console.warn('[HomePage] Database query failed (check DATABASE_URL in Vercel):', err);
+  }
 
   // === GUEST MODE: Show landing page ===
   if (!user) {
@@ -65,70 +92,109 @@ export default async function HomePage() {
   }
 
   // === LOGGED-IN MODE: Fetch profile & consultation history ===
-  const [profileExisting, consultations] = await Promise.all([
-    prisma.user.findUnique({ where: { id: user.id } }),
-    prisma.kuisionerJawaban.findMany({
-      where: { userId: user.id },
-      select: {
-        id: true,
-        judul: true,
-        peruntukan: true,
-        budgetMin: true,
-        budgetMax: true,
-        kondisiPilihan: true,
-        tanggalPengisian: true,
-        createdAt: true,
-        hasilTopsis: {
-          select: {
-            id: true,
-            nilaiV: true,
-            peringkat: true,
-            kondisi: true,
-            laptop: {
-              select: {
-                id: true,
-                name: true,
-                brand: true,
-                price: true,
-                imageUrl: true,
-                condition: true,
+  let profile = {
+    id: user.id,
+    name: (user.user_metadata?.name as string) ?? user.email?.split('@')[0] ?? 'User',
+    email: user.email || '',
+    role: (user.user_metadata?.role as string) ?? 'mahasiswa',
+  };
+  let consultationsSerialized: {
+    id: number;
+    judul: string | null;
+    peruntukan: string;
+    budgetMin: string;
+    budgetMax: string;
+    kondisiPilihan: string;
+    tanggalPengisian: Date;
+    createdAt: Date;
+    hasilTopsis: {
+      id: number;
+      nilaiV: number;
+      peringkat: number;
+      kondisi: string;
+      laptop: {
+        id: number;
+        name: string;
+        brand: string;
+        price: string;
+        imageUrl: string | null;
+        condition: string;
+      } | null;
+    }[];
+  }[] = [];
+
+  try {
+    const [profileExisting, consultations] = await Promise.all([
+      prisma.user.findUnique({ where: { id: user.id } }),
+      prisma.kuisionerJawaban.findMany({
+        where: { userId: user.id },
+        select: {
+          id: true,
+          judul: true,
+          peruntukan: true,
+          budgetMin: true,
+          budgetMax: true,
+          kondisiPilihan: true,
+          tanggalPengisian: true,
+          createdAt: true,
+          hasilTopsis: {
+            select: {
+              id: true,
+              nilaiV: true,
+              peringkat: true,
+              kondisi: true,
+              laptop: {
+                select: {
+                  id: true,
+                  name: true,
+                  brand: true,
+                  price: true,
+                  imageUrl: true,
+                  condition: true,
+                },
               },
             },
+            where: { peringkat: 1, kondisi: 'baru' },
+            take: 1,
           },
-          where: { peringkat: 1, kondisi: 'baru' },
-          take: 1,
         },
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 5,
-    }),
-  ]);
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+      }),
+    ]);
 
-  let profile = profileExisting;
-  if (!profile) {
-    profile = await prisma.user.create({
-      data: {
-        id: user.id,
-        name: user.user_metadata?.name ?? user.email?.split('@')[0] ?? 'User',
-        email: user.email!,
-        role: user.user_metadata?.role ?? 'mahasiswa',
-      },
-    });
+    if (profileExisting) {
+      profile = profileExisting;
+    } else if (user.email) {
+      try {
+        profile = await prisma.user.create({
+          data: {
+            id: user.id,
+            name: (user.user_metadata?.name as string) ?? user.email.split('@')[0],
+            email: user.email,
+            role: (user.user_metadata?.role as string) ?? 'mahasiswa',
+          },
+        });
+      } catch {}
+    }
+
+    consultationsSerialized = consultations.map((c) => ({
+      ...c,
+      budgetMin: c.budgetMin.toString(),
+      budgetMax: c.budgetMax.toString(),
+      hasilTopsis: c.hasilTopsis.map((h) => ({
+        ...h,
+        laptop: h.laptop
+          ? {
+              ...h.laptop,
+              price: h.laptop.price.toString(),
+            }
+          : null,
+      })),
+    }));
+  } catch (err) {
+    console.warn('[HomePage] User profile/consultation query failed:', err);
   }
-
-  // Serialize consultations - konversi BigInt ke string agar aman dipass ke JSX
-  const consultationsSerialized = consultations.map((c) => ({
-    ...c,
-    budgetMin: c.budgetMin.toString(),
-    budgetMax: c.budgetMax.toString(),
-    hasilTopsis: c.hasilTopsis.map((h) => ({
-      ...h,
-      laptop: h.laptop ? {
-        ...h.laptop,
-        price: h.laptop.price.toString(),
-      } : null,
-    })),
-  }));
 
   const latestSession = consultationsSerialized[0];
   const latestBest = latestSession?.hasilTopsis[0]?.laptop;
