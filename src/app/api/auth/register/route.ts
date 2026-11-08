@@ -45,11 +45,12 @@ export async function POST(request: NextRequest) {
     if (authError) {
       // Jika email sudah pernah dibuat/terdaftar di Supabase Auth
       const errMsg = authError.message.toLowerCase();
+      const authErrObj = authError as unknown as { code?: string; status?: number };
       if (
         errMsg.includes('already registered') ||
         errMsg.includes('already exists') ||
-        (authError as any).code === 'email_exists' ||
-        (authError as any).status === 422
+        authErrObj.code === 'email_exists' ||
+        authErrObj.status === 422
       ) {
         const { data: listData } = await adminClient.auth.admin.listUsers({ perPage: 1000 });
         const existing = listData?.users?.find(
@@ -141,10 +142,11 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Register API error:', error);
+    const message = error instanceof Error ? error.message : 'Terjadi kesalahan pada server saat mendaftar.';
     return NextResponse.json(
-      { error: error?.message || 'Terjadi kesalahan pada server saat mendaftar.' },
+      { error: message },
       { status: 500 }
     );
   }

@@ -143,28 +143,37 @@ export default function ProfilePage() {
   };
 
   useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
-    try {
-      const res = await fetch('/api/auth/profile');
-      if (!res.ok) {
-        if (res.status === 401) {
-          window.location.href = '/login?callbackUrl=/profile';
-          return;
+    let ignore = false;
+    async function load() {
+      try {
+        const res = await fetch('/api/auth/profile');
+        if (!res.ok) {
+          if (res.status === 401) {
+            window.location.href = '/login?callbackUrl=/profile';
+            return;
+          }
+          throw new Error('Gagal memuat profil');
         }
-        throw new Error('Gagal memuat profil');
+        const data = await res.json();
+        if (!ignore) {
+          setProfile(data);
+          setNameInput(data.name);
+        }
+      } catch {
+        if (!ignore) {
+          toast.error('Gagal memuat data profil.');
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
       }
-      const data = await res.json();
-      setProfile(data);
-      setNameInput(data.name);
-    } catch {
-      toast.error('Gagal memuat data profil.');
-    } finally {
-      setLoading(false);
     }
-  };
+    load();
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const handleSaveName = async () => {
     if (!nameInput.trim() || nameInput.trim() === profile?.name) {

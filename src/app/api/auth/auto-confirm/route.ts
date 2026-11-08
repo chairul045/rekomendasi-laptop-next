@@ -64,10 +64,11 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Akun berhasil dikonfirmasi langsung tanpa izin admin.',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Auto-confirm error:', error);
+    const message = error instanceof Error ? error.message : 'Terjadi kesalahan server saat konfirmasi.';
     return NextResponse.json(
-      { error: error?.message || 'Terjadi kesalahan server saat konfirmasi.' },
+      { error: message },
       { status: 500 }
     );
   }

@@ -154,7 +154,7 @@ function QuestionnaireContent() {
   const searchParams = useSearchParams();
   const { openAuthPrompt } = useAuthPrompt();
 
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<{ id: string; name: string; email: string; role: string } | null>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [showExplanation, setShowExplanation] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -171,7 +171,12 @@ function QuestionnaireContent() {
           const profile = await res.json();
           if (profile && profile.id) {
             if (isMounted) {
-              setCurrentUser(profile);
+              setCurrentUser({
+                id: profile.id,
+                name: profile.name || 'Pengguna',
+                email: profile.email || '',
+                role: profile.role || 'user',
+              });
               setCheckingAuth(false);
               return;
             }
@@ -187,7 +192,13 @@ function QuestionnaireContent() {
         const { data: userData } = await supabase.auth.getUser();
         if (userData?.user) {
           if (isMounted) {
-            setCurrentUser(userData.user);
+            const u = userData.user;
+            setCurrentUser({
+              id: u.id,
+              name: (u.user_metadata?.name as string) || u.email?.split('@')[0] || 'Pengguna',
+              email: u.email || '',
+              role: (u.user_metadata?.role as string) || 'user',
+            });
             setCheckingAuth(false);
             return;
           }
@@ -196,7 +207,13 @@ function QuestionnaireContent() {
         const { data: sessionData } = await supabase.auth.getSession();
         if (sessionData?.session?.user) {
           if (isMounted) {
-            setCurrentUser(sessionData.session.user);
+            const u = sessionData.session.user;
+            setCurrentUser({
+              id: u.id,
+              name: (u.user_metadata?.name as string) || u.email?.split('@')[0] || 'Pengguna',
+              email: u.email || '',
+              role: (u.user_metadata?.role as string) || 'user',
+            });
             setCheckingAuth(false);
             return;
           }

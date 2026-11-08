@@ -1,7 +1,7 @@
 // src/app/admin/AdminDashboardLayout.tsx - Master Admin Dashboard Layout with Sidebar
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import {
   LayoutDashboard,
@@ -22,7 +22,7 @@ import {
   BarChart3,
 } from 'lucide-react';
 import AdminOverview from './AdminOverview';
-import AdminLaptopManager from './AdminLaptopManager';
+import AdminLaptopManager, { LaptopItem } from './AdminLaptopManager';
 import AdminUserManager from './AdminUserManager';
 import AdminQuestionnaireManager from './AdminQuestionnaireManager';
 import AdminReviewManager from './AdminReviewManager';
@@ -31,7 +31,7 @@ import AdminReportsManager from './AdminReportsManager';
 import AdminSettingsManager from './AdminSettingsManager';
 
 interface AdminDashboardLayoutProps {
-  initialLaptops: any[];
+  initialLaptops: LaptopItem[];
   stats: {
     totalUsers: number;
     totalConsultations: number;
@@ -45,23 +45,17 @@ export default function AdminDashboardLayout({
   stats,
   adminName,
 }: AdminDashboardLayoutProps) {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-
-  // Baca URL query param ?tab=xxx saat load
-  useEffect(() => {
+  const [activeTab, setActiveTab] = useState<string>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get('tab');
       if (tabParam) {
-        if (tabParam === 'banner' || tabParam === 'banners') {
-          setActiveTab('banners');
-        } else {
-          setActiveTab(tabParam);
-        }
+        return tabParam === 'banner' || tabParam === 'banners' ? 'banners' : tabParam;
       }
     }
-  }, []);
+    return 'overview';
+  });
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const navMenuItems = [
     { id: 'overview', label: 'Dashboard Utama', icon: LayoutDashboard, badge: null },

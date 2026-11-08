@@ -1,32 +1,52 @@
 // src/app/admin/AdminReportsManager.tsx - Laporan Analitik & Ekspor Data Excel/CSV
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import {
   FileSpreadsheet,
   Download,
-  TrendingUp,
-  BarChart3,
-  Award,
-  Layers,
-  Calendar,
   CheckCircle2,
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
-export default function AdminReportsManager() {
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<any>(null);
-  const [exporting, setExporting] = useState(false);
+interface LaptopExportItem {
+  id: number;
+  name: string;
+  brand: string;
+  price: number | string;
+  condition: string;
+  category?: string;
+  ramGb?: number;
+  storageGb?: number;
+  displaySize?: number;
+  batteryHours?: number;
+  weightKg?: number;
+  performaKomposit?: number;
+}
 
-  useEffect(() => {
-    fetch('/api/admin/stats')
-      .then((res) => (res.ok ? res.json() : null))
-      .then((d) => setData(d))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
+interface UserExportItem {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  totalConsultations: number;
+  createdAt: string;
+}
+
+interface ConsultationExportItem {
+  id: number;
+  userName?: string;
+  userEmail?: string;
+  peruntukan?: string;
+  budgetMin?: number;
+  budgetMax?: number;
+  topLaptop?: { brand: string; name: string; nilaiV: number } | null;
+  createdAt: string;
+}
+
+export default function AdminReportsManager() {
+  const [exporting, setExporting] = useState(false);
 
   const handleExportExcel = async (format: 'xlsx' | 'csv') => {
     setExporting(true);
@@ -42,7 +62,7 @@ export default function AdminReportsManager() {
 
       // Sheet 1: Data Laptop
       if (resLaptops.laptops && Array.isArray(resLaptops.laptops)) {
-        const laptopRows = resLaptops.laptops.map((l: any) => ({
+        const laptopRows = (resLaptops.laptops as LaptopExportItem[]).map((l) => ({
           'ID': l.id,
           'Nama Laptop': l.name,
           'Merek': l.brand,
@@ -62,7 +82,7 @@ export default function AdminReportsManager() {
 
       // Sheet 2: Data Pengguna
       if (resUsers.users && Array.isArray(resUsers.users)) {
-        const userRows = resUsers.users.map((u: any) => ({
+        const userRows = (resUsers.users as UserExportItem[]).map((u) => ({
           'User ID': u.id,
           'Nama': u.name,
           'Email': u.email,
@@ -76,13 +96,13 @@ export default function AdminReportsManager() {
 
       // Sheet 3: Riwayat Konsultasi
       if (resQuest.consultations && Array.isArray(resQuest.consultations)) {
-        const questRows = resQuest.consultations.map((q: any) => ({
+        const questRows = (resQuest.consultations as ConsultationExportItem[]).map((q) => ({
           'ID Sesi': q.id,
-          'Nama Pengisi': q.userName,
-          'Email': q.userEmail,
-          'Kebutuhan': q.peruntukan,
-          'Budget Min': Number(q.budgetMin),
-          'Budget Max': Number(q.budgetMax),
+          'Nama Pengisi': q.userName || '-',
+          'Email': q.userEmail || '-',
+          'Kebutuhan': q.peruntukan || '-',
+          'Budget Min': Number(q.budgetMin || 0),
+          'Budget Max': Number(q.budgetMax || 0),
           'Laptop Juara #1': q.topLaptop ? `${q.topLaptop.brand} ${q.topLaptop.name}` : '-',
           'Skor Kecocokan': q.topLaptop ? `${(q.topLaptop.nilaiV * 100).toFixed(1)}%` : '-',
           'Tanggal Pengisian': q.createdAt,
@@ -101,8 +121,9 @@ export default function AdminReportsManager() {
       }
 
       toast.success(`Laporan ${format.toUpperCase()} berhasil diunduh! 🎉`);
-    } catch (err: any) {
-      toast.error('Gagal membuat laporan: ' + err.message);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      toast.error('Gagal membuat laporan: ' + msg);
     } finally {
       setExporting(false);
     }

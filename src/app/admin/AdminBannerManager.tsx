@@ -68,22 +68,30 @@ export default function AdminBannerManager() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    fetchBanners();
-  }, []);
-
-  const fetchBanners = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/admin/banners');
-      if (!res.ok) throw new Error('Gagal memuat banner.');
-      const data = await res.json();
-      setBanners(data.banners || []);
-    } catch {
-      toast.error('Gagal mengambil daftar banner iklan.');
-    } finally {
-      setLoading(false);
+    let ignore = false;
+    async function load() {
+      try {
+        const res = await fetch('/api/admin/banners');
+        if (!res.ok) throw new Error('Gagal memuat banner.');
+        const data = await res.json();
+        if (!ignore) {
+          setBanners(data.banners || []);
+        }
+      } catch {
+        if (!ignore) {
+          toast.error('Gagal mengambil daftar banner iklan.');
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
     }
-  };
+    load();
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const handleOpenCreate = () => {
     setEditingId(null);

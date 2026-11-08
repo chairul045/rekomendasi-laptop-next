@@ -113,7 +113,7 @@ export async function GET() {
       topBrandsList,
       laptopsByBrand: laptopsByBrand.map((b) => ({ brand: b.brand, count: b._count.id })),
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Admin stats error:', err);
     return NextResponse.json({ error: 'Gagal memuat statistik.' }, { status: 500 });
   }

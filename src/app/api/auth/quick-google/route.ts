@@ -1,6 +1,7 @@
 // app/api/auth/quick-google/route.ts - Endpoint Masuk Cepat dengan Akun Gmail / Google
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import { User } from '@supabase/supabase-js';
 import { createAdminClient } from '@/lib/supabase/admin';
 import prisma from '@/lib/prisma';
 
@@ -21,7 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     const admin = createAdminClient();
-    let authUser: any = null;
+    let authUser: User | null = null;
 
     // 1. Cari apakah akun sudah ada di Supabase
     const { data: listData } = await admin.auth.admin.listUsers({ perPage: 1000 });

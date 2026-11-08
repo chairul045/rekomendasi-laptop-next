@@ -23,7 +23,7 @@ import ImportLaptopModal from './ImportLaptopModal';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-interface LaptopItem {
+export interface LaptopItem {
   id: number;
   name: string;
   brand: string;

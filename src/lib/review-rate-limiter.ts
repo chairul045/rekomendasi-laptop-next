@@ -97,8 +97,9 @@ function getUpstashRatelimit(): Ratelimit | null {
       });
       redisInitialized = true;
       return upstashRatelimitInstance;
-    } catch (err: any) {
-      console.warn('[ReviewRateLimiter] Failed to initialize Upstash Redis client:', err.message);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn('[ReviewRateLimiter] Failed to initialize Upstash Redis client:', msg);
       redisInitialized = true;
       upstashRatelimitInstance = null;
       return null;
@@ -201,9 +202,10 @@ export async function checkReviewRateLimit(
         source: 'upstash-redis',
         identifier,
       };
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
       console.warn(
-        `[ReviewRateLimiter] Upstash Redis request failed (${err.message}). Engaging strict local sliding-window fallback.`
+        `[ReviewRateLimiter] Upstash Redis request failed (${msg}). Engaging strict local sliding-window fallback.`
       );
       // Fallback lokal ketat dipicu secara eksplisit, TIDAK mengizinkan semua request diam-diam!
       return checkStrictLocalFallback(identifier);

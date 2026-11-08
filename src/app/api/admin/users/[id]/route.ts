@@ -28,7 +28,7 @@ export async function PATCH(
     });
 
     return NextResponse.json({ user: updated, message: 'Role pengguna berhasil diperbarui.' });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Update user role error:', err);
     return NextResponse.json({ error: 'Gagal memperbarui pengguna.' }, { status: 500 });
   }
@@ -58,7 +58,7 @@ export async function DELETE(
     await prisma.user.delete({ where: { id } });
 
     return NextResponse.json({ message: 'Pengguna berhasil dihapus.' });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Delete user error:', err);
     return NextResponse.json({ error: 'Gagal menghapus pengguna.' }, { status: 500 });
   }

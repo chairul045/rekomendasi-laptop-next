@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { checkAdminAuth } from '@/lib/admin-auth';
+import { Prisma } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   const admin = await checkAdminAuth();
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
   const role = searchParams.get('role') || '';
 
   try {
-    const where: any = {};
+    const where: Prisma.UserWhereInput = {};
     if (search.trim()) {
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },
@@ -51,7 +52,7 @@ export async function GET(request: NextRequest) {
     }));
 
     return NextResponse.json({ users: formatted, total: formatted.length });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Admin users GET error:', err);
     return NextResponse.json({ error: 'Gagal mengambil data pengguna.' }, { status: 500 });
   }

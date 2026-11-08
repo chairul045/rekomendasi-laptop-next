@@ -40,8 +40,13 @@ export async function checkAdminAuth(): Promise<AdminAuthSession | null> {
       name: profile.name,
       role: profile.role,
     };
-  } catch (error: any) {
-    if (error && typeof error === 'object' && error.digest === 'DYNAMIC_SERVER_USAGE') {
+  } catch (error: unknown) {
+    if (
+      error &&
+      typeof error === 'object' &&
+      'digest' in error &&
+      (error as { digest: unknown }).digest === 'DYNAMIC_SERVER_USAGE'
+    ) {
       throw error;
     }
     console.error('Error during checkAdminAuth:', error);

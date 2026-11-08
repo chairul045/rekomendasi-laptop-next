@@ -33,11 +33,17 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
   const pathname = usePathname();
   const { openAuthPrompt } = useAuthPrompt();
   const [currentUser, setCurrentUser] = useState(initialUser ?? null);
+  const [prevInitialUser, setPrevInitialUser] = useState(initialUser);
+
+  if (initialUser !== undefined && initialUser !== prevInitialUser) {
+    setPrevInitialUser(initialUser);
+    setCurrentUser(initialUser);
+  }
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (initialUser !== undefined) {
-      setCurrentUser(initialUser);
       return;
     }
 

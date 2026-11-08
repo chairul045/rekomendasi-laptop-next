@@ -44,22 +44,30 @@ export default function AdminUserManager() {
   const [deleteTarget, setDeleteTarget] = useState<UserData | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/admin/users');
-      if (!res.ok) throw new Error('Gagal memuat pengguna');
-      const data = await res.json();
-      setUsers(data.users || []);
-    } catch {
-      toast.error('Gagal memuat daftar pengguna.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchUsers();
+    let ignore = false;
+    async function load() {
+      try {
+        const res = await fetch('/api/admin/users');
+        if (!res.ok) throw new Error('Gagal memuat pengguna');
+        const data = await res.json();
+        if (!ignore) {
+          setUsers(data.users || []);
+        }
+      } catch {
+        if (!ignore) {
+          toast.error('Gagal memuat daftar pengguna.');
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    }
+    load();
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   const filteredUsers = useMemo(() => {
@@ -89,8 +97,9 @@ export default function AdminUserManager() {
         prev.map((u) => (u.id === selectedUser.id ? { ...u, role: newRole } : u))
       );
       setSelectedUser(null);
-    } catch (err: any) {
-      toast.error(err.message || 'Terjadi kesalahan.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Terjadi kesalahan.';
+      toast.error(msg);
     } finally {
       setSavingRole(false);
     }
@@ -109,8 +118,9 @@ export default function AdminUserManager() {
       toast.success(`Akun ${deleteTarget.name} berhasil dihapus.`);
       setUsers((prev) => prev.filter((u) => u.id !== deleteTarget.id));
       setDeleteTarget(null);
-    } catch (err: any) {
-      toast.error(err.message || 'Gagal menghapus akun pengguna.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Gagal menghapus akun pengguna.';
+      toast.error(msg);
     } finally {
       setDeleting(false);
     }

@@ -39,24 +39,9 @@ type LoginForm = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [contactModalOpen, setContactModalOpen] = useState(false);
-  const [activeUserEmail, setActiveUserEmail] = useState<string | null>(null);
-
-  const [callbackUrl, setCallbackUrl] = useState<string>('/');
-
-  // Set document title untuk Bahasa Indonesia yang konsisten
-  useEffect(() => {
-    document.title = 'Masuk - Lapmatch';
-
-    // Cek error & callbackUrl dari URL params atau hash
+  const [errorMessage, setErrorMessage] = useState<string | null>(() => {
     if (typeof window !== 'undefined') {
       const searchParams = new URLSearchParams(window.location.search);
-      const cb = searchParams.get('callbackUrl') || searchParams.get('redirect');
-      if (cb && cb.startsWith('/') && !cb.startsWith('//')) {
-        setCallbackUrl(cb);
-      }
       const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
       const errorMsg =
         searchParams.get('error_description') ||
@@ -66,12 +51,31 @@ export default function LoginPage() {
 
       if (errorMsg) {
         if (errorMsg.includes('auth_callback_failed') || errorMsg.includes('provider')) {
-          setErrorMessage('Autentikasi Google gagal atau belum diaktifkan di server. Silakan gunakan email & kata sandi.');
-        } else {
-          setErrorMessage(decodeURIComponent(errorMsg));
+          return 'Autentikasi Google gagal atau belum diaktifkan di server. Silakan gunakan email & kata sandi.';
         }
+        return decodeURIComponent(errorMsg);
       }
     }
+    return null;
+  });
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [contactModalOpen, setContactModalOpen] = useState(false);
+  const [activeUserEmail, setActiveUserEmail] = useState<string | null>(null);
+
+  const [callbackUrl, setCallbackUrl] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const cb = searchParams.get('callbackUrl') || searchParams.get('redirect');
+      if (cb && cb.startsWith('/') && !cb.startsWith('//')) {
+        return cb;
+      }
+    }
+    return '/';
+  });
+
+  // Set document title untuk Bahasa Indonesia yang konsisten
+  useEffect(() => {
+    document.title = 'Masuk - Lapmatch';
 
     // Cek jika pengguna saat ini sudah memiliki sesi
     const checkSession = async () => {

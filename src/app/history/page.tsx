@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import {
@@ -63,36 +63,44 @@ export default function HistoryPage() {
   const [kondisi, setKondisi] = useState('');
   const [page, setPage] = useState(1);
 
-  const fetchHistory = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams();
-      if (search) params.set('search', search);
-      if (peruntukan) params.set('peruntukan', peruntukan);
-      if (kondisi) params.set('kondisi', kondisi);
-      params.set('page', page.toString());
-
-      const res = await fetch(`/api/history?${params.toString()}`);
-      if (res.status === 401) {
-        window.location.href = '/login?callbackUrl=/history';
-        return;
-      }
-      if (!res.ok) {
-        throw new Error('Gagal memuat riwayat');
-      }
-      const json = await res.json();
-      setConsultations(json.data);
-      setMeta(json.meta);
-    } catch {
-      toast.error('Gagal mengambil data riwayat.');
-    } finally {
-      setLoading(false);
-    }
-  }, [search, peruntukan, kondisi, page]);
-
   useEffect(() => {
-    fetchHistory();
-  }, [fetchHistory]);
+    let ignore = false;
+    async function load() {
+      try {
+        const params = new URLSearchParams();
+        if (search) params.set('search', search);
+        if (peruntukan) params.set('peruntukan', peruntukan);
+        if (kondisi) params.set('kondisi', kondisi);
+        params.set('page', page.toString());
+
+        const res = await fetch(`/api/history?${params.toString()}`);
+        if (res.status === 401) {
+          window.location.href = '/login?callbackUrl=/history';
+          return;
+        }
+        if (!res.ok) {
+          throw new Error('Gagal memuat riwayat');
+        }
+        const json = await res.json();
+        if (!ignore) {
+          setConsultations(json.data);
+          setMeta(json.meta);
+        }
+      } catch {
+        if (!ignore) {
+          toast.error('Gagal mengambil data riwayat.');
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    }
+    load();
+    return () => {
+      ignore = true;
+    };
+  }, [search, peruntukan, kondisi, page]);
 
   const handleDelete = async (id: number) => {
     if (!confirm('Apakah Anda yakin ingin menghapus riwayat konsultasi ini?')) return;

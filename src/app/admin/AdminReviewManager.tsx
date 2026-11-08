@@ -1,7 +1,7 @@
 // src/app/admin/AdminReviewManager.tsx - Manajemen Ulasan dan Rating Laptop
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import {
   Star,
@@ -29,11 +29,7 @@ export default function AdminReviewManager() {
   const [ratingFilter, setRatingFilter] = useState<number | 'all'>('all');
   const [search, setSearch] = useState('');
 
-  useEffect(() => {
-    fetchReviews();
-  }, []);
-
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch('/api/admin/reviews');
@@ -45,7 +41,33 @@ export default function AdminReviewManager() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    let ignore = false;
+    async function load() {
+      try {
+        const res = await fetch('/api/admin/reviews');
+        if (!res.ok) throw new Error('Gagal memuat ulasan');
+        const data = await res.json();
+        if (!ignore) {
+          setReviews(data.reviews || []);
+        }
+      } catch {
+        if (!ignore) {
+          toast.error('Gagal mengambil daftar ulasan.');
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    }
+    load();
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const handleDeleteReview = async (id: string) => {
     if (!confirm('Hapus ulasan ini dari sistem?')) return;

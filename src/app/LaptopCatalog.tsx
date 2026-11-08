@@ -84,11 +84,13 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
 
   // Pagination / Performance optimization - render in chunks of 16
   const [visibleCount, setVisibleCount] = useState(16);
+  const filterKey = `${activeCategory}_${search}_${selectedBrand}_${priceRange}_${selectedCondition}_${sortBy}`;
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
 
-  // Reset pagination when any filter changes
-  useEffect(() => {
+  if (filterKey !== prevFilterKey) {
+    setPrevFilterKey(filterKey);
     setVisibleCount(16);
-  }, [activeCategory, search, selectedBrand, priceRange, selectedCondition, sortBy]);
+  }
 
   // Fetch current user & load stored favorites
   useEffect(() => {
@@ -384,7 +386,7 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
           <div>
             <select
               value={priceRange}
-              onChange={(e) => setPriceRange(e.target.value as any)}
+              onChange={(e) => setPriceRange(e.target.value as 'all' | 'under7' | '7to12' | '12to20' | 'above20')}
               className="w-full px-3 py-2.5 rounded-2xl bg-zinc-950/80 border border-white/10 text-xs text-zinc-200 focus:outline-none focus:border-violet-500 transition cursor-pointer"
             >
               <option value="all" className="bg-zinc-900 text-white">Semua Rentang Harga</option>
@@ -399,7 +401,7 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
           <div>
             <select
               value={selectedCondition}
-              onChange={(e) => setSelectedCondition(e.target.value as any)}
+              onChange={(e) => setSelectedCondition(e.target.value as 'all' | 'baru' | 'second')}
               className="w-full px-3 py-2.5 rounded-2xl bg-zinc-950/80 border border-white/10 text-xs text-zinc-200 focus:outline-none focus:border-violet-500 transition cursor-pointer"
             >
               <option value="all" className="bg-zinc-900 text-white">Semua Kondisi</option>
@@ -412,7 +414,11 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
           <div>
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
+              onChange={(e) =>
+                setSortBy(
+                  e.target.value as 'recommended' | 'priceAsc' | 'priceDesc' | 'ramDesc' | 'batteryDesc' | 'weightAsc'
+                )
+              }
               className="w-full px-3 py-2.5 rounded-2xl bg-zinc-950/80 border border-white/10 text-xs text-zinc-200 focus:outline-none focus:border-violet-500 transition cursor-pointer"
             >
               <option value="recommended" className="bg-zinc-900 text-white">Performa Terbaik</option>

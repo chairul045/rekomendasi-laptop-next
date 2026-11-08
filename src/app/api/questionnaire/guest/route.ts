@@ -1,6 +1,7 @@
 // app/api/questionnaire/guest/route.ts - Endpoint Simulasi Terbatas Tanpa Akun (Hasil Tidak Disimpan)
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { calculateRocWeights } from '@/lib/roc';
 import { calculateTopsis, LaptopData } from '@/lib/topsis';
 
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
     const maxPrice = BigInt(Math.max(Number(budgetMin) || 0, Number(budgetMax) || 50000000));
 
     // Filter katalog laptop berdasarkan budget dan kondisi
-    const whereClause: any = {
+    const whereClause: Prisma.LaptopWhereInput = {
       price: {
         gte: minPrice,
         lte: maxPrice,

@@ -85,7 +85,7 @@ export const INITIAL_FALLBACK_REVIEWS = [
   },
 ];
 
-let inMemoryAdminReviews = [...INITIAL_FALLBACK_REVIEWS];
+const inMemoryAdminReviews = [...INITIAL_FALLBACK_REVIEWS];
 
 export async function GET(request: NextRequest) {
   const admin = await checkAdminAuth();

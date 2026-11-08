@@ -74,7 +74,7 @@ export async function GET() {
       consultations,
       totalCount,
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Admin questionnaire GET error:', err);
     return NextResponse.json({ error: 'Gagal mengambil data kuesioner.' }, { status: 500 });
   }
@@ -104,7 +104,7 @@ export async function PATCH(request: NextRequest) {
     });
 
     return NextResponse.json({ kriteria: updated, message: 'Kriteria berhasil diperbarui.' });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Update kriteria error:', err);
     return NextResponse.json({ error: 'Gagal memperbarui kriteria.' }, { status: 500 });
   }

@@ -65,23 +65,31 @@ export default function AdminQuestionnaireManager() {
   const [editDeskripsi, setEditDeskripsi] = useState('');
   const [savingKriteria, setSavingKriteria] = useState(false);
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/admin/questionnaire');
-      if (!res.ok) throw new Error('Gagal memuat data kuesioner');
-      const data = await res.json();
-      setKriteria(data.kriteria || []);
-      setConsultations(data.consultations || []);
-    } catch {
-      toast.error('Gagal mengambil data kuesioner.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchData();
+    let ignore = false;
+    async function load() {
+      try {
+        const res = await fetch('/api/admin/questionnaire');
+        if (!res.ok) throw new Error('Gagal memuat data kuesioner');
+        const data = await res.json();
+        if (!ignore) {
+          setKriteria(data.kriteria || []);
+          setConsultations(data.consultations || []);
+        }
+      } catch {
+        if (!ignore) {
+          toast.error('Gagal mengambil data kuesioner.');
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    }
+    load();
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   const handleSaveKriteria = async () => {
@@ -110,8 +118,9 @@ export default function AdminQuestionnaireManager() {
         )
       );
       setEditKriteria(null);
-    } catch (err: any) {
-      toast.error(err.message || 'Terjadi kesalahan.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Terjadi kesalahan.';
+      toast.error(msg);
     } finally {
       setSavingKriteria(false);
     }
