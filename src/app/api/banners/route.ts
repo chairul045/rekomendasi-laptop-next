@@ -4,7 +4,7 @@ import { getActiveBanners } from '@/lib/banner-store';
 
 export async function GET() {
   try {
-    const banners = getActiveBanners();
+    const banners = await getActiveBanners();
     return NextResponse.json(
       { banners },
       {

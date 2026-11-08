@@ -11,7 +11,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Akses ditolak. Khusus admin.' }, { status: 403 });
     }
 
-    const banners = getAllBanners();
+    const banners = await getAllBanners();
     return NextResponse.json({ banners });
   } catch (error) {
     console.error('Admin GET banners error:', error);
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const newBanner = addBanner({
+    const newBanner = await addBanner({
       title: title.trim(),
       brand: brand.trim(),
       subtitle: subtitle?.trim() || '',

@@ -27,7 +27,7 @@ export default function LaptopReviewModal({
 
   if (!laptop) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!comment.trim()) {
       toast.error('Silakan tulis ulasan singkat pengalaman Anda.');
@@ -35,8 +35,26 @@ export default function LaptopReviewModal({
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      // Simpan ulasan lokal
+    try {
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          laptopId: laptop.id,
+          rating,
+          comment: comment.trim(),
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Gagal menyimpan ulasan ke server');
+      }
+
+      toast.success('Terima kasih! Ulasan & rating Anda berhasil disimpan. ⭐');
+      onSubmitSuccess?.();
+      onClose();
+    } catch {
+      // Simpan cadangan ulasan lokal jika koneksi terganggu
       try {
         const key = `lapmatch_reviews_${laptop.id}`;
         const existing = JSON.parse(localStorage.getItem(key) || '[]');
@@ -48,11 +66,12 @@ export default function LaptopReviewModal({
         localStorage.setItem(key, JSON.stringify(existing));
       } catch {}
 
-      setIsSubmitting(false);
-      toast.success('Terima kasih! Ulasan & rating Anda berhasil disimpan. ⭐');
+      toast.success('Ulasan & rating Anda telah disimpan secara lokal.');
       onSubmitSuccess?.();
       onClose();
-    }, 400);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

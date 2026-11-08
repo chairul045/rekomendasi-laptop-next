@@ -19,34 +19,38 @@ model User {
   updatedAt DateTime @updatedAt
 
   kuisionerJawaban KuisionerJawaban[]
+  reviews          Review[]
 
   @@map("users")
 }
 
 model Laptop {
-  id               Int     @id @default(autoincrement())
+  id               Int      @id @default(autoincrement())
   name             String
   brand            String
   price            BigInt
-  performaKomposit Int?    @map("performa_komposit")
-  processorScore   Int?    @map("processor_score")
-  vgaScore         Int?    @map("vga_score")
-  ramGb            Int?    @map("ram_gb")
-  storageGb        Int?    @map("storage_gb")
-  displaySize      Float?  @map("display_size")
-  batteryHours     Float?  @map("battery_hours")
-  weightKg         Float?  @map("weight_kg")
-  mobilityScore    Int?    @map("mobility_score")
+  performaKomposit Int?     @map("performa_komposit")
+  processorScore   Int?     @map("processor_score")
+  vgaScore         Int?     @map("vga_score")
+  ramGb            Int?     @map("ram_gb")
+  storageGb        Int?     @map("storage_gb")
+  displaySize      Float?   @map("display_size")
+  batteryHours     Float?   @map("battery_hours")
+  weightKg         Float?   @map("weight_kg")
+  mobilityScore    Int?     @map("mobility_score")
   category         String?
   image            String?
-  imageUrl         String? @map("image_url")
-  condition        String  @default("baru") // baru | second
+  imageUrl         String?  @map("image_url")
+  condition        String   @default("baru") // baru | second
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
   hasilTopsis  HasilTopsis[]
   penjelasanAi PenjelasanAi[]
+  reviews      Review[]
 
+  @@index([condition, price])
+  @@index([brand])
   @@map("laptops")
 }
 
@@ -79,11 +83,12 @@ model KuisionerJawaban {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  user       User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  bobotHasil BobotKriteriaHasil[]
-  hasilTopsis HasilTopsis[]
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bobotHasil   BobotKriteriaHasil[]
+  hasilTopsis  HasilTopsis[]
   penjelasanAi PenjelasanAi[]
 
+  @@index([userId, createdAt])
   @@map("kuisioner_jawaban")
 }
 
@@ -100,15 +105,16 @@ model BobotKriteriaHasil {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([kuisionerJawabanId])
   @@map("bobot_kriteria_hasil")
 }
 
 model HasilTopsis {
-  id                 Int    @id @default(autoincrement())
-  kuisionerJawabanId Int    @map("kuisioner_jawaban_id")
-  laptopId           Int    @map("laptop_id")
+  id                 Int      @id @default(autoincrement())
+  kuisionerJawabanId Int      @map("kuisioner_jawaban_id")
+  laptopId           Int      @map("laptop_id")
   kondisi            String // baru | second
-  nilaiV             Float  @map("nilai_v") @db.DoublePrecision
+  nilaiV             Float    @map("nilai_v") @db.DoublePrecision
   peringkat          Int
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
@@ -116,13 +122,15 @@ model HasilTopsis {
   kuisionerJawaban KuisionerJawaban @relation(fields: [kuisionerJawabanId], references: [id], onDelete: Cascade)
   laptop           Laptop           @relation(fields: [laptopId], references: [id], onDelete: Cascade)
 
+  @@index([kuisionerJawabanId, peringkat])
+  @@index([laptopId])
   @@map("hasil_topsis")
 }
 
 model PenjelasanAi {
-  id                 Int    @id @default(autoincrement())
-  kuisionerJawabanId Int    @map("kuisioner_jawaban_id")
-  laptopId           Int    @map("laptop_id")
+  id                 Int      @id @default(autoincrement())
+  kuisionerJawabanId Int      @map("kuisioner_jawaban_id")
+  laptopId           Int      @map("laptop_id")
   penjelasan         String
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
@@ -130,5 +138,53 @@ model PenjelasanAi {
   kuisionerJawaban KuisionerJawaban @relation(fields: [kuisionerJawabanId], references: [id], onDelete: Cascade)
   laptop           Laptop           @relation(fields: [laptopId], references: [id], onDelete: Cascade)
 
+  @@index([kuisionerJawabanId])
   @@map("penjelasan_ai")
+}
+
+model Banner {
+  id            String   @id @default(cuid())
+  title         String
+  brand         String
+  subtitle      String
+  price         BigInt
+  originalPrice BigInt   @map("original_price")
+  discount      String   @default("")
+  badge         String   @default("")
+  processor     String   @default("")
+  vga           String   @default("")
+  ramGb         Int      @default(0) @map("ram_gb")
+  storageGb     Int      @default(0) @map("storage_gb")
+  display       String   @default("")
+  imageUrl      String   @map("image_url")
+  tokopediaUrl  String?  @map("tokopedia_url")
+  shopeeUrl     String?  @map("shopee_url")
+  isActive      Boolean  @default(true) @map("is_active")
+  sortOrder     Int      @default(0) @map("sort_order")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([isActive, sortOrder])
+  @@map("banners")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  laptopId  Int      @map("laptop_id")
+  userId    String?  @map("user_id")
+  userName  String   @map("user_name")
+  userRole  String   @default("Mahasiswa") @map("user_role")
+  rating    Int      @default(5)
+  comment   String
+  status    String   @default("published") // published | reported | moderated
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  laptop Laptop @relation(fields: [laptopId], references: [id], onDelete: Cascade)
+  user   User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([laptopId, status])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("reviews")
 }

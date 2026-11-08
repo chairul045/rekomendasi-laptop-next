@@ -1,6 +1,6 @@
-// src/lib/banner-store.ts - Penyimpanan & Pengelolaan Iklan Slider Dashboard
-import fs from 'fs';
-import path from 'path';
+// src/lib/banner-store.ts - Penyimpanan & Pengelolaan Iklan Slider Dashboard (PostgreSQL via Prisma)
+import prisma from '@/lib/prisma';
+import type { Banner, Prisma } from '@prisma/client';
 
 export interface BannerAd {
   id: string;
@@ -24,230 +24,338 @@ export interface BannerAd {
   createdAt?: string;
 }
 
-const DEFAULT_BANNERS: BannerAd[] = [
+export const DEFAULT_BANNERS: BannerAd[] = [
   {
-    "id": "banner-1",
-    "title": "ASUS VivoBook 15 OLED - Layar 2.8K OLED Nyaman & Baterai Awet Seharian",
-    "brand": "ASUS",
-    "subtitle": "Rekomendasi #1 mahasiswa untuk skripsi, coding, dan multitasking. Layar OLED 100% DCI-P3 akurat dengan sertifikasi Eye Care anti mata lelah.",
-    "price": 11999000,
-    "originalPrice": 13499000,
-    "discount": "Hemat 11%",
-    "badge": "🏆 Pilihan #1 Kuliah & Skripsi",
-    "processor": "Intel Core i5-1335U (10 Cores, up to 4.6 GHz)",
-    "vga": "Intel Iris Xe Graphics 80EU",
-    "ramGb": 16,
-    "storageGb": 512,
-    "display": "15.6\" FHD OLED 100% DCI-P3 600 nits Peak",
-    "imageUrl": "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80",
-    "tokopediaUrl": "https://www.tokopedia.com/search?q=asus+vivobook+15+oled",
-    "shopeeUrl": "https://shopee.co.id/search?keyword=asus+vivobook+15+oled",
-    "isActive": true,
-    "sortOrder": 1,
-    "createdAt": "2026-11-07T12:00:00.000Z"
+    id: 'banner-1',
+    title: 'ASUS VivoBook 15 OLED - Layar 2.8K OLED Nyaman & Baterai Awet Seharian',
+    brand: 'ASUS',
+    subtitle:
+      'Rekomendasi #1 mahasiswa untuk skripsi, coding, dan multitasking. Layar OLED 100% DCI-P3 akurat dengan sertifikasi Eye Care anti mata lelah.',
+    price: 11999000,
+    originalPrice: 13499000,
+    discount: 'Hemat 11%',
+    badge: '🏆 Pilihan #1 Kuliah & Skripsi',
+    processor: 'Intel Core i5-1335U (10 Cores, up to 4.6 GHz)',
+    vga: 'Intel Iris Xe Graphics 80EU',
+    ramGb: 16,
+    storageGb: 512,
+    display: '15.6" FHD OLED 100% DCI-P3 600 nits Peak',
+    imageUrl:
+      'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80',
+    tokopediaUrl: 'https://www.tokopedia.com/search?q=asus+vivobook+15+oled',
+    shopeeUrl: 'https://shopee.co.id/search?keyword=asus+vivobook+15+oled',
+    isActive: true,
+    sortOrder: 1,
+    createdAt: '2026-11-07T12:00:00.000Z',
   },
   {
-    "id": "banner-2",
-    "title": "Lenovo LOQ 15 Gaming - Intel Core i5 13th Gen + RTX 4050 6GB",
-    "brand": "Lenovo",
-    "subtitle": "Performa buas paling rasional untuk mahasiswa teknik informatika & multimedia. Libas rendering Blender 3D, machine learning, dan gaming esport.",
-    "price": 14999000,
-    "originalPrice": 16999000,
-    "discount": "Hemat 12%",
-    "badge": "⚡ Best Value Gaming & Render",
-    "processor": "Intel Core i5-13420H (8 Cores, 12 Threads)",
-    "vga": "NVIDIA GeForce RTX 4050 6GB GDDR6 (95W TGP)",
-    "ramGb": 16,
-    "storageGb": 512,
-    "display": "15.6\" FHD IPS 144Hz 100% sRGB G-SYNC",
-    "imageUrl": "https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800&auto=format&fit=crop&q=80",
-    "tokopediaUrl": "https://www.tokopedia.com/search?q=lenovo+loq+15",
-    "shopeeUrl": "https://shopee.co.id/search?keyword=lenovo+loq+15",
-    "isActive": true,
-    "sortOrder": 2,
-    "createdAt": "2026-11-07T12:00:00.000Z"
+    id: 'banner-2',
+    title: 'Lenovo LOQ 15 Gaming - Intel Core i5 13th Gen + RTX 4050 6GB',
+    brand: 'Lenovo',
+    subtitle:
+      'Performa buas paling rasional untuk mahasiswa teknik informatika & multimedia. Libas rendering Blender 3D, machine learning, dan gaming esport.',
+    price: 14999000,
+    originalPrice: 16999000,
+    discount: 'Hemat 12%',
+    badge: '⚡ Best Value Gaming & Render',
+    processor: 'Intel Core i5-13420H (8 Cores, 12 Threads)',
+    vga: 'NVIDIA GeForce RTX 4050 6GB GDDR6 (95W TGP)',
+    ramGb: 16,
+    storageGb: 512,
+    display: '15.6" FHD IPS 144Hz 100% sRGB G-SYNC',
+    imageUrl:
+      'https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800&auto=format&fit=crop&q=80',
+    tokopediaUrl: 'https://www.tokopedia.com/search?q=lenovo+loq+15',
+    shopeeUrl: 'https://shopee.co.id/search?keyword=lenovo+loq+15',
+    isActive: true,
+    sortOrder: 2,
+    createdAt: '2026-11-07T12:00:00.000Z',
   },
   {
-    "id": "banner-3",
-    "title": "Apple MacBook Air M3 15-inch - Desain Ultra Tipis & Baterai 18 Jam",
-    "brand": "Apple",
-    "subtitle": "Standar emas produktivitas mahasiswa modern. Desain elegan tanpa kipas, performa Neural Engine AI kencang, dan ketahanan baterai tembus 18 jam.",
-    "price": 18999000,
-    "originalPrice": 21499000,
-    "discount": "Hemat 12%",
-    "badge": "✨ Favorit Desain & Mobilitas",
-    "processor": "Apple M3 Chip (8-Core CPU, 10-Core GPU, 16-Core Neural Engine)",
-    "vga": "Apple 10-Core Integrated GPU with Hardware Ray Tracing",
-    "ramGb": 16,
-    "storageGb": 512,
-    "display": "15.3\" Liquid Retina True Tone (500 nits, P3 Wide Color)",
-    "imageUrl": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&auto=format&fit=crop&q=80",
-    "tokopediaUrl": "https://www.tokopedia.com/search?q=macbook+air+m3",
-    "shopeeUrl": "https://shopee.co.id/search?keyword=macbook+air+m3",
-    "isActive": true,
-    "sortOrder": 3,
-    "createdAt": "2026-11-07T12:00:00.000Z"
+    id: 'banner-3',
+    title: 'Apple MacBook Air M3 15-inch - Desain Ultra Tipis & Baterai 18 Jam',
+    brand: 'Apple',
+    subtitle:
+      'Standar emas produktivitas mahasiswa modern. Desain elegan tanpa kipas, performa Neural Engine AI kencang, dan ketahanan baterai tembus 18 jam.',
+    price: 18999000,
+    originalPrice: 21499000,
+    discount: 'Hemat 12%',
+    badge: '✨ Favorit Desain & Mobilitas',
+    processor: 'Apple M3 Chip (8-Core CPU, 10-Core GPU, 16-Core Neural Engine)',
+    vga: 'Apple 10-Core Integrated GPU with Hardware Ray Tracing',
+    ramGb: 16,
+    storageGb: 512,
+    display: '15.3" Liquid Retina True Tone (500 nits, P3 Wide Color)',
+    imageUrl:
+      'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&auto=format&fit=crop&q=80',
+    tokopediaUrl: 'https://www.tokopedia.com/search?q=macbook+air+m3',
+    shopeeUrl: 'https://shopee.co.id/search?keyword=macbook+air+m3',
+    isActive: true,
+    sortOrder: 3,
+    createdAt: '2026-11-07T12:00:00.000Z',
   },
   {
-    "id": "banner-4",
-    "title": "Acer Swift Go 14 AI - Intel Core Ultra 5 dengan Intel AI Boost NPU",
-    "brand": "Acer",
-    "subtitle": "Laptop bertenaga AI generasi terbaru bersertifikasi Intel Evo. Bobot super ringan hanya 1.32 kg, siap diajak kuliah seharian tanpa pusing cari colokan.",
-    "price": 13499000,
-    "originalPrice": 14999000,
-    "discount": "Hemat 10%",
-    "badge": "🚀 Next-Gen AI Laptop 2026",
-    "processor": "Intel Core Ultra 5 125H (14 Cores, 18 Threads)",
-    "vga": "Intel Arc Graphics (Dedicated-Class iGPU)",
-    "ramGb": 16,
-    "storageGb": 512,
-    "display": "14.0\" 2.8K OLED (2880x1800) 90Hz 100% DCI-P3",
-    "imageUrl": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop&q=80",
-    "tokopediaUrl": "https://www.tokopedia.com/search?q=acer+swift+go+14",
-    "shopeeUrl": "https://shopee.co.id/search?keyword=acer+swift+go+14",
-    "isActive": true,
-    "sortOrder": 4,
-    "createdAt": "2026-11-07T12:00:00.000Z"
+    id: 'banner-4',
+    title: 'Acer Swift Go 14 AI - Intel Core Ultra 5 dengan Intel AI Boost NPU',
+    brand: 'Acer',
+    subtitle:
+      'Laptop bertenaga AI generasi terbaru bersertifikasi Intel Evo. Bobot super ringan hanya 1.32 kg, siap diajak kuliah seharian tanpa pusing cari colokan.',
+    price: 13499000,
+    originalPrice: 14999000,
+    discount: 'Hemat 10%',
+    badge: '🚀 Next-Gen AI Laptop 2026',
+    processor: 'Intel Core Ultra 5 125H (14 Cores, 18 Threads)',
+    vga: 'Intel Arc Graphics (Dedicated-Class iGPU)',
+    ramGb: 16,
+    storageGb: 512,
+    display: '14.0" 2.8K OLED (2880x1800) 90Hz 100% DCI-P3',
+    imageUrl:
+      'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop&q=80',
+    tokopediaUrl: 'https://www.tokopedia.com/search?q=acer+swift+go+14',
+    shopeeUrl: 'https://shopee.co.id/search?keyword=acer+swift+go+14',
+    isActive: true,
+    sortOrder: 4,
+    createdAt: '2026-11-07T12:00:00.000Z',
   },
   {
-    "id": "banner-5",
-    "title": "Lenovo ThinkPad T490 Grade A+ - Bandel, Awet & Siap Tempur Skripsi",
-    "brand": "Lenovo",
-    "subtitle": "Pilihan paling cerdas mahasiswa berbudget hemat 4 jutaan. Keyboard legendaris ternyaman di dunia, bodi standar militer MIL-STD-810G tahan banting.",
-    "price": 4750000,
-    "originalPrice": 6200000,
-    "discount": "Diskon 23%",
-    "badge": "💡 Rekomendasi Second Terlaris",
-    "processor": "Intel Core i5-8365U vPro (4 Cores, 8 Threads)",
-    "vga": "Intel UHD Graphics 620",
-    "ramGb": 16,
-    "storageGb": 512,
-    "display": "14.0\" FHD IPS Anti-Glare 300 nits",
-    "imageUrl": "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=800&auto=format&fit=crop&q=80",
-    "tokopediaUrl": "https://www.tokopedia.com/search?q=thinkpad+t490",
-    "shopeeUrl": "https://shopee.co.id/search?keyword=thinkpad+t490",
-    "isActive": true,
-    "sortOrder": 5,
-    "createdAt": "2026-11-07T12:00:00.000Z"
+    id: 'banner-5',
+    title: 'Lenovo ThinkPad T490 Grade A+ - Bandel, Awet & Siap Tempur Skripsi',
+    brand: 'Lenovo',
+    subtitle:
+      'Pilihan paling cerdas mahasiswa berbudget hemat 4 jutaan. Keyboard legendaris ternyaman di dunia, bodi standar militer MIL-STD-810G tahan banting.',
+    price: 4750000,
+    originalPrice: 6200000,
+    discount: 'Diskon 23%',
+    badge: '💡 Rekomendasi Second Terlaris',
+    processor: 'Intel Core i5-8365U vPro (4 Cores, 8 Threads)',
+    vga: 'Intel UHD Graphics 620',
+    ramGb: 16,
+    storageGb: 512,
+    display: '14.0" FHD IPS Anti-Glare 300 nits',
+    imageUrl:
+      'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=800&auto=format&fit=crop&q=80',
+    tokopediaUrl: 'https://www.tokopedia.com/search?q=thinkpad+t490',
+    shopeeUrl: 'https://shopee.co.id/search?keyword=thinkpad+t490',
+    isActive: true,
+    sortOrder: 5,
+    createdAt: '2026-11-07T12:00:00.000Z',
   },
   {
-    "id": "banner-6",
-    "title": "Lapmatch Care: Paket Servis Kilat, Bersih Kipas & Upgrade SSD RAM",
-    "brand": "Lapmatch Care",
-    "subtitle": "Laptop lemot, cepat panas, atau baterai drop? Konsultasi kerusakan gratis, upgrade kilat ditunggu, dan garansi resmi servis 90 hari.",
-    "price": 75000,
-    "originalPrice": 150000,
-    "discount": "Promo 50%",
-    "badge": "🛠️ Servis & Upgrade Resmi",
-    "processor": "Mendukung Semua Merek: ASUS, Lenovo, HP, Acer, Apple, MSI",
-    "vga": "Teknisi Profesional & Sparepart Original Bergaransi",
-    "ramGb": 16,
-    "storageGb": 512,
-    "display": "Diagnosa Cepat & Estimasi Biaya Transparan",
-    "imageUrl": "https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=800&auto=format&fit=crop&q=80",
-    "tokopediaUrl": "/service-laptop",
-    "shopeeUrl": "/service-laptop",
-    "isActive": true,
-    "sortOrder": 6,
-    "createdAt": "2026-11-07T12:00:00.000Z"
-  }
+    id: 'banner-6',
+    title: 'Lapmatch Care: Paket Servis Kilat, Bersih Kipas & Upgrade SSD RAM',
+    brand: 'Lapmatch Care',
+    subtitle:
+      'Laptop lemot, cepat panas, atau baterai drop? Konsultasi kerusakan gratis, upgrade kilat ditunggu, dan garansi resmi servis 90 hari.',
+    price: 75000,
+    originalPrice: 150000,
+    discount: 'Promo 50%',
+    badge: '🛠️ Servis & Upgrade Resmi',
+    processor: 'Mendukung Semua Merek: ASUS, Lenovo, HP, Acer, Apple, MSI',
+    vga: 'Teknisi Profesional & Sparepart Original Bergaransi',
+    ramGb: 16,
+    storageGb: 512,
+    display: 'Diagnosa Cepat & Estimasi Biaya Transparan',
+    imageUrl:
+      'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=800&auto=format&fit=crop&q=80',
+    tokopediaUrl: '/service-laptop',
+    shopeeUrl: '/service-laptop',
+    isActive: true,
+    sortOrder: 6,
+    createdAt: '2026-11-07T12:00:00.000Z',
+  },
 ];
 
-const DATA_DIR = path.join(process.cwd(), 'data');
-const DATA_FILE = path.join(DATA_DIR, 'banners.json');
-
-// Memory cache fallback in case file system has temporary read/write restrictions
+// Fallback in-memory state for local testing or when database migration is pending
 let memoryBanners: BannerAd[] = [...DEFAULT_BANNERS];
-let isLoaded = false;
 
-function ensureFileExists() {
-  try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
-    }
-    if (!fs.existsSync(DATA_FILE)) {
-      fs.writeFileSync(DATA_FILE, JSON.stringify(DEFAULT_BANNERS, null, 2), 'utf-8');
-      memoryBanners = [...DEFAULT_BANNERS];
-    }
-  } catch (err) {
-    console.warn('Banner store file init notice:', err);
-  }
+function toBannerAd(b: Banner | BannerAd): BannerAd {
+  return {
+    id: String(b.id),
+    title: b.title,
+    brand: b.brand,
+    subtitle: b.subtitle,
+    price: Number(b.price),
+    originalPrice: Number(b.originalPrice),
+    discount: b.discount ?? '',
+    badge: b.badge ?? '',
+    processor: b.processor ?? '',
+    vga: b.vga ?? '',
+    ramGb: Number(b.ramGb) || 0,
+    storageGb: Number(b.storageGb) || 0,
+    display: b.display ?? '',
+    imageUrl: b.imageUrl,
+    tokopediaUrl: b.tokopediaUrl ?? undefined,
+    shopeeUrl: b.shopeeUrl ?? undefined,
+    isActive: Boolean(b.isActive),
+    sortOrder: Number(b.sortOrder) || 0,
+    createdAt: b.createdAt instanceof Date ? b.createdAt.toISOString() : String(b.createdAt),
+  };
 }
 
-export function getAllBanners(): BannerAd[] {
-  if (isLoaded && memoryBanners.length > 0) {
+export async function getAllBanners(): Promise<BannerAd[]> {
+  try {
+    const banners = await prisma.banner.findMany({
+      orderBy: { sortOrder: 'asc' },
+    });
+    if (banners.length > 0) {
+      return banners.map(toBannerAd);
+    }
+    // Return memory banners if table is empty
+    return memoryBanners.sort((a, b) => a.sortOrder - b.sortOrder);
+  } catch (err) {
+    console.warn('PostgreSQL banner fetch fallback to in-memory:', err);
     return memoryBanners.sort((a, b) => a.sortOrder - b.sortOrder);
   }
+}
 
-  ensureFileExists();
+export async function getActiveBanners(): Promise<BannerAd[]> {
   try {
-    if (fs.existsSync(DATA_FILE)) {
-      const content = fs.readFileSync(DATA_FILE, 'utf-8');
-      const parsed = JSON.parse(content);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        memoryBanners = parsed;
-        isLoaded = true;
-        return parsed.sort((a, b) => a.sortOrder - b.sortOrder);
-      }
+    const banners = await prisma.banner.findMany({
+      where: { isActive: true },
+      orderBy: { sortOrder: 'asc' },
+    });
+    if (banners.length > 0) {
+      return banners.map(toBannerAd);
     }
+    return memoryBanners.filter((b) => b.isActive).sort((a, b) => a.sortOrder - b.sortOrder);
   } catch (err) {
-    console.warn('Error reading banners.json, falling back to cache:', err);
+    console.warn('PostgreSQL active banner fetch fallback to in-memory:', err);
+    return memoryBanners.filter((b) => b.isActive).sort((a, b) => a.sortOrder - b.sortOrder);
   }
-  isLoaded = true;
-  return memoryBanners.sort((a, b) => a.sortOrder - b.sortOrder);
 }
 
-export function getActiveBanners(): BannerAd[] {
-  return getAllBanners().filter((b) => b.isActive);
-}
-
-export function saveAllBanners(banners: BannerAd[]): boolean {
-  ensureFileExists();
-  memoryBanners = [...banners];
+export async function addBanner(data: Omit<BannerAd, 'id' | 'createdAt'>): Promise<BannerAd> {
   try {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(banners, null, 2), 'utf-8');
+    const created = await prisma.banner.create({
+      data: {
+        title: data.title,
+        brand: data.brand,
+        subtitle: data.subtitle,
+        price: BigInt(Math.round(data.price)),
+        originalPrice: BigInt(Math.round(data.originalPrice)),
+        discount: data.discount ?? '',
+        badge: data.badge ?? '',
+        processor: data.processor ?? '',
+        vga: data.vga ?? '',
+        ramGb: Number(data.ramGb) || 0,
+        storageGb: Number(data.storageGb) || 0,
+        display: data.display ?? '',
+        imageUrl: data.imageUrl,
+        tokopediaUrl: data.tokopediaUrl || null,
+        shopeeUrl: data.shopeeUrl || null,
+        isActive: data.isActive,
+        sortOrder: data.sortOrder,
+      },
+    });
+    const result = toBannerAd(created);
+    memoryBanners.push(result);
+    return result;
+  } catch (err) {
+    console.error('Database addBanner error:', err);
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('Gagal menyimpan banner ke database PostgreSQL.');
+    }
+    const newBanner: BannerAd = {
+      ...data,
+      id: `banner-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+    };
+    memoryBanners.push(newBanner);
+    return newBanner;
+  }
+}
+
+export async function updateBanner(
+  id: string,
+  updates: Partial<BannerAd>
+): Promise<BannerAd | null> {
+  try {
+    const dataToUpdate: Prisma.BannerUpdateInput = {};
+    if (updates.title !== undefined) dataToUpdate.title = updates.title;
+    if (updates.brand !== undefined) dataToUpdate.brand = updates.brand;
+    if (updates.subtitle !== undefined) dataToUpdate.subtitle = updates.subtitle;
+    if (updates.price !== undefined) dataToUpdate.price = BigInt(Math.round(updates.price));
+    if (updates.originalPrice !== undefined)
+      dataToUpdate.originalPrice = BigInt(Math.round(updates.originalPrice));
+    if (updates.discount !== undefined) dataToUpdate.discount = updates.discount;
+    if (updates.badge !== undefined) dataToUpdate.badge = updates.badge;
+    if (updates.processor !== undefined) dataToUpdate.processor = updates.processor;
+    if (updates.vga !== undefined) dataToUpdate.vga = updates.vga;
+    if (updates.ramGb !== undefined) dataToUpdate.ramGb = Number(updates.ramGb);
+    if (updates.storageGb !== undefined) dataToUpdate.storageGb = Number(updates.storageGb);
+    if (updates.display !== undefined) dataToUpdate.display = updates.display;
+    if (updates.imageUrl !== undefined) dataToUpdate.imageUrl = updates.imageUrl;
+    if (updates.tokopediaUrl !== undefined) dataToUpdate.tokopediaUrl = updates.tokopediaUrl || null;
+    if (updates.shopeeUrl !== undefined) dataToUpdate.shopeeUrl = updates.shopeeUrl || null;
+    if (updates.isActive !== undefined) dataToUpdate.isActive = updates.isActive;
+    if (updates.sortOrder !== undefined) dataToUpdate.sortOrder = Number(updates.sortOrder);
+
+    const updated = await prisma.banner.update({
+      where: { id },
+      data: dataToUpdate,
+    });
+    const result = toBannerAd(updated);
+    const idx = memoryBanners.findIndex((b) => b.id === id);
+    if (idx !== -1) memoryBanners[idx] = result;
+    return result;
+  } catch (err) {
+    console.error('Database updateBanner error:', err);
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('Gagal memperbarui banner di database PostgreSQL.');
+    }
+    const idx = memoryBanners.findIndex((b) => b.id === id);
+    if (idx === -1) return null;
+    memoryBanners[idx] = { ...memoryBanners[idx], ...updates };
+    return memoryBanners[idx];
+  }
+}
+
+export async function deleteBanner(id: string): Promise<boolean> {
+  try {
+    await prisma.banner.delete({
+      where: { id },
+    });
+    memoryBanners = memoryBanners.filter((b) => b.id !== id);
     return true;
   } catch (err) {
-    console.error('Error writing banners.json:', err);
-    return false;
+    console.error('Database deleteBanner error:', err);
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('Gagal menghapus banner dari database PostgreSQL.');
+    }
+    const lenBefore = memoryBanners.length;
+    memoryBanners = memoryBanners.filter((b) => b.id !== id);
+    return memoryBanners.length !== lenBefore;
   }
 }
 
-export function addBanner(data: Omit<BannerAd, 'id' | 'createdAt'>): BannerAd {
-  const banners = getAllBanners();
-  const newBanner: BannerAd = {
-    ...data,
-    id: `banner-${Date.now()}`,
-    createdAt: new Date().toISOString(),
-  };
-  banners.push(newBanner);
-  saveAllBanners(banners);
-  return newBanner;
-}
-
-export function updateBanner(id: string, updates: Partial<BannerAd>): BannerAd | null {
-  const banners = getAllBanners();
-  const index = banners.findIndex((b) => b.id === id);
-  if (index === -1) return null;
-
-  banners[index] = { ...banners[index], ...updates };
-  saveAllBanners(banners);
-  return banners[index];
-}
-
-export function deleteBanner(id: string): boolean {
-  const banners = getAllBanners();
-  const filtered = banners.filter((b) => b.id !== id);
-  if (filtered.length === banners.length) return false;
-  saveAllBanners(filtered);
-  return true;
-}
-
-export function toggleBannerStatus(id: string): BannerAd | null {
-  const banners = getAllBanners();
-  const item = banners.find((b) => b.id === id);
-  if (!item) return null;
-  item.isActive = !item.isActive;
-  saveAllBanners(banners);
-  return item;
+export async function toggleBannerStatus(id: string): Promise<BannerAd | null> {
+  try {
+    const existing = await prisma.banner.findUnique({ where: { id } });
+    if (!existing) {
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error('Banner tidak ditemukan di database.');
+      }
+      const mem = memoryBanners.find((b) => b.id === id);
+      if (!mem) return null;
+      mem.isActive = !mem.isActive;
+      return mem;
+    }
+    const updated = await prisma.banner.update({
+      where: { id },
+      data: { isActive: !existing.isActive },
+    });
+    const result = toBannerAd(updated);
+    const idx = memoryBanners.findIndex((b) => b.id === id);
+    if (idx !== -1) memoryBanners[idx] = result;
+    return result;
+  } catch (err) {
+    console.error('Database toggleBannerStatus error:', err);
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('Gagal mengubah status banner di database PostgreSQL.');
+    }
+    const mem = memoryBanners.find((b) => b.id === id);
+    if (!mem) return null;
+    mem.isActive = !mem.isActive;
+    return mem;
+  }
 }

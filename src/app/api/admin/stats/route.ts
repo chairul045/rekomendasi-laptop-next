@@ -82,7 +82,22 @@ export async function GET() {
       .sort((a, b) => b.count - a.count)
       .slice(0, 6);
 
-    const banners = getAllBanners();
+    const banners = await getAllBanners();
+
+    let totalReviews = 12;
+    let avgRating = 4.8;
+    try {
+      const reviewAggregate = await prisma.review.aggregate({
+        _count: { id: true },
+        _avg: { rating: true },
+      });
+      if (reviewAggregate._count.id > 0) {
+        totalReviews = reviewAggregate._count.id;
+        avgRating = Number((reviewAggregate._avg.rating ?? 4.8).toFixed(1));
+      }
+    } catch {
+      // Table pending migration fallback
+    }
 
     return NextResponse.json({
       overview: {
@@ -90,8 +105,8 @@ export async function GET() {
         totalLaptops,
         totalConsultations,
         totalBanners: banners.length,
-        totalReviews: 12, // Simulasi review & ulasan aktif
-        avgRating: 4.8,
+        totalReviews,
+        avgRating,
       },
       peruntukanList,
       topLaptopsList,

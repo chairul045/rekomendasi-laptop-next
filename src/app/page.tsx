@@ -133,7 +133,7 @@ export default async function HomePage() {
   const latestSession = consultationsSerialized[0];
   const latestBest = latestSession?.hasilTopsis[0]?.laptop;
 
-  const activeBanners = getActiveBanners();
+  const activeBanners = await getActiveBanners();
 
   return (
     <div className="min-h-screen flex flex-col bg-[#09090d] text-zinc-100">

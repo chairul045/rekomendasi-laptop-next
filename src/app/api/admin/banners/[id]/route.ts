@@ -17,7 +17,7 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
 
-    const updated = updateBanner(id, {
+    const updated = await updateBanner(id, {
       ...body,
       price: body.price !== undefined ? Number(body.price) : undefined,
       originalPrice: body.originalPrice !== undefined ? Number(body.originalPrice) : undefined,
@@ -50,7 +50,7 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    const success = deleteBanner(id);
+    const success = await deleteBanner(id);
     if (!success) {
       return NextResponse.json({ error: 'Banner tidak ditemukan.' }, { status: 404 });
     }
@@ -74,7 +74,7 @@ export async function PATCH(
     }
 
     const { id } = await params;
-    const updated = toggleBannerStatus(id);
+    const updated = await toggleBannerStatus(id);
     if (!updated) {
       return NextResponse.json({ error: 'Banner tidak ditemukan.' }, { status: 404 });
     }
