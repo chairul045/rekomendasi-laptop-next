@@ -1,20 +1,7 @@
 // app/api/admin/banners/[id]/route.ts - Update, Delete & Toggle status banner
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import prisma from '@/lib/prisma';
-import { isSuperAdminEmail } from '@/lib/auth-constants';
+import { checkAdmin } from '@/lib/admin-auth';
 import { updateBanner, deleteBanner, toggleBannerStatus } from '@/lib/banner-store';
-
-async function checkAdmin() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
-  const profile = await prisma.user.findUnique({ where: { id: user.id } });
-  if (!profile || profile.role !== 'admin' || !isSuperAdminEmail(profile.email)) return null;
-  return profile;
-}
 
 // PUT: Perbarui data banner iklan
 export async function PUT(

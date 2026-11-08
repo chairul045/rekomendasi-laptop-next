@@ -1,25 +1,8 @@
 // src/app/api/admin/stats/route.ts - Admin Dashboard KPI & Statistical Aggregations
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import prisma from '@/lib/prisma';
-import { isSuperAdminEmail } from '@/lib/auth-constants';
+import { checkAdminAuth } from '@/lib/admin-auth';
 import { getAllBanners } from '@/lib/banner-store';
-
-async function checkAdminAuth() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return null;
-
-  const profile = await prisma.user.findUnique({ where: { id: user.id } });
-  if (!profile || profile.role !== 'admin' || !isSuperAdminEmail(profile.email)) {
-    return null;
-  }
-
-  return profile;
-}
 
 export async function GET() {
   const admin = await checkAdminAuth();

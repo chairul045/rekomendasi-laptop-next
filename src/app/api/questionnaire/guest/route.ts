@@ -20,9 +20,12 @@ export async function POST(request: NextRequest) {
       ? peruntukan.filter(Boolean).join(' & ') || 'Kuliah'
       : peruntukan || 'Kuliah';
 
-    const validRanking = Array.isArray(rankingKriteria) && rankingKriteria.length === 6
-      ? rankingKriteria
-      : ['C1', 'C2', 'C3', 'C4', 'C5', 'C6'];
+    const validRanking =
+      Array.isArray(rankingKriteria) &&
+      rankingKriteria.length === 6 &&
+      new Set(rankingKriteria).size === 6
+        ? rankingKriteria
+        : ['C1', 'C2', 'C3', 'C4', 'C5', 'C6'];
 
     const minPrice = BigInt(Math.max(0, Number(budgetMin) || 0));
     const maxPrice = BigInt(Math.max(Number(budgetMin) || 0, Number(budgetMax) || 50000000));

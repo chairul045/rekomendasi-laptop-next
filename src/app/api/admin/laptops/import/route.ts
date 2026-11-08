@@ -1,19 +1,7 @@
 // app/api/admin/laptops/import/route.ts - API Bulk Import Data Laptop via Excel/CSV
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import prisma from '@/lib/prisma';
-import { isSuperAdminEmail } from '@/lib/auth-constants';
-
-async function checkAdmin() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
-  const profile = await prisma.user.findUnique({ where: { id: user.id } });
-  if (!profile || profile.role !== 'admin' || !isSuperAdminEmail(profile.email)) return null;
-  return user;
-}
+import { checkAdmin } from '@/lib/admin-auth';
 
 export interface RawImportLaptop {
   name: string;

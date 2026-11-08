@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import prisma from '@/lib/prisma';
 import { calculateTopsis, LaptopData } from '@/lib/topsis';
+import { isUserAdmin } from '@/lib/admin-auth';
 
 export async function GET(
   request: NextRequest,
@@ -40,8 +41,8 @@ export async function GET(
     // Cek akses: hanya pemilik atau admin
     const userId = user.id;
     if (jawaban.userId !== userId) {
-      const userProfile = await prisma.user.findUnique({ where: { id: userId } });
-      if (userProfile?.role !== 'admin') {
+      const userIsAdmin = await isUserAdmin(userId);
+      if (!userIsAdmin) {
         return NextResponse.json({ error: 'Akses ditolak.' }, { status: 403 });
       }
     }
@@ -167,16 +168,16 @@ export async function DELETE(
     const jawabanId = parseInt(id);
     const userId = user.id;
 
-    // Check user role
-    const userProfile = await prisma.user.findUnique({ where: { id: userId } });
-    const isAdmin = userProfile?.role === 'admin';
-
     const jawaban = await prisma.kuisionerJawaban.findUnique({ where: { id: jawabanId } });
     if (!jawaban) {
       return NextResponse.json({ error: 'Data tidak ditemukan.' }, { status: 404 });
     }
-    if (jawaban.userId !== userId && !isAdmin) {
-      return NextResponse.json({ error: 'Akses ditolak.' }, { status: 403 });
+
+    if (jawaban.userId !== userId) {
+      const userIsAdmin = await isUserAdmin(userId);
+      if (!userIsAdmin) {
+        return NextResponse.json({ error: 'Akses ditolak.' }, { status: 403 });
+      }
     }
 
     await prisma.kuisionerJawaban.delete({ where: { id: jawabanId } });

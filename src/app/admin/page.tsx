@@ -1,21 +1,16 @@
 // src/app/admin/page.tsx - Halaman Dashboard Admin Terpusat Lapmatch
-import { createClient } from '@/lib/supabase/server';
 import prisma from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import AdminDashboardLayout from './AdminDashboardLayout';
-import { isSuperAdminEmail } from '@/lib/auth-constants';
+import { checkAdminAuth } from '@/lib/admin-auth';
+
+export const dynamic = 'force-dynamic';
 
 export default async function AdminPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const adminSession = await checkAdminAuth();
 
-  if (!user) redirect('/login?callbackUrl=/admin');
-
-  const profile = await prisma.user.findUnique({ where: { id: user.id } });
-  if (!profile || profile.role !== 'admin' || !isSuperAdminEmail(profile.email)) {
-    redirect('/');
+  if (!adminSession) {
+    redirect('/login?callbackUrl=/admin');
   }
 
   const [laptops, totalUsers, totalConsultations] = await Promise.all([
@@ -36,7 +31,7 @@ export default async function AdminPage() {
     <AdminDashboardLayout
       initialLaptops={laptopsSerialized}
       stats={{ totalUsers, totalConsultations, totalLaptops: laptops.length }}
-      adminName={profile.name}
+      adminName={adminSession.name}
     />
   );
 }

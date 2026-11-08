@@ -6,9 +6,16 @@ export async function GET(request: NextRequest) {
   const origin = request.nextUrl.origin;
   const response = NextResponse.redirect(new URL('/', origin), { status: 302 });
 
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return response;
+  }
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://njnvkjhnefmawskhcbdy.supabase.co',
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_xDgQzcDtU7unpQKeCIQRLw_IvPJUIWk',
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         getAll() {

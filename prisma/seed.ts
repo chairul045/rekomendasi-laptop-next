@@ -2,11 +2,18 @@
 // Jalankan dengan: npx tsx prisma/seed.ts
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
+import dotenv from 'dotenv';
 
-const connectionString =
-  process.env.DIRECT_URL ??
-  process.env.DATABASE_URL ??
-  'postgresql://postgres.njnvkjhnefmawskhcbdy:Chairull003_@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres';
+dotenv.config({ path: '.env.local' });
+dotenv.config();
+
+const connectionString = process.env.DIRECT_URL ?? process.env.DATABASE_URL;
+
+if (!connectionString) {
+  throw new Error(
+    'DIRECT_URL or DATABASE_URL environment variable is required to run the seed script.'
+  );
+}
 
 const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });

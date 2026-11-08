@@ -11,9 +11,16 @@ export async function GET(request: NextRequest) {
   if (code) {
     const response = NextResponse.redirect(new URL(next, origin));
 
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      return NextResponse.redirect(new URL('/login?error=auth_config_missing', origin));
+    }
+
     const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://njnvkjhnefmawskhcbdy.supabase.co',
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_xDgQzcDtU7unpQKeCIQRLw_IvPJUIWk',
+      supabaseUrl,
+      supabaseAnonKey,
       {
         cookies: {
           getAll() {

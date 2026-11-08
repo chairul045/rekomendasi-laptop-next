@@ -9,13 +9,35 @@ export interface RocResult {
 }
 
 /**
+ * Memeriksa apakah urutan kode kriteria valid dan tidak memuat duplikat.
+ */
+export function isValidCriterionCodes(codes: unknown): codes is string[] {
+  if (!Array.isArray(codes) || codes.length === 0) return false;
+  if (!codes.every((c) => typeof c === 'string' && c.trim().length > 0)) return false;
+  return new Set(codes).size === codes.length;
+}
+
+/**
  * Menghitung bobot ROC berdasarkan urutan prioritas kriteria.
  * Rumus: W_i = (1/K) * sum_{j=i}^{K} (1/j)
- * @param orderedCriterionCodes Array kode kriteria dari prioritas tertinggi ke terendah
+ * @param orderedCriterionCodes Array kode kriteria unik dari prioritas tertinggi ke terendah
+ * @throws {Error} Jika ditemukan kode kriteria duplikat atau array tidak valid
  */
 export function calculateRocWeights(orderedCriterionCodes: string[]): RocResult {
+  if (!Array.isArray(orderedCriterionCodes)) {
+    throw new Error('Input kriteria ROC harus berupa array.');
+  }
+
   const k = orderedCriterionCodes.length;
   if (k === 0) return {};
+
+  // Validasi keunikan elemen kriteria (mencegah penimpaan key dan perusakan total bobot)
+  const uniqueCodes = new Set(orderedCriterionCodes);
+  if (uniqueCodes.size !== k) {
+    throw new Error(
+      'Input kriteria ROC tidak valid: ditemukan kriteria duplikat. Setiap kriteria harus unik.'
+    );
+  }
 
   const result: RocResult = {};
 

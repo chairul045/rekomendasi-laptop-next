@@ -1,24 +1,30 @@
 // lib/supabase/admin.ts - Supabase Admin Client dengan Service Role Key
-// Digunakan untuk administrasi pengguna, auto-confirm email, dan bypass izin manual
+// Digunakan HANYA di lingkungan server untuk administrasi pengguna, auto-confirm email, dan sinkronisasi
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL =
-  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://njnvkjhnefmawskhcbdy.supabase.co';
-
-const DEFAULT_SERVICE_ROLE_FALLBACK = Buffer.from(
-  'c2Jfc2VjcmV0X09oVDlGeVhGQ3djMHdLcEJjWWlISUFfcXlLV21xVEM=',
-  'base64'
-).toString('utf-8');
-
-const SUPABASE_SERVICE_ROLE_KEY = (
-  process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  DEFAULT_SERVICE_ROLE_FALLBACK
-)
-  .replace(/^["']|["']$/g, '')
-  .trim();
-
 export function createAdminClient() {
-  return createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+  if (typeof window !== 'undefined') {
+    throw new Error('createAdminClient can only be used on the server side.');
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    ? process.env.SUPABASE_SERVICE_ROLE_KEY.replace(/^["']|["']$/g, '').trim()
+    : undefined;
+
+  if (!supabaseUrl) {
+    throw new Error(
+      'NEXT_PUBLIC_SUPABASE_URL is not set. Please set it in your environment or .env.local file.'
+    );
+  }
+
+  if (!serviceRoleKey) {
+    throw new Error(
+      'SUPABASE_SERVICE_ROLE_KEY is not set. Please set it in your environment or .env.local file.'
+    );
+  }
+
+  return createClient(supabaseUrl, serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,

@@ -1,0 +1,42 @@
+feature,area,priority,original,clone,notes
+Registrasi akun baru dengan email dan kata sandi,auth,must,yes,yes,Dilengkapi PasswordStrengthMeter dan validasi zod
+Login pengguna dengan email dan kata sandi,auth,must,yes,yes,Diproteksi rate limit IP + email (5 percobaan / 15 menit)
+Login via Google OAuth,auth,must,yes,yes,Supabase OAuth terintegrasi callback route handler
+Lupa sandi dan pemulihan password via email,auth,must,yes,yes,Alur forgot-password dan reset-password via token
+Session proxy proteksi rute di Next.js 16,auth,must,yes,yes,Menggunakan src/proxy.ts sesuai konvensi terbaru Next.js 16
+Profil pengguna dan ubah nama/data akun,auth,should,yes,yes,Tersedia di /profile
+Kuesioner kebutuhan laptop 5 parameter,questionnaire,must,yes,yes,Budget slider peruntukan frekuensi kondisi dan merek
+Preset anggaran populer mahasiswa,questionnaire,should,yes,yes,Opsi cepat Rp 3-6 Jt 6-10 Jt hingga >25 Jt
+Pilihan peruntukan komputasi ganda,questionnaire,must,yes,yes,Kuliah Coding Desain Gaming Bisnis (bisa pilih hingga 2)
+Penentuan prioritas kriteria otomatis,questionnaire,must,yes,yes,Fungsi computeRankingKriteria berbasis peruntukan & mobilitas
+Filter preferensi kondisi baru second keduanya,questionnaire,must,yes,yes,Pemisahan evaluasi laptop baru dan laptop second
+Multi-select filter merek laptop dinamis,questionnaire,should,yes,yes,Daftar merek diambil dinamis dari database laptop
+Simulasi kuesioner mode pengunjung / guest,questionnaire,should,yes,yes,Endpoint /api/questionnaire/guest tanpa simpan riwayat
+Perhitungan bobot kriteria metode ROC,spk-engine,must,yes,yes,Formula Centroid Rank Order W_i = (1/K) * sum(1/j)
+Mesin evaluasi multi-kriteria TOPSIS,spk-engine,must,yes,yes,Matriks keputusan normalisasi pembobotan solusi ideal & kedekatan relatif
+Imputasi otomatis spesifikasi baterai dan bobot,spk-engine,should,yes,yes,Mengisi nilai default representatif berbasis kategori industri
+Estimasi skor performa komposit berbasis RAM & prosesor,spk-engine,should,yes,yes,Mencegah bias nilai default laptop spek rendah
+Peringkat rekomendasi laptop Baru teratas (Top 5),recommendation,must,yes,yes,Ditampilkan di kartu pemenang peringkat 1 sampai 5
+Peringkat rekomendasi laptop Second teratas (Top 5),recommendation,must,yes,yes,Ditampilkan terpisah untuk opsi hemat mahasiswa
+Penjelasan naratif AI personal tiap rekomendasi,ai,should,yes,yes,Menggunakan Google Gemini 1.5 Flash API
+Fallback generator naratif kontekstual jika AI offline,ai,should,yes,yes,Rule-based narrative engine tanpa delay atau error
+Modal transparansi perhitungan matematis TOPSIS,recommendation,should,yes,yes,Audit Matriks X R Y Solusi Ideal Jarak D & Nilai V
+Cetak / Ekspor Laporan Rekomendasi ke PDF,recommendation,should,yes,yes,CSS print styling responsif tanpa navbar & footer
+Tautan langsung belanja marketplace resmi,recommendation,could,yes,yes,Tautan pencarian Tokopedia Shopee Blibli
+Katalog laptop publik dengan filter komprehensif,catalog,must,yes,yes,Pencarian teks filter brand range harga dan kondisi
+Modal detail spesifikasi teknis lengkap laptop,catalog,must,yes,yes,Menampilkan skor prosesor VGA baterai dan dimensi
+Modal komparasi berdampingan (Side-by-side comparison),catalog,must,yes,yes,Membandingkan 2 hingga 3 laptop sekaligus
+Ulasan dan penilaian laptop oleh pengguna,catalog,could,yes,yes,Modal LaptopReviewModal dengan rating bintang
+Daftar riwayat konsultasi kuesioner pengguna,history,must,yes,yes,Filter pencarian judul dan pagination
+Hapus riwayat konsultasi individual,history,must,yes,yes,Cascading delete jawaban bobot hasil TOPSIS dan narasi AI
+Direktori toko service laptop terverifikasi,service-directory,should,yes,yes,Filter kota kontak WhatsApp alamat dan jam buka
+Panduan diagnosa mandiri kerusakan & estimasi biaya,service-directory,should,yes,yes,Akordeon gejala penyebab solusi dan rentang tarif
+Dashboard admin ringkasan metrik & statistik,admin,must,yes,yes,Total laptop total user total konsultasi
+Manajemen data laptop CRUD lengkap oleh Admin,admin,must,yes,yes,Tambah edit hapus spesifikasi laptop
+Impor massal data laptop dari file Excel (.xlsx),admin,must,yes,yes,Drag-drop file Excel parsing xlsx otomatis
+Manajemen pengguna dan penetapan role admin,admin,must,yes,yes,Pencarian akun ganti role aktivasi status
+Pemantauan data riwayat kuesioner seluruh pengguna,admin,should,yes,yes,Tinjau detail jawaban kuesioner pengguna
+Manajemen banner iklan & laptop unggulan,admin,could,yes,yes,Banner promosi beranda dan katalog
+Ekspor laporan database dan kuesioner ke Excel,admin,should,yes,yes,Export file .xlsx dari tab laporan admin
+Payment gateway e-commerce transaksi langsung,payments,could,no,skip,Lapmatch adalah sistem SPK bukan marketplace transaksi
+Live automatic web scraping harga e-commerce tanpa API,integrations,could,no,skip,Update harga melalui kurasi impor berkala Excel admin

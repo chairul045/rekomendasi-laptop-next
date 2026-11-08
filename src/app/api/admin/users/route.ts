@@ -1,24 +1,7 @@
 // src/app/api/admin/users/route.ts - Admin Users Management API
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import prisma from '@/lib/prisma';
-import { isSuperAdminEmail } from '@/lib/auth-constants';
-
-async function checkAdminAuth() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return null;
-
-  const profile = await prisma.user.findUnique({ where: { id: user.id } });
-  if (!profile || profile.role !== 'admin' || !isSuperAdminEmail(profile.email)) {
-    return null;
-  }
-
-  return profile;
-}
+import { checkAdminAuth } from '@/lib/admin-auth';
 
 export async function GET(request: NextRequest) {
   const admin = await checkAdminAuth();

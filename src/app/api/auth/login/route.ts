@@ -48,9 +48,19 @@ export async function POST(request: NextRequest) {
     // 3. Setup Response & Supabase Server Client
     const response = NextResponse.json({ success: true });
 
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      return NextResponse.json(
+        { error: 'Konfigurasi autentikasi server belum lengkap.' },
+        { status: 500 }
+      );
+    }
+
     const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://njnvkjhnefmawskhcbdy.supabase.co',
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_xDgQzcDtU7unpQKeCIQRLw_IvPJUIWk',
+      supabaseUrl,
+      supabaseAnonKey,
       {
         cookies: {
           getAll() {

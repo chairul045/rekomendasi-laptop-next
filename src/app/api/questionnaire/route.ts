@@ -30,10 +30,24 @@ export async function POST(request: NextRequest) {
       tanggalPengisian,
     } = body;
 
-    // Validasi input ranking kriteria (fallback otomatis jika tidak disediakan)
+    // Validasi input ranking kriteria (mencegah kriteria duplikat)
+    const DEFAULT_RANKING = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6'];
     let finalRankingKriteria = rankingKriteria;
-    if (!finalRankingKriteria || !Array.isArray(finalRankingKriteria) || finalRankingKriteria.length !== 6) {
-      finalRankingKriteria = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6'];
+
+    if (!finalRankingKriteria) {
+      finalRankingKriteria = DEFAULT_RANKING;
+    } else {
+      if (
+        !Array.isArray(finalRankingKriteria) ||
+        finalRankingKriteria.length !== 6 ||
+        new Set(finalRankingKriteria).size !== 6 ||
+        !finalRankingKriteria.every((c) => typeof c === 'string' && c.trim().length > 0)
+      ) {
+        return NextResponse.json(
+          { error: 'Ranking kriteria tidak valid: harus memuat tepat 6 kriteria unik tanpa duplikasi.' },
+          { status: 400 }
+        );
+      }
     }
 
     // Validasi input budget
