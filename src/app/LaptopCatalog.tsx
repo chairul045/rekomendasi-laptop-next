@@ -50,13 +50,14 @@ export interface LaptopCatalogItem {
 
 const BRANDS = [
   'Semua Merek',
-  'ASUS',
   'Lenovo',
   'HP',
+  'Dell',
   'Acer',
+  'Microsoft',
+  'ASUS',
   'Apple',
   'MSI',
-  'Dell',
   'Huawei',
   'Axioo',
   'ADVAN',

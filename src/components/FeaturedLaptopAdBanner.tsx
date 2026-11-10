@@ -96,7 +96,7 @@ export default function FeaturedLaptopAdBanner({
         <div className="flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 uppercase tracking-wide shadow-sm animate-pulse">
             <Flame className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-            <span>IKLAN REKOMENDASI TERBARU &amp; TERBAIK</span>
+            <span>REKOMENDASI RESMI LAPTOPSEBER PALEMBANG</span>
           </span>
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-violet-500/20 text-violet-300 border border-violet-500/30">
             <Sparkles className="w-3 h-3 text-violet-400" />
@@ -158,7 +158,7 @@ export default function FeaturedLaptopAdBanner({
                 <span className="text-xs text-zinc-400 font-mono">
                   {currentBanner.brand.toLowerCase().includes('care') || currentBanner.brand.toLowerCase().includes('servis')
                     ? 'Layanan Servis & Reparasi Resmi'
-                    : 'Flagship Generasi AI Terkini'}
+                    : 'Unit Pilihan Resmi Toko LaptopSeber Palembang'}
                 </span>
               </div>
 
@@ -235,9 +235,9 @@ export default function FeaturedLaptopAdBanner({
                 <p className="text-[11px] text-zinc-400 mt-0.5 flex items-center gap-1.5">
                   <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                   <span>
-                    {currentBanner.brand.toLowerCase().includes('care')
-                      ? 'Garansi Servis 90 Hari + Gratis Checkup'
-                      : 'Garansi Resmi 2 Tahun + Free Windows 11 & OHS'}
+                    {currentBanner.brand.toLowerCase().includes('care') || currentBanner.brand.toLowerCase().includes('servis')
+                      ? 'Garansi Servis Toko + Lacak Status Online'
+                      : 'Garansi Resmi Toko LaptopSeber + Lolos Uji QC 30+ Titik'}
                   </span>
                 </p>
               </div>
@@ -252,7 +252,7 @@ export default function FeaturedLaptopAdBanner({
                     className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs transition shadow-lg shadow-emerald-600/25 active:scale-95 cursor-pointer"
                   >
                     <ShoppingBag className="w-3.5 h-3.5" />
-                    <span>Beli di Tokopedia</span>
+                    <span>Lihat Unit di Web Toko</span>
                     <ExternalLink className="w-3 h-3 ml-0.5 opacity-80" />
                   </a>
                 ) : (
@@ -261,7 +261,7 @@ export default function FeaturedLaptopAdBanner({
                     className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs transition shadow-lg shadow-emerald-600/25 active:scale-95 cursor-pointer"
                   >
                     <Wrench className="w-3.5 h-3.5" />
-                    <span>Lihat Toko Servis</span>
+                    <span>Pusat Servis LaptopSeber</span>
                   </Link>
                 )}
 
@@ -273,7 +273,7 @@ export default function FeaturedLaptopAdBanner({
                     className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold text-xs transition shadow-lg shadow-orange-600/25 active:scale-95 cursor-pointer"
                   >
                     <ShoppingBag className="w-3.5 h-3.5" />
-                    <span>Cek Shopee</span>
+                    <span>Beli di Shopee Toko</span>
                     <ExternalLink className="w-3 h-3 ml-0.5 opacity-80" />
                   </a>
                 ) : (
