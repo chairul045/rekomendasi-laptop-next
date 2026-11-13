@@ -267,15 +267,7 @@ export default function ServiceLaptopPage() {
                     <span>Chat WhatsApp Toko</span>
                   </a>
 
-                  <a
-                    href={shop.mapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-white/10 font-semibold text-xs transition cursor-pointer"
-                  >
-                    <MapPin className="w-3.5 h-3.5 text-violet-400" />
-                    <span>Rute Google Maps</span>
-                  </a>
+
                 </div>
               </div>
             </div>
@@ -373,28 +365,6 @@ export default function ServiceLaptopPage() {
                 >
                   <MessageSquare className="w-4 h-4" />
                   <span>Hubungi via WhatsApp</span>
-                </a>
-
-                <a
-                  href={shop.mapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-white/10 font-semibold text-xs transition cursor-pointer"
-                >
-                  <MapPin className="w-4 h-4 text-violet-400" />
-                  <span>Petunjuk Rute Maps</span>
-                  <ExternalLink className="w-3 h-3 opacity-70" />
-                </a>
-
-                <a
-                  href="https://laptopseber.com/tracking-servis"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-cyan-950/40 hover:bg-cyan-900/40 text-cyan-300 border border-cyan-800/50 font-semibold text-xs transition cursor-pointer"
-                >
-                  <Wrench className="w-4 h-4" />
-                  <span>Lacak Status Servis</span>
-                  <ExternalLink className="w-3 h-3 opacity-70" />
                 </a>
               </div>
             </div>

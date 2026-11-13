@@ -130,7 +130,7 @@ export const DEFAULT_BANNERS: BannerAd[] = [
     display: 'DC Kuliner Pakjo, Kota Palembang',
     imageUrl: '/images/laptops/laptopseber/lenovo-thinkpad-t480.jpg',
     tokopediaUrl: '/service-laptop',
-    shopeeUrl: 'https://laptopseber.com/tracking-servis',
+    shopeeUrl: '/service-laptop',
     isActive: true,
     sortOrder: 5,
     createdAt: '2026-11-07T12:00:00.000Z',

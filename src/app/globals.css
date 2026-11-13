@@ -5,6 +5,61 @@
   --foreground: #f4f4f5;
 }
 
+/* Light theme variables */
+html.light {
+  --background: #f5f5f7;
+  --foreground: #18181b;
+}
+
+html.light body {
+  background-color: #f5f5f7 !important;
+  color: #18181b !important;
+}
+
+/* Light mode overrides for common patterns */
+html.light .bg-\[\#09090d\] { background-color: #f5f5f7 !important; }
+html.light .bg-\[\#0e0e15\]\/90,
+html.light .bg-\[\#0e0e15\]\/80,
+html.light .bg-\[\#0e0e15\] { background-color: #ffffff !important; }
+html.light .bg-zinc-950\/80,
+html.light .bg-zinc-950\/70,
+html.light .bg-zinc-950\/60,
+html.light .bg-zinc-950 { background-color: #f4f4f5 !important; }
+html.light .bg-zinc-900\/80,
+html.light .bg-zinc-900\/70,
+html.light .bg-zinc-900 { background-color: #e4e4e7 !important; }
+html.light .bg-black\/40,
+html.light .bg-black\/50 { background-color: #f4f4f5 !important; }
+
+/* Light text overrides */
+html.light .text-zinc-100 { color: #18181b !important; }
+html.light .text-zinc-200 { color: #27272a !important; }
+html.light .text-zinc-300 { color: #3f3f46 !important; }
+html.light .text-zinc-400 { color: #52525b !important; }
+html.light .text-zinc-500 { color: #71717a !important; }
+html.light .text-white { color: #09090b !important; }
+
+/* Light border overrides */
+html.light .border-white\/10,
+html.light .border-white\/5,
+html.light .border-white\/20 { border-color: rgba(0, 0, 0, 0.1) !important; }
+
+/* Light navbar/header */
+html.light .bg-\[\#09090d\]\/90 { background-color: rgba(255, 255, 255, 0.92) !important; }
+html.light .bg-\[\#09090d\]\/95 { background-color: rgba(255, 255, 255, 0.95) !important; }
+
+/* Light mode scrollbar */
+html.light ::-webkit-scrollbar-track { background: #f5f5f7; }
+html.light ::-webkit-scrollbar-thumb { background: #d4d4d8; }
+html.light ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
+
+/* Light mode selection */
+html.light ::selection { background-color: rgb(139, 92, 246); color: white; }
+
+/* Hide ambient bg in light mode */
+html.light .light-hidden { display: none !important; }
+html.light .bg-grid-pattern { display: none !important; }
+
 body {
   font-family: var(--font-sans), 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   background-color: #09090d;

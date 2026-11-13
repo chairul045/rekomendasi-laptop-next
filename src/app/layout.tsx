@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import { AuthPromptProvider } from '@/components/auth/AuthPromptModal';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -30,35 +31,37 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" className={`dark h-full ${plusJakartaSans.variable} ${jetbrainsMono.variable}`}>
-      <body className="min-h-full flex flex-col bg-[#09090d] text-zinc-100 antialiased selection:bg-violet-500 selection:text-white relative font-sans">
-        {/* Ambient background decoration */}
-        <div className="fixed inset-0 pointer-events-none bg-grid-pattern opacity-80 z-0" />
-        <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[850px] h-[400px] bg-gradient-to-b from-violet-600/15 via-indigo-600/10 to-transparent blur-[120px] pointer-events-none z-0" />
-        <div className="fixed top-20 right-0 w-[500px] h-[350px] bg-gradient-to-bl from-cyan-500/15 via-blue-600/10 to-transparent blur-[110px] pointer-events-none z-0" />
-        <div className="fixed top-60 left-0 w-[450px] h-[350px] bg-gradient-to-tr from-pink-500/10 via-purple-600/10 to-transparent blur-[110px] pointer-events-none z-0" />
+    <html lang="id" className={`dark h-full ${plusJakartaSans.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
+      <body className="min-h-full flex flex-col bg-[#09090d] dark:bg-[#09090d] light:bg-[#f5f5f7] text-zinc-100 dark:text-zinc-100 light:text-zinc-900 antialiased selection:bg-violet-500 selection:text-white relative font-sans transition-colors duration-300">
+        <ThemeProvider>
+          {/* Ambient background decoration */}
+          <div className="fixed inset-0 pointer-events-none bg-grid-pattern opacity-80 z-0 dark:opacity-80 light-hidden" />
+          <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[850px] h-[400px] bg-gradient-to-b from-violet-600/15 via-indigo-600/10 to-transparent blur-[120px] pointer-events-none z-0 dark:opacity-100 light-hidden" />
+          <div className="fixed top-20 right-0 w-[500px] h-[350px] bg-gradient-to-bl from-cyan-500/15 via-blue-600/10 to-transparent blur-[110px] pointer-events-none z-0 dark:opacity-100 light-hidden" />
+          <div className="fixed top-60 left-0 w-[450px] h-[350px] bg-gradient-to-tr from-pink-500/10 via-purple-600/10 to-transparent blur-[110px] pointer-events-none z-0 dark:opacity-100 light-hidden" />
 
-        <div className="relative z-10 flex flex-col min-h-screen">
-          <AuthPromptProvider>
-            {children}
-          </AuthPromptProvider>
-        </div>
+          <div className="relative z-10 flex flex-col min-h-screen">
+            <AuthPromptProvider>
+              {children}
+            </AuthPromptProvider>
+          </div>
 
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#0e0e15',
-              color: '#f4f4f5',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '16px',
-              fontSize: '13px',
-              backdropFilter: 'blur(16px)',
-              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
-            },
-          }}
-        />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#0e0e15',
+                color: '#f4f4f5',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '16px',
+                fontSize: '13px',
+                backdropFilter: 'blur(16px)',
+                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
+              },
+            }}
+          />
+        </ThemeProvider>
       </body>
     </html>
   );

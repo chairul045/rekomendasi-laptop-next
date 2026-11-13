@@ -15,9 +15,12 @@ import {
   Sparkles,
   LogIn,
   UserPlus,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuthPrompt } from '@/components/auth/AuthPromptModal';
+import { useTheme } from '@/components/ThemeProvider';
 
 interface NavbarProps {
   user?: {
@@ -32,6 +35,7 @@ interface NavbarProps {
 export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarProps) {
   const pathname = usePathname();
   const { openAuthPrompt } = useAuthPrompt();
+  const { theme, toggleTheme } = useTheme();
   const [currentUser, setCurrentUser] = useState(initialUser ?? null);
   const [prevInitialUser, setPrevInitialUser] = useState(initialUser);
 
@@ -95,7 +99,6 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
       guestAccessible: false,
     },
     { href: '/service-laptop', label: 'Servis Laptop', active: pathname === '/service-laptop', guestAccessible: true },
-    { href: '/tentang-metode', label: 'Metode SPK', active: pathname === '/tentang-metode', guestAccessible: true },
   ];
 
   const handleRestrictedNavClick = (e: React.MouseEvent, link: typeof navLinks[0]) => {
@@ -190,6 +193,17 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
 
         {/* Right Section */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Theme Toggle */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 dark:hover:bg-white/10 border border-white/10 dark:border-white/10 transition cursor-pointer"
+            aria-label={theme === 'dark' ? 'Ganti ke mode terang' : 'Ganti ke mode gelap'}
+            title={theme === 'dark' ? 'Mode Terang' : 'Mode Gelap'}
+          >
+            {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-violet-400" />}
+          </button>
+
           {currentUser ? (
             <>
               {/* Profile Shortcut */}
@@ -371,6 +385,28 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
                   Admin Control Panel
                 </Link>
               )}
+            </div>
+
+            {/* Theme Switcher in Mobile Menu */}
+            <div className="pt-2 border-t border-white/10 flex items-center justify-between px-1">
+              <span className="text-xs text-zinc-400 font-medium">Tema Tampilan</span>
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-zinc-200 transition cursor-pointer"
+              >
+                {theme === 'dark' ? (
+                  <>
+                    <Sun className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Mode Terang</span>
+                  </>
+                ) : (
+                  <>
+                    <Moon className="w-3.5 h-3.5 text-violet-400" />
+                    <span>Mode Gelap</span>
+                  </>
+                )}
+              </button>
             </div>
 
             {/* Logout Button */}

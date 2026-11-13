@@ -61,13 +61,6 @@ export default function Footer() {
               </Link>
               <span className="text-zinc-600">&bull;</span>
               <Link
-                href="/tentang-metode"
-                className="hover:text-white transition py-2 px-1 min-h-[44px] inline-flex items-center text-cyan-400/90 hover:text-cyan-300"
-              >
-                Tentang Metode (ROC & TOPSIS)
-              </Link>
-              <span className="text-zinc-600">&bull;</span>
-              <Link
                 href="/tentang"
                 className="hover:text-white transition py-2 px-1 min-h-[44px] inline-flex items-center"
               >

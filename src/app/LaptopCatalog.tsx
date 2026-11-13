@@ -3,10 +3,10 @@
 import { useState, useMemo, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getLaptopImageUrl, formatRupiah, getMarketplaceLinks } from '@/lib/laptop-utils';
+import { getLaptopImageUrl, formatRupiah } from '@/lib/laptop-utils';
+import ScrollReveal, { StaggerContainer, StaggerItem } from '@/components/ScrollReveal';
 import {
   Zap,
-  ExternalLink,
   Search,
   Filter,
   ArrowUpDown,
@@ -18,6 +18,7 @@ import {
   Star,
   MessageSquare,
   ChevronDown,
+  PhoneCall,
 } from 'lucide-react';
 import type { LaptopDetailItem } from '@/components/LaptopDetailModal';
 import { useAuthPrompt } from '@/components/auth/AuthPromptModal';
@@ -452,17 +453,19 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
       </div>
 
       {/* Laptop Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-        {displayedLaptops.map((laptop) => {
+      <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+        {displayedLaptops.map((laptop, index) => {
           const imgUrl = getLaptopImageUrl(laptop.brand, laptop.name, laptop.imageUrl);
-          const links = getMarketplaceLinks(laptop.brand, laptop.name, laptop.price);
           const isComparing = comparingLaptops.some((l) => l.id === laptop.id);
           const isFav = favorites.includes(laptop.id);
 
           return (
-            <div
+            <StaggerItem
               key={laptop.id}
-              className={`group rounded-3xl bg-[#0e0e15]/90 border backdrop-blur-md overflow-hidden flex flex-col justify-between hover:border-violet-500/50 hover:shadow-xl hover:shadow-violet-950/20 transition-all duration-300 ${
+              direction={index % 3 === 0 ? 'right' : index % 3 === 1 ? 'up' : 'left'}
+            >
+            <div
+              className={`group rounded-3xl bg-[#0e0e15]/90 border backdrop-blur-md overflow-hidden flex flex-col justify-between hover:border-violet-500/50 hover:shadow-xl hover:shadow-violet-950/20 transition-all duration-300 card-interactive ${
                 isComparing ? 'border-cyan-500/60 ring-1 ring-cyan-500/30' : 'border-white/10'
               }`}
             >
@@ -494,12 +497,19 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
                 {/* Laptop Image with Heart Favorite Button */}
                 <div className="relative w-full h-40 rounded-2xl bg-zinc-950 overflow-hidden flex items-center justify-center p-3 border border-white/5 group-hover:border-violet-500/30 transition">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <motion.img
                     onClick={() => setSelectedDetailLaptop(laptop as unknown as LaptopDetailItem)}
                     src={imgUrl}
                     alt={laptop.name}
-                    className="max-h-full max-w-full object-contain group-hover:scale-105 transition duration-300 cursor-pointer"
+                    className="max-h-full max-w-full object-contain cursor-pointer"
                     loading="lazy"
+                    whileHover={{ scale: 1.08, rotate: 1, y: -4 }}
+                    animate={{ y: [0, -5, 0] }}
+                    transition={{
+                      y: { duration: 3, repeat: Infinity, ease: "easeInOut" },
+                      scale: { duration: 0.3 },
+                      rotate: { duration: 0.3 },
+                    }}
                   />
 
                   {/* Favorite Heart Button (Shopee Style) */}
@@ -589,29 +599,21 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
 
                 <div className="flex items-center gap-1">
                   <a
-                    href={links.shopee}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-1.5 rounded-xl bg-orange-950/40 text-orange-300 hover:bg-orange-900/60 border border-orange-800/40 transition"
-                    title="Cek di Shopee"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                  <a
-                    href={links.tokopedia}
+                    href={`https://wa.me/6287851164239?text=${encodeURIComponent(`Halo, saya tertarik dengan laptop ${laptop.name} (${formatRupiah(laptop.price)}). Apakah masih tersedia?`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-1.5 rounded-xl bg-emerald-950/40 text-emerald-300 hover:bg-emerald-900/60 border border-emerald-800/40 transition"
-                    title="Cek di Tokopedia"
+                    title="Hubungi via WhatsApp"
                   >
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    <PhoneCall className="w-3.5 h-3.5" />
                   </a>
                 </div>
               </div>
             </div>
+            </StaggerItem>
           );
         })}
-      </div>
+      </StaggerContainer>
 
       {/* Load More Pagination Button */}
       {visibleCount < filteredAndSorted.length && (
@@ -655,7 +657,7 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] as const }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#0e0e15]/95 border border-white/20 backdrop-blur-2xl rounded-2xl p-3 px-5 shadow-2xl flex items-center gap-4"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#0e0e15]/95 border border-white/20 backdrop-blur-2xl rounded-2xl p-3 px-4 sm:px-5 shadow-2xl flex items-center justify-between sm:justify-start gap-3 sm:gap-4 w-[calc(100vw-2rem)] sm:w-auto max-w-lg"
           >
             <div className="flex items-center gap-2">
               <Scale className="w-4 h-4 text-cyan-300 animate-pulse" />

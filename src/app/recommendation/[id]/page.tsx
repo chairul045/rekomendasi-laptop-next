@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import {
   Trophy,
   Sparkles,
-  ExternalLink,
+  PhoneCall,
   RotateCcw,
   History,
   Clock,
@@ -27,7 +27,7 @@ import {
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import dynamic from 'next/dynamic';
-import { getLaptopImageUrl, formatRupiah, getMarketplaceLinks, formatTanggal } from '@/lib/laptop-utils';
+import { getLaptopImageUrl, formatRupiah, formatTanggal } from '@/lib/laptop-utils';
 import type { LaptopDetailItem } from '@/components/LaptopDetailModal';
 import type { TopsisCalculationData } from '@/components/TopsisStepByStepModal';
 
@@ -144,7 +144,6 @@ function LaptopCard({
   const [showExplain, setShowExplain] = useState(true);
   const scorePct = Math.round(item.nilaiV * 10000) / 100;
   const imgUrl = getLaptopImageUrl(item.laptop.brand, item.laptop.name, item.laptop.imageUrl);
-  const links = getMarketplaceLinks(item.laptop.brand, item.laptop.name, item.laptop.price);
 
   return (
     <motion.div
@@ -174,11 +173,14 @@ function LaptopCard({
             title="Klik untuk lihat detail spesifikasi"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <motion.img
               src={imgUrl}
               alt={item.laptop.name}
               className="max-h-full max-w-full object-contain"
               loading="lazy"
+              animate={{ y: [0, -4, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+              whileHover={{ scale: 1.1 }}
             />
           </div>
 
@@ -334,40 +336,15 @@ function LaptopCard({
           </div>
 
           <div className="flex items-center gap-1.5">
-            <span className="text-xs text-zinc-400 font-mono hidden sm:inline mr-1">Beli:</span>
-            {links.shopee && (
-              <a
-                href={links.shopee}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-orange-950/40 text-orange-300 hover:bg-orange-900/60 border border-orange-800/40 text-xs font-medium transition min-h-[40px] hover:scale-105 active:scale-95"
-              >
-                <span>Shopee</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            )}
-            {links.tokopedia && (
-              <a
-                href={links.tokopedia}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-emerald-950/40 text-emerald-300 hover:bg-emerald-900/60 border border-emerald-800/40 text-xs font-medium transition min-h-[40px] hover:scale-105 active:scale-95"
-              >
-                <span>Tokopedia</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            )}
-            {links.facebook && (
-              <a
-                href={links.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-blue-950/40 text-blue-300 hover:bg-blue-900/60 border border-blue-800/40 text-xs font-medium transition min-h-[40px] hover:scale-105 active:scale-95"
-              >
-                <span>FB</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            )}
+            <a
+              href={`https://wa.me/6287851164239?text=${encodeURIComponent(`Halo, saya tertarik dengan laptop rekomendasi ini: ${item.laptop.name} (${formatRupiah(item.laptop.price)}). Apakah masih tersedia?`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs transition min-h-[40px] shadow-md shadow-emerald-600/20 hover:scale-105 active:scale-95 cursor-pointer"
+            >
+              <PhoneCall className="w-3.5 h-3.5" />
+              <span>Beli via WhatsApp (087851164239)</span>
+            </a>
           </div>
         </div>
       </div>

@@ -1,8 +1,8 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ExternalLink, Trophy, CheckCircle, Scale, Trash2 } from 'lucide-react';
-import { getLaptopImageUrl, formatRupiah, getMarketplaceLinks } from '@/lib/laptop-utils';
+import { X, Trophy, CheckCircle, Scale, Trash2, PhoneCall } from 'lucide-react';
+import { getLaptopImageUrl, formatRupiah } from '@/lib/laptop-utils';
 import { LaptopDetailItem } from './LaptopDetailModal';
 
 interface LaptopCompareModalProps {
@@ -122,10 +122,12 @@ export default function LaptopCompareModal({
                         </button>
                         <div className="w-full h-24 rounded-xl bg-zinc-900 overflow-hidden flex items-center justify-center p-2">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
+                          <motion.img
                             src={imgUrl}
                             alt={laptop.name}
                             className="max-h-full max-w-full object-contain"
+                            animate={{ y: [0, -3, 0] }}
+                            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                           />
                         </div>
                         <span className="inline-block text-[10px] font-mono px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 font-bold uppercase">
@@ -287,40 +289,22 @@ export default function LaptopCompareModal({
                 ))}
               </tr>
 
-              {/* Marketplace Links */}
+              {/* WhatsApp Contact */}
               <tr>
-                <td className="p-3 font-mono font-semibold text-zinc-400">Beli Sekarang</td>
-                {laptops.map((l) => {
-                  const links = getMarketplaceLinks(l.brand, l.name, l.price);
-                  return (
-                    <td key={l.id} className="p-3">
-                      <div className="flex flex-col gap-1.5">
-                        {links.shopee && (
-                          <a
-                            href={links.shopee}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-3 py-1.5 rounded-xl bg-orange-950/40 hover:bg-orange-900/60 text-orange-300 border border-orange-800/40 text-xs font-medium transition flex items-center justify-between min-h-[40px]"
-                          >
-                            <span>Shopee</span>
-                            <ExternalLink className="w-3.5 h-3.5" />
-                          </a>
-                        )}
-                        {links.tokopedia && (
-                          <a
-                            href={links.tokopedia}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-3 py-1.5 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-800/40 text-xs font-medium transition flex items-center justify-between min-h-[40px]"
-                          >
-                            <span>Tokopedia</span>
-                            <ExternalLink className="w-3.5 h-3.5" />
-                          </a>
-                        )}
-                      </div>
-                    </td>
-                  );
-                })}
+                <td className="p-3 font-mono font-semibold text-zinc-400">Pemesanan</td>
+                {laptops.map((l) => (
+                  <td key={l.id} className="p-3">
+                    <a
+                      href={`https://wa.me/6287851164239?text=${encodeURIComponent(`Halo, saya tertarik dengan laptop ${l.name} (${formatRupiah(l.price)}). Apakah masih tersedia?`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-md shadow-emerald-600/20 min-h-[40px] text-center"
+                    >
+                      <PhoneCall className="w-3.5 h-3.5 shrink-0" />
+                      <span>WhatsApp Toko</span>
+                    </a>
+                  </td>
+                ))}
               </tr>
             </tbody>
           </table>

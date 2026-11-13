@@ -6,18 +6,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sparkles,
   Zap,
-  ShoppingBag,
-  ExternalLink,
   Flame,
-  Star,
   CheckCircle2,
   Tag,
   ChevronLeft,
   ChevronRight,
   Settings,
   Wrench,
+  PhoneCall,
+  ShieldCheck,
 } from 'lucide-react';
-import { formatRupiah, getMarketplaceLinks } from '@/lib/laptop-utils';
+import { formatRupiah } from '@/lib/laptop-utils';
 import { BannerAd } from '@/lib/banner-store';
 
 export default function FeaturedLaptopAdBanner({
@@ -76,9 +75,12 @@ export default function FeaturedLaptopAdBanner({
     setCurrentIndex((prev) => (prev + 1) % banners.length);
   };
 
-  const mpLinks = getMarketplaceLinks(currentBanner.brand, currentBanner.title);
-  const tokopediaTarget = currentBanner.tokopediaUrl || mpLinks.tokopedia;
-  const shopeeTarget = currentBanner.shopeeUrl || mpLinks.shopee;
+  const isServisBanner = currentBanner.brand.toLowerCase().includes('care') || currentBanner.brand.toLowerCase().includes('servis');
+  const waContactUrl = `https://wa.me/6287851164239?text=${encodeURIComponent(
+    isServisBanner
+      ? `Halo Lapmatch Care, saya ingin konsultasi mengenai servis/perbaikan laptop.`
+      : `Halo, saya tertarik dengan unit laptop ${currentBanner.title} (${formatRupiah(currentBanner.price)}). Apakah masih tersedia?`
+  )}`;
 
   return (
     <div
@@ -148,37 +150,37 @@ export default function FeaturedLaptopAdBanner({
           transition={{ duration: 0.35, ease: 'easeInOut' }}
           className="relative z-10 grid lg:grid-cols-12 gap-6 pt-6 items-center"
         >
-          {/* Left Col: Laptop Details & Specs */}
-          <div className="lg:col-span-7 space-y-4">
+          {/* Left Col: Specs & Direct Order */}
+          <div className="lg:col-span-5 space-y-4">
             <div className="space-y-1.5">
               <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 font-mono text-[10px] uppercase font-bold border border-cyan-500/30">
+                <span className="px-2.5 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 font-mono text-[10px] uppercase font-bold border border-cyan-500/30">
                   {currentBanner.brand}
                 </span>
-                <span className="text-xs text-zinc-400 font-mono">
-                  {currentBanner.brand.toLowerCase().includes('care') || currentBanner.brand.toLowerCase().includes('servis')
+                <span className="text-[11px] text-zinc-400 font-mono">
+                  {isServisBanner
                     ? 'Layanan Servis & Reparasi Resmi'
                     : 'Unit Pilihan Resmi Toko LaptopSeber Palembang'}
                 </span>
               </div>
 
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight leading-tight">
+              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-tight">
                 {currentBanner.title}
               </h2>
 
-              <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed pt-1">
+              <p className="text-xs text-zinc-300 leading-relaxed pt-0.5">
                 {currentBanner.subtitle}
               </p>
             </div>
 
             {/* Key Specs Matrix */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
+            <div className="grid grid-cols-2 gap-2 pt-1">
               <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md">
                 <div className="text-[10px] text-zinc-400 font-mono uppercase flex items-center gap-1">
                   <Zap className="w-3 h-3 text-cyan-400" />
                   <span>Processor</span>
                 </div>
-                <div className="text-xs font-bold text-white mt-1 line-clamp-1" title={currentBanner.processor}>
+                <div className="text-xs font-bold text-white mt-0.5 line-clamp-1" title={currentBanner.processor}>
                   {currentBanner.processor}
                 </div>
               </div>
@@ -188,7 +190,7 @@ export default function FeaturedLaptopAdBanner({
                   <Flame className="w-3 h-3 text-amber-400" />
                   <span>GPU / Layanan</span>
                 </div>
-                <div className="text-xs font-bold text-amber-300 mt-1 line-clamp-1" title={currentBanner.vga}>
+                <div className="text-xs font-bold text-amber-300 mt-0.5 line-clamp-1" title={currentBanner.vga}>
                   {currentBanner.vga}
                 </div>
               </div>
@@ -196,9 +198,9 @@ export default function FeaturedLaptopAdBanner({
               <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md">
                 <div className="text-[10px] text-zinc-400 font-mono uppercase flex items-center gap-1">
                   <Tag className="w-3 h-3 text-emerald-400" />
-                  <span>Kapasitas RAM</span>
+                  <span>RAM</span>
                 </div>
-                <div className="text-xs font-bold text-emerald-300 mt-1">
+                <div className="text-xs font-bold text-emerald-300 mt-0.5">
                   {currentBanner.ramGb}GB RAM
                 </div>
               </div>
@@ -206,113 +208,104 @@ export default function FeaturedLaptopAdBanner({
               <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md">
                 <div className="text-[10px] text-zinc-400 font-mono uppercase flex items-center gap-1">
                   <Sparkles className="w-3 h-3 text-violet-400" />
-                  <span>Penyimpanan</span>
+                  <span>Storage</span>
                 </div>
-                <div className="text-xs font-bold text-violet-300 mt-1">
+                <div className="text-xs font-bold text-violet-300 mt-0.5">
                   {currentBanner.storageGb}GB SSD
                 </div>
               </div>
             </div>
 
-            {/* Pricing & CTA Row */}
-            <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-cyan-300 to-white font-mono">
-                    {formatRupiah(currentBanner.price)}
-                  </span>
-                  {currentBanner.originalPrice > currentBanner.price && (
-                    <span className="text-xs sm:text-sm text-zinc-500 line-through font-mono">
-                      {formatRupiah(currentBanner.originalPrice)}
+            {/* Compact Professional Price & Contact CTA */}
+            <div className="pt-2 space-y-3">
+              <div className="p-3 rounded-2xl bg-zinc-950/70 border border-white/10 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <div className="text-[10px] text-zinc-400 font-mono uppercase">Harga Penawaran</div>
+                  <div className="flex items-baseline gap-2 mt-0.5">
+                    <span className="text-lg sm:text-xl font-black text-emerald-400 font-mono">
+                      {formatRupiah(currentBanner.price)}
                     </span>
-                  )}
-                  {currentBanner.discount && (
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
-                      {currentBanner.discount}
-                    </span>
-                  )}
+                    {currentBanner.originalPrice > currentBanner.price && (
+                      <span className="text-xs text-zinc-500 line-through font-mono">
+                        {formatRupiah(currentBanner.originalPrice)}
+                      </span>
+                    )}
+                    {currentBanner.discount && (
+                      <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                        {currentBanner.discount}
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <p className="text-[11px] text-zinc-400 mt-0.5 flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                  <span>
-                    {currentBanner.brand.toLowerCase().includes('care') || currentBanner.brand.toLowerCase().includes('servis')
-                      ? 'Garansi Servis Toko + Lacak Status Online'
-                      : 'Garansi Resmi Toko LaptopSeber + Lolos Uji QC 30+ Titik'}
-                  </span>
-                </p>
+
+                <div className="text-[10px] text-zinc-400 flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Garansi Resmi QC</span>
+                </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-2">
-                {tokopediaTarget.startsWith('http') ? (
-                  <a
-                    href={tokopediaTarget}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs transition shadow-lg shadow-emerald-600/25 active:scale-95 cursor-pointer"
-                  >
-                    <ShoppingBag className="w-3.5 h-3.5" />
-                    <span>Lihat Unit di Web Toko</span>
-                    <ExternalLink className="w-3 h-3 ml-0.5 opacity-80" />
-                  </a>
-                ) : (
-                  <Link
-                    href={tokopediaTarget}
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs transition shadow-lg shadow-emerald-600/25 active:scale-95 cursor-pointer"
-                  >
-                    <Wrench className="w-3.5 h-3.5" />
-                    <span>Pusat Servis LaptopSeber</span>
-                  </Link>
-                )}
+              {/* WhatsApp Action Button */}
+              <div className="flex flex-col sm:flex-row items-center gap-2.5">
+                <a
+                  href={waContactUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-bold text-xs sm:text-sm transition shadow-lg shadow-emerald-600/30 active:scale-95 cursor-pointer"
+                >
+                  <PhoneCall className="w-4 h-4 animate-bounce" />
+                  <span>Hubungi Penjual (WhatsApp 087851164239)</span>
+                </a>
 
-                {shopeeTarget.startsWith('http') ? (
-                  <a
-                    href={shopeeTarget}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold text-xs transition shadow-lg shadow-orange-600/25 active:scale-95 cursor-pointer"
-                  >
-                    <ShoppingBag className="w-3.5 h-3.5" />
-                    <span>Beli di Shopee Toko</span>
-                    <ExternalLink className="w-3 h-3 ml-0.5 opacity-80" />
-                  </a>
-                ) : (
+                {isServisBanner && (
                   <Link
                     href="/service-laptop"
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs transition shadow-lg shadow-violet-600/25 active:scale-95 cursor-pointer"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/10 text-xs font-semibold transition"
                   >
                     <Wrench className="w-3.5 h-3.5" />
-                    <span>Konsultasi Servis</span>
+                    <span>Info Servis</span>
                   </Link>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Right Col: High-Impact Image Card */}
-          <div className="lg:col-span-5">
-            <div className="relative group rounded-2xl overflow-hidden border border-white/15 bg-gradient-to-b from-white/10 to-black/60 p-4 backdrop-blur-md shadow-2xl">
-              <div className="absolute top-3 right-3 z-20">
-                <span className="px-3 py-1 rounded-full text-[10px] font-mono font-black bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-lg shadow-rose-500/40 uppercase">
+          {/* Right Col: Expanded High-Impact Animated Laptop Showcase */}
+          <div className="lg:col-span-7">
+            <div className="relative group rounded-3xl overflow-hidden border border-white/15 bg-gradient-to-b from-white/10 via-zinc-950/70 to-black/80 p-4 sm:p-6 backdrop-blur-xl shadow-2xl">
+              <div className="absolute top-4 right-4 z-20">
+                <span className="px-3 py-1 rounded-full text-[10px] font-mono font-black bg-gradient-to-r from-rose-500 via-amber-500 to-orange-500 text-white shadow-lg shadow-rose-500/40 uppercase">
                   {currentBanner.badge}
                 </span>
               </div>
 
-              <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-black/60 flex items-center justify-center">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+              {/* Large Extended Visual Area with Dynamic Floating Motion */}
+              <div className="relative w-full aspect-[16/10] sm:aspect-[16/9] rounded-2xl overflow-hidden bg-black/50 flex items-center justify-center p-4">
+                <motion.img
                   src={currentBanner.imageUrl}
                   alt={currentBanner.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  className="w-full h-full object-contain cursor-pointer drop-shadow-[0_20px_35px_rgba(124,58,237,0.35)]"
                   loading="lazy"
+                  animate={{
+                    y: [0, -8, 0],
+                    rotate: [0, 0.8, 0, -0.8, 0],
+                  }}
+                  transition={{
+                    duration: 5,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  }}
+                  whileHover={{ scale: 1.05 }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[11px] font-mono text-zinc-300">
-                  <span className="px-2 py-0.5 rounded bg-black/70 backdrop-blur-md border border-white/10">
+
+                {/* Subtle Ambient Floor Glow */}
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-cyan-500/20 blur-xl rounded-full pointer-events-none" />
+
+                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[11px] font-mono text-zinc-300 pointer-events-none">
+                  <span className="px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-md border border-white/10">
                     {currentBanner.display}
                   </span>
-                  <span className="px-2 py-0.5 rounded bg-black/70 backdrop-blur-md border border-white/10 text-cyan-300 font-bold">
-                    Slide {currentIndex + 1}
+                  <span className="px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-md border border-white/10 text-cyan-300 font-bold">
+                    Slide {currentIndex + 1} dari {banners.length}
                   </span>
                 </div>
               </div>

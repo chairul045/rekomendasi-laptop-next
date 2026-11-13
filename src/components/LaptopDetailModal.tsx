@@ -1,8 +1,8 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ExternalLink, Cpu, HardDrive, Battery, Gauge, Monitor, ShieldCheck, Sparkles, Scale, Heart, Star } from 'lucide-react';
-import { getLaptopImageUrl, formatRupiah, getMarketplaceLinks } from '@/lib/laptop-utils';
+import { X, Cpu, HardDrive, Battery, Gauge, Monitor, ShieldCheck, Sparkles, Scale, Heart, Star, PhoneCall } from 'lucide-react';
+import { getLaptopImageUrl, formatRupiah } from '@/lib/laptop-utils';
 
 export interface LaptopDetailItem {
   id: number;
@@ -45,7 +45,6 @@ export default function LaptopDetailModal({
   if (!laptop) return null;
 
   const imgUrl = getLaptopImageUrl(laptop.brand, laptop.name, laptop.imageUrl);
-  const links = getMarketplaceLinks(laptop.brand, laptop.name, laptop.price);
 
   return (
     <AnimatePresence>
@@ -99,10 +98,12 @@ export default function LaptopDetailModal({
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 pb-6 border-b border-white/10">
           <div className="w-28 h-28 rounded-2xl bg-zinc-950 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center p-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <motion.img
               src={imgUrl}
               alt={laptop.name}
               className="w-full h-full object-contain"
+              animate={{ y: [0, -4, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
             />
           </div>
 
@@ -245,36 +246,18 @@ export default function LaptopDetailModal({
           </div>
         </div>
 
-        {/* Marketplace Links & Actions */}
+        {/* Contact & Actions */}
         <div className="pt-5 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs text-zinc-400 font-mono mr-1">Beli di:</span>
+            <span className="text-xs text-zinc-400 dark:text-zinc-400 font-mono mr-1">Mau beli? Hubungi:</span>
             <a
-              href={links.shopee}
+              href={`https://wa.me/6287851164239?text=${encodeURIComponent(`Halo, saya tertarik dengan laptop ${laptop.name} (${formatRupiah(laptop.price)}). Apakah masih tersedia?`)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-orange-950/50 hover:bg-orange-900/70 text-orange-300 border border-orange-800/50 text-xs font-semibold transition"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs transition shadow-lg shadow-emerald-600/25 active:scale-95"
             >
-              <span>Shopee</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
-            <a
-              href={links.tokopedia}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-950/50 hover:bg-emerald-900/70 text-emerald-300 border border-emerald-800/50 text-xs font-semibold transition"
-            >
-              <span>Tokopedia</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
-            <a
-              href={links.facebook}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-950/50 hover:bg-blue-900/70 text-blue-300 border border-blue-800/50 text-xs font-semibold transition"
-            >
-              <span>FB Marketplace</span>
-              <ExternalLink className="w-3.5 h-3.5" />
+              <PhoneCall className="w-3.5 h-3.5" />
+              <span>WhatsApp 087851164239</span>
             </a>
           </div>
 

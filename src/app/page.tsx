@@ -9,6 +9,7 @@ import { getLaptopImageUrl, formatRupiah } from '@/lib/laptop-utils';
 import { ClipboardList, ArrowRight, Clock, Wrench } from 'lucide-react';
 import FeaturedLaptopAdBanner from '@/components/FeaturedLaptopAdBanner';
 import { getActiveBanners } from '@/lib/banner-store';
+import HomeSection from '@/components/HomeSection';
 
 export default async function HomePage() {
   let user: { id: string; email?: string; user_metadata?: Record<string, unknown> } | null = null;
@@ -207,9 +208,12 @@ export default async function HomePage() {
 
       <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-8 sm:space-y-12">
         {/* Iklan Slider Laptop Terbaru & Terbaik (Multi-Slide, Editable by Admin) */}
-        <FeaturedLaptopAdBanner initialBanners={activeBanners} userEmail={profile.email} />
+        <HomeSection direction="zoom">
+          <FeaturedLaptopAdBanner initialBanners={activeBanners} userEmail={profile.email} />
+        </HomeSection>
 
         {/* Top Header Banner */}
+        <HomeSection direction="right" delay={0.1}>
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-zinc-900/90 via-violet-950/30 to-zinc-900/90 border border-white/10 p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
           <div className="absolute -right-16 -top-16 w-64 h-64 bg-violet-600/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -left-16 -bottom-16 w-64 h-64 bg-cyan-600/10 rounded-full blur-3xl pointer-events-none" />
@@ -230,8 +234,10 @@ export default async function HomePage() {
             </div>
           </div>
         </div>
+        </HomeSection>
 
         {/* Toko Service Laptop Feature Banner */}
+        <HomeSection direction="left" delay={0.15}>
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-violet-950/40 via-zinc-900/90 to-cyan-950/40 border border-white/10 p-6 sm:p-8 backdrop-blur-xl shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6 group hover:border-violet-500/40 transition">
           <div className="space-y-2 max-w-2xl">
             <div className="flex items-center gap-2">
@@ -262,11 +268,13 @@ export default async function HomePage() {
             </Link>
           </div>
         </div>
+        </HomeSection>
 
         {/* Catalog Showcase with Images */}
         <LaptopCatalog laptops={laptops} />
 
         {/* Riwayat Konsultasi Section */}
+        <HomeSection direction="up" delay={0.2}>
         <div className="rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-xl overflow-hidden shadow-2xl">
           <div className="px-6 py-5 border-b border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="space-y-0.5">
@@ -402,6 +410,7 @@ export default async function HomePage() {
             </div>
           )}
         </div>
+        </HomeSection>
       </main>
 
       <Footer />

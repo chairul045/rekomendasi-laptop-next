@@ -40,3 +40,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local reports & artifacts
+replica/
+replica-skill/
+data/backups/
+*.docx
+generate_latest_progress_doc.py
+.agents/
