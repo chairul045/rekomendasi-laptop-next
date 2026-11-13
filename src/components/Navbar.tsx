@@ -115,16 +115,16 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-violet-500/35 sm:border-white/20 bg-[#09090d]/90 backdrop-blur-2xl transition-all shadow-lg">
-      {/* Garis Border Paling Atas - Lebih Terang, Bergradien & Mudah Dilihat */}
-      <div className="w-full h-[3px] bg-gradient-to-r from-violet-500 via-cyan-400 to-indigo-500 shadow-[0_1px_16px_rgba(6,182,212,0.85)]" />
+    <header className="sticky top-0 z-40 w-full border-b border-slate-200 dark:border-white/10 bg-white/95 dark:bg-[#09090d]/90 backdrop-blur-md transition-all shadow-sm">
+      {/* Garis Border Paling Atas */}
+      <div className="w-full h-[3px] bg-gradient-to-r from-violet-500 via-cyan-400 to-indigo-500 shadow-[0_1px_16px_rgba(6,182,212,0.6)]" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         {/* Brand */}
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-3 group">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 via-indigo-600 to-cyan-500 p-0.5 shadow-[0_0_20px_rgba(124,58,237,0.35)] group-hover:shadow-[0_0_30px_rgba(124,58,237,0.6)] transition duration-300 overflow-hidden shrink-0">
-              <div className="w-full h-full bg-[#09090d] rounded-[9px] overflow-hidden flex items-center justify-center">
+              <div className="w-full h-full bg-white dark:bg-[#09090d] rounded-[9px] overflow-hidden flex items-center justify-center">
                 <img
                   src="/logo.svg"
                   alt="Lapmatch Logo"
@@ -134,15 +134,15 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-sm tracking-tight text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:via-violet-200 group-hover:to-cyan-300 transition">
+                <span className="font-bold text-sm tracking-tight text-zinc-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-cyan-300 transition">
                   Lapmatch
                 </span>
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-mono font-medium bg-gradient-to-r from-violet-500/20 to-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-mono font-medium bg-violet-500/10 dark:bg-violet-500/20 text-violet-700 dark:text-cyan-300 border border-violet-500/20 dark:border-cyan-500/30">
                   AI Match
                 </span>
               </div>
-              <span className="text-[10px] text-zinc-400 hidden sm:inline">
-                Smart Laptop Matcher & Recommender
+              <span className="text-[10px] text-zinc-500 dark:text-zinc-400 hidden sm:inline">
+                Smart Laptop Matcher &amp; Recommender
               </span>
             </div>
           </Link>
@@ -156,8 +156,8 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
                 onClick={(e) => handleRestrictedNavClick(e, link)}
                 className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
                   link.active
-                    ? 'text-white bg-gradient-to-r from-violet-500/20 to-indigo-500/20 border border-violet-500/40 shadow-sm'
-                    : 'text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.06]'
+                    ? 'text-violet-700 dark:text-white bg-violet-50 dark:bg-gradient-to-r dark:from-violet-500/20 dark:to-indigo-500/20 border border-violet-200 dark:border-violet-500/40 shadow-sm font-semibold'
+                    : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-slate-100 dark:hover:bg-white/[0.06]'
                 }`}
               >
                 <span>{link.label}</span>
@@ -165,8 +165,8 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
                   <span
                     className={`inline-flex items-center px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
                       link.active
-                        ? 'bg-cyan-400 text-zinc-950 font-bold'
-                        : 'bg-zinc-800 text-cyan-300 border border-cyan-500/30'
+                        ? 'bg-violet-600 dark:bg-cyan-400 text-white dark:text-zinc-950 font-bold'
+                        : 'bg-slate-100 dark:bg-zinc-800 text-zinc-700 dark:text-cyan-300 border border-slate-200 dark:border-cyan-500/30'
                     }`}
                   >
                     {link.badge}
@@ -279,7 +279,7 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="md:hidden border-t border-white/10 bg-[#09090d]/95 backdrop-blur-2xl px-4 py-4 space-y-3 overflow-hidden shadow-2xl"
+            className="md:hidden border-t border-slate-200 dark:border-white/10 bg-white/95 dark:bg-[#09090d]/95 backdrop-blur-2xl px-4 py-4 space-y-3 overflow-hidden shadow-2xl"
           >
             {/* Header User / Guest Card */}
             {currentUser ? (

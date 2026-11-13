@@ -98,7 +98,7 @@ export default function LandingPage({ previewLaptops = [] }: { previewLaptops?: 
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#09090d] text-zinc-100 overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-[#09090d] text-zinc-900 dark:text-zinc-100 overflow-x-hidden transition-colors">
       <Navbar user={null} />
 
       <main className="flex-grow space-y-28 pb-20">

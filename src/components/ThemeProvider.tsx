@@ -19,7 +19,7 @@ export function useTheme() {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('dark');
+  const [theme, setTheme] = useState<Theme>('light');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -28,19 +28,23 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       const saved = localStorage.getItem('lapmatch-theme') as Theme | null;
       if (saved === 'light' || saved === 'dark') {
         setTheme(saved);
+      } else {
+        setTheme('light');
       }
-    } catch {}
+    } catch {
+      setTheme('light');
+    }
   }, []);
 
   useEffect(() => {
     if (!mounted) return;
     const root = document.documentElement;
-    if (theme === 'light') {
-      root.classList.remove('dark');
-      root.classList.add('light');
-    } else {
+    if (theme === 'dark') {
       root.classList.remove('light');
       root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+      root.classList.add('light');
     }
     try {
       localStorage.setItem('lapmatch-theme', theme);

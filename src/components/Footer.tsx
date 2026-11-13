@@ -10,25 +10,25 @@ export default function Footer() {
 
   return (
     <>
-      <footer className="relative z-10 border-t border-white/[0.08] bg-[#09090d]/80 backdrop-blur-xl py-6 text-xs text-zinc-400 mt-auto">
+      <footer className="relative z-10 border-t border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#09090d]/80 backdrop-blur-xl py-6 text-xs text-zinc-600 dark:text-zinc-400 mt-auto transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             {/* Branding & Deskripsi */}
             <div className="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
               <div className="flex items-center gap-2.5">
-                <div className="w-6 h-6 rounded-lg bg-zinc-900 border border-white/10 p-0.5 flex items-center justify-center">
+                <div className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-white/10 p-0.5 flex items-center justify-center">
                   <img
                     src="/logo.svg"
                     alt="Lapmatch Logo"
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <span className="font-semibold text-zinc-200">
+                <span className="font-semibold text-zinc-800 dark:text-zinc-200">
                   Lapmatch &bull; Smart Laptop Matching
                 </span>
               </div>
-              <span className="hidden sm:inline text-zinc-600">|</span>
-              <span className="text-zinc-400">
+              <span className="hidden sm:inline text-zinc-400 dark:text-zinc-600">|</span>
+              <span className="text-zinc-500 dark:text-zinc-400">
                 Sistem Pendukung Keputusan Pemilihan Laptop Mahasiswa Berbasis Multi-Kriteria
               </span>
             </div>
@@ -38,9 +38,9 @@ export default function Footer() {
               <button
                 type="button"
                 onClick={() => setModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-white/10 hover:border-white/25 transition shadow-sm min-h-[44px] cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/25 transition shadow-sm min-h-[44px] cursor-pointer"
               >
-                <HelpCircle className="w-3.5 h-3.5 text-cyan-400" />
+                <HelpCircle className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
                 <span>Pusat Bantuan & Kontak</span>
               </button>
             </div>

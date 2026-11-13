@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import {
   Check,
@@ -12,6 +13,7 @@ import {
   DollarSign,
   Laptop as LaptopIcon,
   ArrowRight,
+  ArrowLeft,
   ShieldCheck,
   CheckCircle2,
   GraduationCap,
@@ -159,13 +161,16 @@ function QuestionnaireContent() {
   const [showExplanation, setShowExplanation] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Multi-step Wizard State: 1 soal per tampilan
+  const [currentStep, setCurrentStep] = useState<number>(1);
+  const TOTAL_STEPS = 5;
+
   // Check authentication status across API profile & Supabase client
   useEffect(() => {
     let isMounted = true;
 
     async function checkAuth() {
       try {
-        // Cek via API profile yang membaca SSR cookies secara akurat
         const res = await fetch('/api/auth/profile');
         if (res.ok) {
           const profile = await res.json();
@@ -182,11 +187,8 @@ function QuestionnaireContent() {
             }
           }
         }
-      } catch {
-        // Lanjutkan fallback ke supabase client
-      }
+      } catch {}
 
-      // Fallback ke Supabase auth client
       try {
         const supabase = createClient();
         const { data: userData } = await supabase.auth.getUser();
@@ -218,9 +220,7 @@ function QuestionnaireContent() {
             return;
           }
         }
-      } catch {
-        // Abaikan error
-      }
+      } catch {}
 
       if (isMounted) {
         setCurrentUser(null);
@@ -245,9 +245,7 @@ function QuestionnaireContent() {
           setBrands(data.brands.map((b: { name: string }) => b.name));
         }
       })
-      .catch(() => {
-        // Tetap pakai BRANDS_DEFAULT jika gagal fetch
-      });
+      .catch(() => {});
   }, []);
 
   // Form State
@@ -304,6 +302,28 @@ function QuestionnaireContent() {
     setSelectedBrands(updated);
   };
 
+  // Step Navigation Validation
+  const handleNextStep = () => {
+    if (currentStep === 1) {
+      if (budgetError) {
+        toast.error(budgetError);
+        return;
+      }
+    } else if (currentStep === 2) {
+      if (selectedPeruntukan.length === 0) {
+        toast.error('Pilih minimal 1 kebutuhan utama.');
+        return;
+      }
+    }
+    setCurrentStep((prev) => Math.min(prev + 1, TOTAL_STEPS));
+    window.scrollTo({ top: 120, behavior: 'smooth' });
+  };
+
+  const handlePrevStep = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
+    window.scrollTo({ top: 120, behavior: 'smooth' });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (budgetError) {
@@ -318,7 +338,6 @@ function QuestionnaireContent() {
 
     setLoading(true);
 
-    // Hitung ranking kriteria otomatis secara cerdas
     const computedRanking = computeRankingKriteria(selectedPeruntukan, frekuensiPemakaian);
     const peruntukanText = selectedPeruntukan.join(' & ');
 
@@ -365,10 +384,10 @@ function QuestionnaireContent() {
 
   if (checkingAuth) {
     return (
-      <div className="min-h-screen flex flex-col bg-[#09090d] text-zinc-100">
+      <div className="min-h-screen flex flex-col bg-white dark:bg-[#09090d] text-zinc-900 dark:text-zinc-100 transition-colors">
         <Navbar user={null} />
         <main className="flex-grow flex items-center justify-center p-8">
-          <div className="flex items-center gap-3 text-sm text-zinc-400">
+          <div className="flex items-center gap-3 text-sm text-zinc-500">
             <span className="w-5 h-5 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
             <span>Memeriksa status akun...</span>
           </div>
@@ -378,198 +397,82 @@ function QuestionnaireContent() {
     );
   }
 
-  // === TAMPILAN PENJELASAN KUESIONER (Bisa dilihat siapa saja, Shopee style) ===
-  // Khusus pengunjung tanpa login: boleh melihat halaman penjelasan, wajib login saat menekan "Mulai Kuesioner"
+  // === TAMPILAN PANDUAN PENJELASAN KUESIONER ===
   if (!currentUser || showExplanation) {
     return (
-      <div className="min-h-screen flex flex-col bg-[#09090d] text-zinc-100">
+      <div className="min-h-screen flex flex-col bg-white dark:bg-[#09090d] text-zinc-900 dark:text-zinc-100 transition-colors">
         <Navbar user={currentUser} />
 
-        <main className="flex-grow max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-10">
-          {/* Tombol kembali ke formulir jika user sudah login */}
+        <main className="flex-grow max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
           {currentUser && showExplanation && (
             <div>
               <button
                 type="button"
                 onClick={() => setShowExplanation(false)}
-                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-semibold border border-white/10 transition cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-semibold border border-slate-200 dark:border-white/10 transition cursor-pointer"
               >
-                ← Kembali ke Pengisian Formulir
+                ← Kembali ke Pengisian Kuesioner
               </button>
             </div>
           )}
 
           {/* Hero Header Penjelasan */}
-          <div className="text-center space-y-4 max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-violet-950/70 via-indigo-950/60 to-cyan-950/70 border border-violet-500/30 text-cyan-300 shadow-lg shadow-violet-500/10">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-              <span>Panduan &amp; Penjelasan Kuesioner Rekomendasi SPK</span>
+          <div className="text-center space-y-3 max-w-2xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold bg-violet-500/10 text-violet-700 dark:text-violet-300 border border-violet-500/30">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Panduan Kuesioner Rekomendasi Laptop</span>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-              Kuesioner Cerdas Pemilihan Laptop Kuliah Berbasis{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-300 to-cyan-300">
-                Metode Ilmiah &amp; AI
-              </span>
+            <h1 className="text-2xl sm:text-4xl font-black text-zinc-900 dark:text-white tracking-tight leading-tight">
+              Pencarian Laptop Kuliah Presisi &amp; Personal
             </h1>
 
-            <p className="text-sm sm:text-base text-zinc-400 leading-relaxed">
-              Selamat datang di sistem pendukung keputusan Lapmatch. Pengunjung dapat membaca panduan dan alur evaluasi di bawah ini. Anda hanya perlu menjawab 5 parameter mudah untuk menemukan laptop terbaik sesuai kebutuhan dan anggaran Anda.
+            <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">
+              Kuesioner ini dirancang praktis: 1 soal per langkah. Anda hanya perlu menjawab 5 pertanyaan singkat untuk menemukan laptop paling ideal untuk perkuliahan Anda.
             </p>
           </div>
 
-          {/* 5 Parameter yang Digunakan dalam Kuesioner */}
-          <div className="space-y-4">
-            <div className="text-center sm:text-left">
-              <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">
-                Parameter Evaluasi
-              </span>
-              <h2 className="text-xl sm:text-2xl font-black text-white mt-1">
-                5 Pertanyaan Kunci dalam Kuesioner
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-5 rounded-3xl bg-[#0e0e15]/90 border border-white/10 space-y-3 hover:border-violet-500/40 transition">
-                <div className="w-10 h-10 rounded-2xl bg-violet-600/20 border border-violet-500/30 flex items-center justify-center text-violet-300 font-bold font-mono">
-                  1
+          {/* 5 Parameter Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {[
+              { num: '1', title: 'Anggaran (Budget)', desc: 'Rentang dana hemat hingga spesifikasi tinggi.' },
+              { num: '2', title: 'Kebutuhan Utama', desc: 'Kuliah harian, koding, desain, gaming, atau bisnis.' },
+              { num: '3', title: 'Kondisi Laptop', desc: 'Pilihan unit Baru, Bekas/Second, atau Keduanya.' },
+              { num: '4', title: 'Preferensi Merek', desc: 'Pilih brand favorit Anda atau semua merek.' },
+              { num: '5', title: 'Frekuensi Pakai', desc: 'Menilai prioritas baterai dan bobot portabel.' },
+            ].map((p) => (
+              <div key={p.num} className="p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200 dark:border-white/10 space-y-1.5">
+                <div className="w-7 h-7 rounded-lg bg-violet-600/10 text-violet-600 dark:text-violet-400 font-bold font-mono flex items-center justify-center text-xs">
+                  {p.num}
                 </div>
-                <h3 className="text-sm font-bold text-white">Rentang Anggaran (Budget)</h3>
-                <p className="text-xs text-zinc-400 leading-relaxed">
-                  Menentukan rentang dana minimal dan maksimal yang realistis, dari budget hemat hingga laptop performa flagship.
-                </p>
+                <h3 className="text-xs font-bold text-zinc-900 dark:text-white">{p.title}</h3>
+                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-snug">{p.desc}</p>
               </div>
-
-              <div className="p-5 rounded-3xl bg-[#0e0e15]/90 border border-white/10 space-y-3 hover:border-violet-500/40 transition">
-                <div className="w-10 h-10 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-300 font-bold font-mono">
-                  2
-                </div>
-                <h3 className="text-sm font-bold text-white">Kebutuhan Perkuliahan</h3>
-                <p className="text-xs text-zinc-400 leading-relaxed">
-                  Pilih fokus aktivitas: Kuliah Harian, Pemrograman/Koding, Desain Grafis/Video, Gaming, atau Bisnis/Mobilitas.
-                </p>
-              </div>
-
-              <div className="p-5 rounded-3xl bg-[#0e0e15]/90 border border-white/10 space-y-3 hover:border-violet-500/40 transition">
-                <div className="w-10 h-10 rounded-2xl bg-cyan-600/20 border border-cyan-500/30 flex items-center justify-center text-cyan-300 font-bold font-mono">
-                  3
-                </div>
-                <h3 className="text-sm font-bold text-white">Pilihan Kondisi Unit</h3>
-                <p className="text-xs text-zinc-400 leading-relaxed">
-                  Evaluasi laptop baru resmi bergaransi, laptop second berkinerja tinggi, atau komparasi objektif keduanya sekaligus.
-                </p>
-              </div>
-
-              <div className="p-5 rounded-3xl bg-[#0e0e15]/90 border border-white/10 space-y-3 hover:border-violet-500/40 transition">
-                <div className="w-10 h-10 rounded-2xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-300 font-bold font-mono">
-                  4
-                </div>
-                <h3 className="text-sm font-bold text-white">Preferensi Brand</h3>
-                <p className="text-xs text-zinc-400 leading-relaxed">
-                  Pilih merek tertentu (ASUS, Lenovo, HP, Acer, Apple, dll.) atau pilih semua brand untuk pilihan terlengkap.
-                </p>
-              </div>
-
-              <div className="p-5 rounded-3xl bg-[#0e0e15]/90 border border-white/10 space-y-3 hover:border-violet-500/40 transition md:col-span-2">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-300 font-bold font-mono">
-                  5
-                </div>
-                <h3 className="text-sm font-bold text-white">Pembobotan ROC &amp; Algoritma TOPSIS</h3>
-                <p className="text-xs text-zinc-400 leading-relaxed">
-                  Secara cerdas memprioritaskan 6 kriteria teknis (Harga, CPU, GPU, RAM, SSD, Baterai, Bobot) dan menghitung nilai kedekatan terhadap solusi ideal positif (kinerja terbaik).
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
 
-          {/* Keunggulan Hasil yang Didapatkan */}
-          <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-violet-950/40 via-zinc-950 to-cyan-950/30 border border-white/10 space-y-4">
-            <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-cyan-400" />
-              <span>Apa yang Akan Anda Dapatkan Setelah Mengisi Kuesioner?</span>
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-zinc-300">
-              <div className="flex items-start gap-2.5 p-3 rounded-2xl bg-zinc-900/60 border border-white/5">
-                <span className="text-cyan-400 font-bold">✓</span>
-                <span><strong>Ranking Alternatif Objektif:</strong> Urutan laptop nomor 1 sampai seterusnya dengan skor matematis Nilai Vi.</span>
-              </div>
-              <div className="flex items-start gap-2.5 p-3 rounded-2xl bg-zinc-900/60 border border-white/5">
-                <span className="text-cyan-400 font-bold">✓</span>
-                <span><strong>Analisis Naratif Gemini AI:</strong> Penjelasan mendalam tentang mengapa laptop tersebut paling cocok untuk jurusan kuliah Anda.</span>
-              </div>
-              <div className="flex items-start gap-2.5 p-3 rounded-2xl bg-zinc-900/60 border border-white/5">
-                <span className="text-cyan-400 font-bold">✓</span>
-                <span><strong>Simpan Riwayat &amp; Unduh PDF:</strong> Konsultasi tersimpan aman di akun Anda dan dapat dicetak sebagai lampiran tugas/skripsi.</span>
-              </div>
-              <div className="flex items-start gap-2.5 p-3 rounded-2xl bg-zinc-900/60 border border-white/5">
-                <span className="text-cyan-400 font-bold">✓</span>
-                <span><strong>Tautan Resmi Marketplace:</strong> Cek langsung ketersediaan dan harga di Shopee &amp; Tokopedia resmi.</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Call to Action Box - Tombol Mulai Kuesioner (Shopee Concept) */}
-          <div className="p-8 sm:p-10 rounded-3xl bg-[#0e0e15] border border-violet-500/30 text-center space-y-6 shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-400" />
-
-            <div className="space-y-2 max-w-xl mx-auto">
-              <h3 className="text-2xl sm:text-3xl font-black text-white">
-                Siap Memulai Kuesioner Rekomendasi?
-              </h3>
-              <p className="text-xs sm:text-sm text-zinc-400">
-                {!currentUser
-                  ? 'Pengunjung wajib masuk atau mendaftar akun terlebih dahulu sebelum memulai agar riwayat preferensi dan hasil rekomendasi Anda dapat disimpan secara aman.'
-                  : 'Klik tombol di bawah untuk langsung mengisi 5 preferensi kriteria dan mendapatkan rekomendasi laptop kuliah terbaik.'}
-              </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  if (!currentUser) {
-                    openAuthPrompt({
-                      title: 'Masuk Akun untuk Memulai Kuesioner',
-                      message: 'Silakan login terlebih dahulu untuk menggunakan fitur ini.',
-                      featureName: 'Memulai kuesioner rekomendasi laptop',
-                      returnUrl: '/questionnaire',
-                    });
-                  } else {
-                    setShowExplanation(false);
-                  }
-                }}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-2xl bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-extrabold text-sm sm:text-base shadow-xl shadow-violet-600/30 transition transform active:scale-95 cursor-pointer"
-              >
-                <Sparkles className="w-5 h-5 text-cyan-300" />
-                <span>Mulai Kuesioner Sekarang</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-
-              <Link
-                href="/#katalog"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/10 text-xs sm:text-sm font-bold transition"
-              >
-                Jelajahi Katalog Laptop Dahulu
-              </Link>
-            </div>
-
-            {!currentUser && (
-              <div className="pt-2 flex items-center justify-center gap-4 text-xs text-zinc-400">
-                <Link
-                  href="/login?callbackUrl=%2Fquestionnaire"
-                  className="text-cyan-400 hover:text-cyan-300 hover:underline"
-                >
-                  Sudah punya akun? Masuk
-                </Link>
-                <span>•</span>
-                <Link
-                  href="/register?callbackUrl=%2Fquestionnaire"
-                  className="text-violet-400 hover:text-violet-300 hover:underline"
-                >
-                  Belum punya akun? Daftar gratis
-                </Link>
-              </div>
-            )}
+          {/* Tombol Mulai Kuesioner */}
+          <div className="pt-4 text-center space-y-3">
+            <button
+              type="button"
+              onClick={() => {
+                if (!currentUser) {
+                  openAuthPrompt({
+                    title: 'Masuk Akun untuk Memulai Kuesioner',
+                    message: 'Silakan login terlebih dahulu untuk menggunakan fitur ini.',
+                    featureName: 'Memulai kuesioner rekomendasi laptop',
+                    returnUrl: '/questionnaire',
+                  });
+                } else {
+                  setShowExplanation(false);
+                }
+              }}
+              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-extrabold text-sm shadow-lg shadow-violet-600/25 transition active:scale-95 cursor-pointer"
+            >
+              <Sparkles className="w-4 h-4 text-cyan-300" />
+              <span>Mulai Kuesioner Sekarang (5 Soal Cepat)</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
         </main>
 
@@ -578,401 +481,543 @@ function QuestionnaireContent() {
     );
   }
 
-  // === TAMPILAN FORMULIR KUESIONER (Bagi User yang Sudah Login) ===
+  // === TAMPILAN WIZARD MULTI-STEP: 1 SOAL HABIS ITU LANJUT SOAL BERIKUTNYA ===
   return (
-    <div className="min-h-screen flex flex-col bg-[#09090d] text-zinc-100">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-[#09090d] text-zinc-900 dark:text-zinc-100 transition-colors">
       <Navbar user={currentUser} />
 
-      <main className="flex-grow max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8">
-        {/* Header Bersih & Ramah Pengguna dengan Tombol Lihat Penjelasan */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-violet-950/60 to-cyan-950/60 border border-violet-500/30 text-cyan-300 shadow-[0_0_15px_rgba(124,58,237,0.2)]">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Pencarian Cerdas Sesuai Kebutuhan &amp; Anggaranmu</span>
-            </div>
-            <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Temukan Laptop yang{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-300 to-cyan-400">
-                Paling Tepat untuk Kamu
+      <main className="flex-grow max-w-3xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6">
+        {/* Top Wizard Progress Bar */}
+        <div className="p-4 sm:p-5 rounded-3xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200 dark:border-white/10 space-y-3">
+          <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2">
+              <span className="font-mono font-bold px-2.5 py-0.5 rounded-full bg-violet-600/10 text-violet-600 dark:text-violet-400 border border-violet-500/20">
+                Soal {currentStep} dari {TOTAL_STEPS}
               </span>
-            </h1>
-            <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed max-w-2xl">
-              Jawab 5 pertanyaan mudah di bawah ini. Algoritma kami akan menyaring ratusan laptop di katalog dan memberikan rekomendasi terbaik lengkap dengan analisis keunggulannya.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setShowExplanation(true)}
-            className="self-start sm:self-center px-3.5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/10 text-xs font-semibold transition flex items-center gap-1.5 shrink-0 cursor-pointer"
-          >
-            <Info className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Baca Penjelasan Kuesioner</span>
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* 1. Anggaran (Budget) */}
-          <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md space-y-5 shadow-lg">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <div className="flex items-center gap-2.5">
-                <span className="w-7 h-7 rounded-xl bg-violet-600/20 border border-violet-500/30 flex items-center justify-center text-xs font-bold text-violet-300">
-                  1
-                </span>
-                <label className="text-base font-bold text-white">
-                  Berapa anggaran (budget) yang kamu siapkan?
-                </label>
-              </div>
-              <span className="text-xs text-zinc-400">
-                Pilih rekomendasi cepat atau atur bebas
+              <span className="text-zinc-500 dark:text-zinc-400 font-medium hidden sm:inline">
+                {currentStep === 1 && 'Rentang Anggaran (Budget)'}
+                {currentStep === 2 && 'Kebutuhan Penggunaan Utama'}
+                {currentStep === 3 && 'Pilihan Kondisi Laptop'}
+                {currentStep === 4 && 'Preferensi Merek'}
+                {currentStep === 5 && 'Frekuensi Pemakaian'}
               </span>
             </div>
 
-            {/* Bagian Atas: Rekomendasi Pilihan Anggaran */}
-            <div className="space-y-2">
-              <span className="text-xs font-semibold text-zinc-400 block">
-                💡 Rekomendasi Pilihan Anggaran Cepat:
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                {BUDGET_RECOMMENDATIONS.map((preset) => {
-                  const isSelected = budgetMin === preset.min && budgetMax === preset.max;
-                  return (
-                    <button
-                      key={preset.label}
-                      type="button"
-                      onClick={() => {
-                        setBudgetMin(preset.min);
-                        setBudgetMax(preset.max);
-                      }}
-                      className={`p-3 rounded-2xl border text-left transition cursor-pointer flex flex-col justify-between ${
-                        isSelected
-                          ? 'bg-gradient-to-br from-emerald-950/50 via-cyan-950/40 to-zinc-950 border-emerald-500/60 shadow-[0_0_20px_rgba(16,185,129,0.2)]'
-                          : 'border-zinc-800 bg-zinc-950/60 hover:border-zinc-700 text-zinc-400'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className={`text-sm font-bold ${isSelected ? 'text-white' : 'text-zinc-200'}`}>
-                          {preset.label}
-                        </span>
-                        {isSelected && (
-                          <div className="w-4 h-4 rounded-full bg-emerald-400 text-zinc-950 flex items-center justify-center">
-                            <Check className="w-2.5 h-2.5 stroke-[3]" />
-                          </div>
-                        )}
-                      </div>
-                      <span className="text-[11px] text-zinc-400 mt-1">
-                        {preset.desc}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Bagian Bawah: Bebas Memilih Anggaran */}
-            <div className="pt-2 border-t border-zinc-800/80 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-zinc-300 flex items-center gap-1.5">
-                  <Sliders className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Atau Bebas Menentukan Rentang Anggaran Sendiri:</span>
-                </span>
-                <span className="text-xs font-mono text-cyan-300 font-semibold">
-                  {formatRupiahShort(budgetMin)} – {formatRupiahShort(budgetMax)}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs text-zinc-400 block font-medium">
-                    Anggaran Minimal (Dari)
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-500">
-                      Rp
-                    </span>
-                    <input
-                      type="number"
-                      value={budgetMin}
-                      onChange={(e) => setBudgetMin(Number(e.target.value))}
-                      step="500000"
-                      min="0"
-                      className={`w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-zinc-950/90 border font-mono text-sm focus:outline-none transition ${
-                        budgetError ? 'border-rose-500/80 text-rose-200 focus:border-rose-400' : 'border-zinc-800 text-zinc-100 focus:border-cyan-400'
-                      }`}
-                    />
-                  </div>
-                  <span className="text-[11px] text-zinc-500 block">
-                    {formatRupiahShort(budgetMin)}
-                  </span>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs text-zinc-400 block font-medium">
-                    Anggaran Maksimal (Sampai)
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-500">
-                      Rp
-                    </span>
-                    <input
-                      type="number"
-                      value={budgetMax}
-                      onChange={(e) => setBudgetMax(Number(e.target.value))}
-                      step="500000"
-                      min="0"
-                      className={`w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-zinc-950/90 border font-mono text-sm focus:outline-none transition ${
-                        budgetError ? 'border-rose-500/80 text-rose-200 focus:border-rose-400' : 'border-zinc-800 text-zinc-100 focus:border-cyan-400'
-                      }`}
-                    />
-                  </div>
-                  <span className="text-[11px] text-zinc-500 block">
-                    {formatRupiahShort(budgetMax)}
-                  </span>
-                </div>
-              </div>
-
-              {budgetError && (
-                <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
-                  <span className="font-bold">⚠️</span>
-                  <span>{budgetError}</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* 2. Peruntukan Pemakaian (Bisa Pilih Hingga 2) */}
-          <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md space-y-4 shadow-lg">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <div className="flex items-center gap-2.5">
-                <span className="w-7 h-7 rounded-xl bg-violet-600/20 border border-violet-500/30 flex items-center justify-center text-xs font-bold text-violet-300">
-                  2
-                </span>
-                <label className="text-base font-bold text-white">
-                  Untuk apa saja laptop ini akan kamu gunakan?
-                </label>
-              </div>
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-cyan-300 bg-cyan-950/50 px-2.5 py-1 rounded-full border border-cyan-800/50">
-                <span>Pilih 1 atau 2 kebutuhan ({selectedPeruntukan.length}/2)</span>
-              </span>
-            </div>
-            <p className="text-xs text-zinc-400 leading-relaxed">
-              Kamu bisa memilih maksimal <strong>2 pilihan</strong> jika laptop dipakai untuk beberapa kebutuhan sekaligus (misalnya untuk kuliah dan sesekali main game).
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {PERUNTUKAN_OPTIONS.map((opt) => {
-                const isSelected = selectedPeruntukan.includes(opt.value);
-                return (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => handleTogglePeruntukan(opt.value)}
-                    className={`p-4 rounded-2xl border text-left transition cursor-pointer flex items-start gap-3.5 relative overflow-hidden ${
-                      isSelected
-                        ? 'bg-gradient-to-br from-violet-950/70 via-indigo-950/50 to-zinc-950 border-violet-500/60 text-white shadow-[0_0_20px_rgba(124,58,237,0.25)] ring-1 ring-violet-500/40'
-                        : 'border-zinc-800 bg-zinc-950/50 hover:border-zinc-700 text-zinc-400'
-                    }`}
-                  >
-                    <span className="text-2xl shrink-0 mt-0.5">{opt.emoji}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <span className={`text-sm font-bold ${isSelected ? 'text-white' : 'text-zinc-200'}`}>
-                          {opt.title}
-                        </span>
-                        <div
-                          className={`w-5 h-5 rounded-lg border flex items-center justify-center shrink-0 transition ${
-                            isSelected
-                              ? 'border-cyan-400 bg-cyan-400 text-zinc-950'
-                              : 'border-zinc-700 bg-zinc-900/60'
-                          }`}
-                        >
-                          {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
-                        </div>
-                      </div>
-                      <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                        {opt.desc}
-                      </p>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* 3. Kondisi Laptop */}
-          <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md space-y-4 shadow-lg">
-            <div className="flex items-center gap-2.5">
-              <span className="w-7 h-7 rounded-xl bg-violet-600/20 border border-violet-500/30 flex items-center justify-center text-xs font-bold text-violet-300">
-                3
-              </span>
-              <label className="text-base font-bold text-white">
-                Kondisi laptop seperti apa yang kamu inginkan?
-              </label>
-            </div>
-            <p className="text-xs text-zinc-400">
-              Pilih apakah kamu mencari laptop baru bergaransi resmi atau laptop bekas (second) yang lebih hemat.
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {[
-                {
-                  value: 'keduanya',
-                  label: '✨ Bebas (Baru & Second)',
-                  sub: 'Tampilkan laptop baru maupun second terbaik yang masuk anggaran',
-                },
-                {
-                  value: 'baru',
-                  label: '📦 Hanya Baru',
-                  sub: 'Kondisi segel dengan garansi resmi distributor',
-                },
-                {
-                  value: 'second',
-                  label: '🔄 Hanya Bekas / Second',
-                  sub: 'Spesifikasi lebih tinggi dengan harga yang jauh lebih hemat',
-                },
-              ].map((opt) => {
-                const isSelected = kondisiPilihan === opt.value;
-                return (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => setKondisiPilihan(opt.value as 'baru' | 'second' | 'keduanya')}
-                    className={`p-4 rounded-2xl border text-center transition cursor-pointer flex flex-col justify-between ${
-                      isSelected
-                        ? 'bg-gradient-to-r from-violet-600 to-indigo-600 border-violet-500/60 text-white font-bold shadow-[0_0_20px_rgba(124,58,237,0.3)]'
-                        : 'border-zinc-800 bg-zinc-950/60 hover:border-zinc-700 text-zinc-400'
-                    }`}
-                  >
-                    <div className="text-sm font-bold">{opt.label}</div>
-                    <div className="text-[11px] text-zinc-300/80 mt-1.5 leading-relaxed">
-                      {opt.sub}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* 4. Filter Merek Laptop */}
-          <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md space-y-4 shadow-lg">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-              <div className="flex items-center gap-2.5">
-                <span className="w-7 h-7 rounded-xl bg-violet-600/20 border border-violet-500/30 flex items-center justify-center text-xs font-bold text-violet-300">
-                  4
-                </span>
-                <label className="text-base font-bold text-white">
-                  Apakah ada merek laptop tertentu yang kamu sukai?
-                </label>
-              </div>
-              <span className="text-xs text-zinc-400">Bisa pilih beberapa merek</span>
-            </div>
-            <p className="text-xs text-zinc-400">
-              Pilih merek favoritmu, atau biarkan <strong>&quot;Semua Merek&quot;</strong> agar pilihan laptop yang dianalisis semakin beragam dan optimal.
-            </p>
-
-            <div className="flex flex-wrap gap-2 pt-1">
-              <button
-                type="button"
-                onClick={() => toggleBrand('semua')}
-                className={`px-4 py-2.5 rounded-xl border text-xs font-bold transition cursor-pointer ${
-                  selectedBrands.includes('semua')
-                    ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-sm'
-                    : 'border-zinc-800 bg-zinc-950/60 text-zinc-400 hover:border-zinc-600'
-                }`}
-              >
-                ✨ Semua Merek (Rekomendasi)
-              </button>
-              {brands.map((brand) => {
-                const isSelected = selectedBrands.includes(brand);
-                return (
-                  <button
-                    key={brand}
-                    type="button"
-                    onClick={() => toggleBrand(brand)}
-                    className={`px-3.5 py-2.5 rounded-xl border text-xs font-semibold transition cursor-pointer ${
-                      isSelected
-                        ? 'bg-violet-600/30 text-violet-300 border-violet-500/50 shadow-sm'
-                        : 'border-zinc-800 bg-zinc-950/60 text-zinc-400 hover:border-zinc-600'
-                    }`}
-                  >
-                    {brand}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* 5. Frekuensi Pemakaian dalam Seminggu */}
-          <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md space-y-4 shadow-lg">
-            <div className="flex items-center gap-2.5">
-              <span className="w-7 h-7 rounded-xl bg-violet-600/20 border border-violet-500/30 flex items-center justify-center text-xs font-bold text-violet-300">
-                5
-              </span>
-              <label className="text-base font-bold text-white">
-                Dalam seminggu, seberapa sering laptop akan kamu pakai?
-              </label>
-            </div>
-            <p className="text-xs text-zinc-400">
-              Ini membantu kami menilai seberapa penting daya tahan baterai dan kemudahan membawa laptop (bobot ringan) untuk keseharianmu.
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {FREKUENSI_PEMAKAIAN_OPTIONS.map((f) => {
-                const isSelected = frekuensiPemakaian === f.value;
-                return (
-                  <button
-                    key={f.value}
-                    type="button"
-                    onClick={() => setFrekuensiPemakaian(f.value)}
-                    className={`p-4 rounded-2xl border text-left transition cursor-pointer flex items-start gap-3.5 ${
-                      isSelected
-                        ? 'bg-gradient-to-br from-amber-950/60 to-orange-950/40 border-amber-500/50 text-white shadow-[0_0_20px_rgba(245,158,11,0.2)]'
-                        : 'border-zinc-800 bg-zinc-950/50 hover:border-zinc-700 text-zinc-400'
-                    }`}
-                  >
-                    <span className="text-2xl shrink-0 mt-0.5">{f.emoji}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <span className={`text-sm font-bold ${isSelected ? 'text-white' : 'text-zinc-200'}`}>
-                          {f.title}
-                        </span>
-                        {isSelected && (
-                          <div className="w-4 h-4 rounded-full bg-amber-400 text-zinc-950 flex items-center justify-center shrink-0">
-                            <Check className="w-2.5 h-2.5 stroke-[3]" />
-                          </div>
-                        )}
-                      </div>
-                      <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                        {f.desc}
-                      </p>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Tombol Submit */}
-          <div className="pt-2">
             <button
-              type="submit"
-              disabled={loading}
-              className="shimmer-button w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-extrabold text-sm sm:text-base shadow-[0_0_30px_rgba(124,58,237,0.4)] hover:shadow-[0_0_40px_rgba(124,58,237,0.7)] transition active:scale-[0.98] cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+              type="button"
+              onClick={() => setShowExplanation(true)}
+              className="text-[11px] text-zinc-500 hover:text-zinc-800 dark:hover:text-white flex items-center gap-1 transition cursor-pointer"
             >
-              {loading ? (
-                <>
-                  <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Sedang Mencocokkan Laptop Terbaik untuk Kamu...</span>
-                </>
-              ) : (
-                <>
-                  <span>Lihat Rekomendasi Laptop untuk Saya</span>
-                  <Send className="w-4 h-4" />
-                </>
-              )}
+              <Info className="w-3.5 h-3.5 text-cyan-500" />
+              <span>Bantuan Panduan</span>
             </button>
           </div>
+
+          {/* Animated Progress Bar */}
+          <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-zinc-800 overflow-hidden">
+            <motion.div
+              className="h-full bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500"
+              initial={false}
+              animate={{ width: `${(currentStep / TOTAL_STEPS) * 100}%` }}
+              transition={{ duration: 0.35, ease: 'easeInOut' }}
+            />
+          </div>
+
+          {/* Step Pill Indicators */}
+          <div className="flex items-center justify-between pt-1 px-1">
+            {[1, 2, 3, 4, 5].map((stepNum) => {
+              const isPast = stepNum < currentStep;
+              const isCurrent = stepNum === currentStep;
+              return (
+                <button
+                  key={stepNum}
+                  type="button"
+                  onClick={() => {
+                    if (stepNum < currentStep) setCurrentStep(stepNum);
+                  }}
+                  disabled={stepNum > currentStep}
+                  className={`flex items-center gap-1 text-[11px] font-mono transition ${
+                    isCurrent
+                      ? 'text-violet-600 dark:text-violet-400 font-bold'
+                      : isPast
+                      ? 'text-emerald-600 dark:text-emerald-400 font-semibold cursor-pointer'
+                      : 'text-zinc-400 cursor-not-allowed opacity-60'
+                  }`}
+                >
+                  <span
+                    className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                      isCurrent
+                        ? 'bg-violet-600 text-white'
+                        : isPast
+                        ? 'bg-emerald-500 text-white'
+                        : 'bg-slate-200 dark:bg-zinc-800 text-zinc-500'
+                    }`}
+                  >
+                    {isPast ? '✓' : stepNum}
+                  </span>
+                  <span className="hidden sm:inline">Soal {stepNum}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Wizard Form Container */}
+        <form onSubmit={handleSubmit}>
+          <AnimatePresence mode="wait">
+            {/* ── SOAL 1: ANGGARAN (BUDGET) ── */}
+            {currentStep === 1 && (
+              <motion.div
+                key="step-1"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+                className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#0e0e15]/90 border border-slate-200 dark:border-white/10 shadow-sm space-y-6"
+              >
+                <div className="space-y-1">
+                  <span className="text-xs font-mono font-bold text-violet-600 dark:text-violet-400 uppercase">
+                    Pertanyaan #1
+                  </span>
+                  <h2 className="text-lg sm:text-2xl font-black text-zinc-900 dark:text-white">
+                    Berapa rentang anggaran (budget) yang Anda siapkan?
+                  </h2>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    Pilih salah satu rekomendasi cepat di bawah atau tentukan rentang angka sendiri secara bebas.
+                  </p>
+                </div>
+
+                {/* Preset Anggaran Cepat */}
+                <div className="space-y-2">
+                  <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 block">
+                    Pilihan Anggaran Populer:
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    {BUDGET_RECOMMENDATIONS.map((preset) => {
+                      const isSelected = budgetMin === preset.min && budgetMax === preset.max;
+                      return (
+                        <button
+                          key={preset.label}
+                          type="button"
+                          onClick={() => {
+                            setBudgetMin(preset.min);
+                            setBudgetMax(preset.max);
+                          }}
+                          className={`p-3.5 rounded-2xl border text-left transition cursor-pointer flex flex-col justify-between ${
+                            isSelected
+                              ? 'bg-violet-50 dark:bg-violet-950/40 border-violet-600 ring-2 ring-violet-500/30'
+                              : 'border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/40 hover:border-slate-300 text-zinc-600 dark:text-zinc-400'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className={`text-xs font-bold ${isSelected ? 'text-violet-700 dark:text-white' : 'text-zinc-800 dark:text-zinc-200'}`}>
+                              {preset.label}
+                            </span>
+                            {isSelected && (
+                              <div className="w-4 h-4 rounded-full bg-violet-600 text-white flex items-center justify-center text-[10px]">
+                                ✓
+                              </div>
+                            )}
+                          </div>
+                          <span className="text-[11px] text-zinc-500 mt-1">{preset.desc}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Input Anggaran Manual */}
+                <div className="pt-2 border-t border-slate-100 dark:border-white/10 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
+                      <Sliders className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
+                      <span>Atur Rentang Anggaran Sendiri:</span>
+                    </span>
+                    <span className="text-xs font-mono font-bold text-violet-600 dark:text-cyan-400">
+                      {formatRupiahShort(budgetMin)} – {formatRupiahShort(budgetMax)}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-[11px] text-zinc-500 font-medium">Anggaran Minimal (Dari)</label>
+                      <input
+                        type="number"
+                        value={budgetMin}
+                        onChange={(e) => setBudgetMin(Number(e.target.value))}
+                        step="500000"
+                        min="0"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 font-mono text-xs text-zinc-900 dark:text-white focus:outline-none focus:border-violet-500"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[11px] text-zinc-500 font-medium">Anggaran Maksimal (Sampai)</label>
+                      <input
+                        type="number"
+                        value={budgetMax}
+                        onChange={(e) => setBudgetMax(Number(e.target.value))}
+                        step="500000"
+                        min="0"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 font-mono text-xs text-zinc-900 dark:text-white focus:outline-none focus:border-violet-500"
+                      />
+                    </div>
+                  </div>
+
+                  {budgetError && (
+                    <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-500/30 text-rose-600 dark:text-rose-300 text-xs flex items-center gap-2">
+                      <span>⚠️ {budgetError}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Step Action Buttons */}
+                <div className="pt-4 border-t border-slate-100 dark:border-white/10 flex items-center justify-end">
+                  <button
+                    type="button"
+                    onClick={handleNextStep}
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs sm:text-sm shadow-sm transition active:scale-95 cursor-pointer"
+                  >
+                    <span>Lanjut ke Soal 2</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* ── SOAL 2: KEBUTUHAN PENGGUNAAN UTAMA ── */}
+            {currentStep === 2 && (
+              <motion.div
+                key="step-2"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+                className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#0e0e15]/90 border border-slate-200 dark:border-white/10 shadow-sm space-y-6"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono font-bold text-violet-600 dark:text-violet-400 uppercase">
+                      Pertanyaan #2
+                    </span>
+                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-cyan-50 dark:bg-cyan-950/50 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800/40">
+                      Pilihan: {selectedPeruntukan.length} dari 2
+                    </span>
+                  </div>
+                  <h2 className="text-lg sm:text-2xl font-black text-zinc-900 dark:text-white">
+                    Untuk apa saja laptop ini akan Anda gunakan?
+                  </h2>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    Pilih 1 atau 2 kebutuhan yang paling sering Anda lakukan.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {PERUNTUKAN_OPTIONS.map((opt) => {
+                    const isSelected = selectedPeruntukan.includes(opt.value);
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => handleTogglePeruntukan(opt.value)}
+                        className={`p-4 rounded-2xl border text-left transition cursor-pointer flex items-start gap-3.5 ${
+                          isSelected
+                            ? 'bg-violet-50 dark:bg-violet-950/40 border-violet-600 ring-2 ring-violet-500/30'
+                            : 'border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/40 hover:border-slate-300 text-zinc-600 dark:text-zinc-400'
+                        }`}
+                      >
+                        <span className="text-2xl shrink-0 mt-0.5">{opt.emoji}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <span className={`text-xs sm:text-sm font-bold ${isSelected ? 'text-violet-700 dark:text-white' : 'text-zinc-800 dark:text-zinc-200'}`}>
+                              {opt.title}
+                            </span>
+                            <div
+                              className={`w-5 h-5 rounded-lg border flex items-center justify-center shrink-0 transition ${
+                                isSelected
+                                  ? 'border-violet-600 bg-violet-600 text-white'
+                                  : 'border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900'
+                              }`}
+                            >
+                              {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
+                            </div>
+                          </div>
+                          <p className="text-[11px] text-zinc-500 mt-1 leading-relaxed">{opt.desc}</p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Step Action Buttons */}
+                <div className="pt-4 border-t border-slate-100 dark:border-white/10 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={handlePrevStep}
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-slate-200 transition cursor-pointer"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span>Kembali ke Soal 1</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleNextStep}
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs sm:text-sm shadow-sm transition active:scale-95 cursor-pointer"
+                  >
+                    <span>Lanjut ke Soal 3</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* ── SOAL 3: KONDISI LAPTOP ── */}
+            {currentStep === 3 && (
+              <motion.div
+                key="step-3"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+                className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#0e0e15]/90 border border-slate-200 dark:border-white/10 shadow-sm space-y-6"
+              >
+                <div className="space-y-1">
+                  <span className="text-xs font-mono font-bold text-violet-600 dark:text-violet-400 uppercase">
+                    Pertanyaan #3
+                  </span>
+                  <h2 className="text-lg sm:text-2xl font-black text-zinc-900 dark:text-white">
+                    Kondisi laptop seperti apa yang Anda inginkan?
+                  </h2>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    Tentukan apakah Anda ingin unit baru bergaransi resmi, bekas (second) hemat, atau komparasi keduanya.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {[
+                    {
+                      value: 'keduanya',
+                      label: '✨ Bebas (Baru & Second)',
+                      sub: 'Tampilkan alternatif baru maupun second terbaik yang masuk anggaran.',
+                    },
+                    {
+                      value: 'baru',
+                      label: '📦 Hanya Baru',
+                      sub: 'Kondisi segel dengan garansi resmi distributor resmi.',
+                    },
+                    {
+                      value: 'second',
+                      label: '🔄 Hanya Bekas / Second',
+                      sub: 'Spesifikasi lebih tinggi dengan harga yang jauh lebih hemat.',
+                    },
+                  ].map((opt) => {
+                    const isSelected = kondisiPilihan === opt.value;
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setKondisiPilihan(opt.value as 'baru' | 'second' | 'keduanya')}
+                        className={`p-4 rounded-2xl border text-center transition cursor-pointer flex flex-col justify-between ${
+                          isSelected
+                            ? 'bg-violet-50 dark:bg-violet-950/40 border-violet-600 ring-2 ring-violet-500/30'
+                            : 'border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/40 hover:border-slate-300 text-zinc-600 dark:text-zinc-400'
+                        }`}
+                      >
+                        <div className={`text-xs sm:text-sm font-bold ${isSelected ? 'text-violet-700 dark:text-white' : 'text-zinc-800 dark:text-zinc-200'}`}>
+                          {opt.label}
+                        </div>
+                        <div className="text-[11px] text-zinc-500 mt-2 leading-relaxed">{opt.sub}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Step Action Buttons */}
+                <div className="pt-4 border-t border-slate-100 dark:border-white/10 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={handlePrevStep}
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-slate-200 transition cursor-pointer"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span>Kembali ke Soal 2</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleNextStep}
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs sm:text-sm shadow-sm transition active:scale-95 cursor-pointer"
+                  >
+                    <span>Lanjut ke Soal 4</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* ── SOAL 4: PREFERENSI MEREK ── */}
+            {currentStep === 4 && (
+              <motion.div
+                key="step-4"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+                className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#0e0e15]/90 border border-slate-200 dark:border-white/10 shadow-sm space-y-6"
+              >
+                <div className="space-y-1">
+                  <span className="text-xs font-mono font-bold text-violet-600 dark:text-violet-400 uppercase">
+                    Pertanyaan #4
+                  </span>
+                  <h2 className="text-lg sm:text-2xl font-black text-zinc-900 dark:text-white">
+                    Apakah Anda memiliki preferensi merek laptop tertentu?
+                  </h2>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    Pilih merek yang Anda sukai, atau pilih <strong>Semua Merek</strong> agar analisis memberikan rekomendasi paling objektif.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => toggleBrand('semua')}
+                    className={`px-4 py-2.5 rounded-xl border text-xs font-bold transition cursor-pointer ${
+                      selectedBrands.includes('semua')
+                        ? 'bg-violet-600 text-white border-violet-600 shadow-sm'
+                        : 'border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-300 hover:border-slate-300'
+                    }`}
+                  >
+                    ✨ Semua Merek (Rekomendasi)
+                  </button>
+                  {brands.map((brand) => {
+                    const isSelected = selectedBrands.includes(brand);
+                    return (
+                      <button
+                        key={brand}
+                        type="button"
+                        onClick={() => toggleBrand(brand)}
+                        className={`px-3.5 py-2.5 rounded-xl border text-xs font-semibold transition cursor-pointer ${
+                          isSelected
+                            ? 'bg-violet-600 text-white border-violet-600 shadow-sm'
+                            : 'border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-300 hover:border-slate-300'
+                        }`}
+                      >
+                        {brand}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Step Action Buttons */}
+                <div className="pt-4 border-t border-slate-100 dark:border-white/10 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={handlePrevStep}
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-slate-200 transition cursor-pointer"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span>Kembali ke Soal 3</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleNextStep}
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs sm:text-sm shadow-sm transition active:scale-95 cursor-pointer"
+                  >
+                    <span>Lanjut ke Soal 5</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* ── SOAL 5: FREKUENSI PEMAKAIAN ── */}
+            {currentStep === 5 && (
+              <motion.div
+                key="step-5"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+                className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#0e0e15]/90 border border-slate-200 dark:border-white/10 shadow-sm space-y-6"
+              >
+                <div className="space-y-1">
+                  <span className="text-xs font-mono font-bold text-violet-600 dark:text-violet-400 uppercase">
+                    Pertanyaan Terakhir (#5)
+                  </span>
+                  <h2 className="text-lg sm:text-2xl font-black text-zinc-900 dark:text-white">
+                    Seberapa sering Anda membawa laptop untuk kuliah / luar rumah?
+                  </h2>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    Membantu algoritma menilai seberapa penting daya tahan baterai dan bobot portabilitas untuk keseharian Anda.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {FREKUENSI_PEMAKAIAN_OPTIONS.map((f) => {
+                    const isSelected = frekuensiPemakaian === f.value;
+                    return (
+                      <button
+                        key={f.value}
+                        type="button"
+                        onClick={() => setFrekuensiPemakaian(f.value)}
+                        className={`p-4 rounded-2xl border text-left transition cursor-pointer flex items-start gap-3.5 ${
+                          isSelected
+                            ? 'bg-violet-50 dark:bg-violet-950/40 border-violet-600 ring-2 ring-violet-500/30'
+                            : 'border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/40 hover:border-slate-300 text-zinc-600 dark:text-zinc-400'
+                        }`}
+                      >
+                        <span className="text-2xl shrink-0 mt-0.5">{f.emoji}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <span className={`text-xs sm:text-sm font-bold ${isSelected ? 'text-violet-700 dark:text-white' : 'text-zinc-800 dark:text-zinc-200'}`}>
+                              {f.title}
+                            </span>
+                            {isSelected && (
+                              <div className="w-4 h-4 rounded-full bg-violet-600 text-white flex items-center justify-center text-[10px]">
+                                ✓
+                              </div>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-zinc-500 mt-1 leading-relaxed">{f.desc}</p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Step Action Buttons (Submit Final) */}
+                <div className="pt-4 border-t border-slate-100 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <button
+                    type="button"
+                    onClick={handlePrevStep}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-slate-200 transition cursor-pointer"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span>Kembali ke Soal 4</span>
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-extrabold text-sm shadow-md transition active:scale-95 cursor-pointer disabled:opacity-50"
+                  >
+                    {loading ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Menganalisis Hasil Rekomendasi Presisi...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Dapatkan Rekomendasi Laptop Sekarang</span>
+                        <Send className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </form>
       </main>
 
@@ -985,10 +1030,10 @@ export default function QuestionnairePage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#09090d] text-zinc-100 flex items-center justify-center">
+        <div className="min-h-screen bg-white dark:bg-[#09090d] text-zinc-900 dark:text-zinc-100 flex items-center justify-center">
           <div className="flex items-center gap-3 text-sm font-medium">
             <span className="w-5 h-5 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
-            <span>Memuat formulir rekomendasi...</span>
+            <span>Memuat kuesioner presisi...</span>
           </div>
         </div>
       }

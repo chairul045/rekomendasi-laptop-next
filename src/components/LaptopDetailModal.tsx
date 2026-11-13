@@ -61,7 +61,7 @@ export default function LaptopDetailModal({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.94, y: 16 }}
           transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] as const }}
-          className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-[#0e0e15] border border-white/15 p-6 sm:p-8 text-zinc-100 shadow-2xl"
+          className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white dark:bg-[#0e0e15] border border-slate-200 dark:border-white/15 p-6 sm:p-8 text-zinc-900 dark:text-zinc-100 shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
         {/* Glow Header Accent */}

@@ -54,7 +54,7 @@ export default function LaptopCompareModal({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.94, y: 16 }}
           transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] as const }}
-          className="relative w-full max-w-6xl max-h-[92vh] flex flex-col rounded-3xl bg-[#0e0e15] border border-white/15 text-zinc-100 shadow-2xl overflow-hidden"
+          className="relative w-full max-w-6xl max-h-[92vh] flex flex-col rounded-3xl bg-white dark:bg-[#0e0e15] border border-slate-200 dark:border-white/15 text-zinc-900 dark:text-zinc-100 shadow-2xl overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
         {/* Glow Header Line */}

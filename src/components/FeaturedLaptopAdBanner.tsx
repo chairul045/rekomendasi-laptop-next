@@ -279,22 +279,13 @@ export default function FeaturedLaptopAdBanner({
               </div>
 
               {/* Large Extended Visual Area with Dynamic Floating Motion */}
-              <div className="relative w-full aspect-[16/10] sm:aspect-[16/9] rounded-2xl overflow-hidden bg-black/50 flex items-center justify-center p-4">
+              <div className="relative w-full aspect-[16/10] sm:aspect-[16/9] rounded-2xl overflow-hidden bg-black/50 dark:bg-black/50 light:bg-slate-100 flex items-center justify-center p-4">
                 <motion.img
                   src={currentBanner.imageUrl}
                   alt={currentBanner.title}
-                  className="w-full h-full object-contain cursor-pointer drop-shadow-[0_20px_35px_rgba(124,58,237,0.35)]"
+                  className="w-full h-full object-contain cursor-pointer drop-shadow-xl transition-transform duration-300"
                   loading="lazy"
-                  animate={{
-                    y: [0, -8, 0],
-                    rotate: [0, 0.8, 0, -0.8, 0],
-                  }}
-                  transition={{
-                    duration: 5,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                  }}
-                  whileHover={{ scale: 1.05 }}
+                  whileHover={{ scale: 1.05, y: -4 }}
                 />
 
                 {/* Subtle Ambient Floor Glow */}

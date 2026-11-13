@@ -1,64 +1,142 @@
 @import "tailwindcss";
 
 :root {
+  --background: #ffffff;
+  --foreground: #0f172a;
+}
+
+html.dark {
   --background: #09090d;
   --foreground: #f4f4f5;
 }
 
-/* Light theme variables */
+/* Light theme: Pure solid white & clean modern slate everywhere */
 html.light {
-  --background: #f5f5f7;
-  --foreground: #18181b;
+  --background: #ffffff;
+  --foreground: #0f172a;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
 }
 
 html.light body {
-  background-color: #f5f5f7 !important;
-  color: #18181b !important;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
 }
 
-/* Light mode overrides for common patterns */
-html.light .bg-\[\#09090d\] { background-color: #f5f5f7 !important; }
+/* Ensure no dark patches in light mode: containers & cards become clean white or soft light gray */
+html.light .bg-\[\#09090d\],
+html.light .bg-\[\#09090d\]\/90,
+html.light .bg-\[\#09090d\]\/95 {
+  background-color: #ffffff !important;
+}
+
+html.light .bg-\[\#0e0e15\],
 html.light .bg-\[\#0e0e15\]\/90,
 html.light .bg-\[\#0e0e15\]\/80,
-html.light .bg-\[\#0e0e15\] { background-color: #ffffff !important; }
+html.light .bg-\[\#0e0e15\]\/95 {
+  background-color: #ffffff !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+html.light .bg-zinc-950,
+html.light .bg-zinc-950\/90,
 html.light .bg-zinc-950\/80,
 html.light .bg-zinc-950\/70,
-html.light .bg-zinc-950\/60,
-html.light .bg-zinc-950 { background-color: #f4f4f5 !important; }
-html.light .bg-zinc-900\/80,
-html.light .bg-zinc-900\/70,
-html.light .bg-zinc-900 { background-color: #e4e4e7 !important; }
-html.light .bg-black\/40,
-html.light .bg-black\/50 { background-color: #f4f4f5 !important; }
+html.light .bg-zinc-950\/60 {
+  background-color: #f8fafc !important;
+}
 
-/* Light text overrides */
-html.light .text-zinc-100 { color: #18181b !important; }
-html.light .text-zinc-200 { color: #27272a !important; }
-html.light .text-zinc-300 { color: #3f3f46 !important; }
-html.light .text-zinc-400 { color: #52525b !important; }
-html.light .text-zinc-500 { color: #71717a !important; }
+html.light .bg-zinc-900,
+html.light .bg-zinc-900\/90,
+html.light .bg-zinc-900\/80,
+html.light .bg-zinc-900\/70 {
+  background-color: #f1f5f9 !important;
+}
+
+html.light .bg-black\/40,
+html.light .bg-black\/50,
+html.light .bg-black\/60,
+html.light .bg-black\/70,
+html.light .bg-black\/80 {
+  background-color: #f8fafc !important;
+}
+
+/* Light mode overrides for dark gradient backgrounds */
+html.light [class*="bg-gradient-to-"][class*="from-zinc-900"],
+html.light [class*="bg-gradient-to-"][class*="from-violet-950"],
+html.light [class*="bg-gradient-to-"][class*="from-[#120f24]"],
+html.light [class*="bg-gradient-to-"][class*="from-[#0c0d18]"] {
+  background-image: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%) !important;
+}
+
+/* Light text overrides: high-contrast dark slate */
+html.light .text-zinc-100 { color: #0f172a !important; }
+html.light .text-zinc-200 { color: #1e293b !important; }
+html.light .text-zinc-300 { color: #334155 !important; }
+html.light .text-zinc-400 { color: #475569 !important; }
+html.light .text-zinc-500 { color: #64748b !important; }
 html.light .text-white { color: #09090b !important; }
 
-/* Light border overrides */
+/* Light border overrides: clean crisp slate borders */
 html.light .border-white\/10,
 html.light .border-white\/5,
-html.light .border-white\/20 { border-color: rgba(0, 0, 0, 0.1) !important; }
+html.light .border-white\/15,
+html.light .border-white\/20,
+html.light .border-white\/25,
+html.light .border-white\/30,
+html.light .border-white\/40 {
+  border-color: #e2e8f0 !important;
+}
 
-/* Light navbar/header */
-html.light .bg-\[\#09090d\]\/90 { background-color: rgba(255, 255, 255, 0.92) !important; }
-html.light .bg-\[\#09090d\]\/95 { background-color: rgba(255, 255, 255, 0.95) !important; }
+/* Light input, select, & option styling */
+html.light input,
+html.light select,
+html.light textarea {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* Light mode table headers */
+html.light thead tr {
+  background-color: #f1f5f9 !important;
+  color: #475569 !important;
+}
+
+/* Light mode floating navbar & comparison dock */
+html.light header {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+html.light .fixed.bottom-6 {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
 
 /* Light mode scrollbar */
-html.light ::-webkit-scrollbar-track { background: #f5f5f7; }
-html.light ::-webkit-scrollbar-thumb { background: #d4d4d8; }
-html.light ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
+html.light ::-webkit-scrollbar-track { background: #f8fafc; }
+html.light ::-webkit-scrollbar-thumb { background: #cbd5e1; }
+html.light ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
 /* Light mode selection */
 html.light ::selection { background-color: rgb(139, 92, 246); color: white; }
 
-/* Hide ambient bg in light mode */
+/* Hide ambient neon blur backgrounds in light mode for 100% pure clean white */
 html.light .light-hidden { display: none !important; }
 html.light .bg-grid-pattern { display: none !important; }
+html.light [class*="bg-violet-600/"],
+html.light [class*="bg-cyan-500/"],
+html.light [class*="bg-pink-500/"],
+html.light [class*="bg-amber-500/"] {
+  opacity: 0.15 !important;
+}
 
 body {
   font-family: var(--font-sans), 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;

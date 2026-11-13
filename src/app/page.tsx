@@ -203,7 +203,7 @@ export default async function HomePage() {
   const activeBanners = await getActiveBanners();
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#09090d] text-zinc-100">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-[#09090d] text-zinc-900 dark:text-zinc-100 transition-colors">
       <Navbar user={profile} historyCount={consultationsSerialized.length} />
 
       <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-8 sm:space-y-12">
@@ -214,21 +214,18 @@ export default async function HomePage() {
 
         {/* Top Header Banner */}
         <HomeSection direction="right" delay={0.1}>
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-zinc-900/90 via-violet-950/30 to-zinc-900/90 border border-white/10 p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
-          <div className="absolute -right-16 -top-16 w-64 h-64 bg-violet-600/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -left-16 -bottom-16 w-64 h-64 bg-cyan-600/10 rounded-full blur-3xl pointer-events-none" />
-
+        <div className="relative overflow-hidden rounded-3xl bg-slate-50 dark:bg-zinc-900/90 border border-slate-200 dark:border-white/10 p-6 sm:p-8 shadow-sm">
           <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
             <div className="space-y-2">
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                <h1 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight">
                   Halo, {profile.name}
                 </h1>
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-violet-500/10 text-violet-300 border border-violet-500/20 capitalize">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-violet-500/10 text-violet-700 dark:text-violet-300 border border-violet-500/20 capitalize">
                   {profile.role}
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-zinc-400 max-w-xl leading-relaxed">
+              <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 max-w-xl leading-relaxed">
                 Platform pencocokan dan rekomendasi laptop mahasiswa presisi berbasis Smart Decision Matching &amp; AI Analysis.
               </p>
             </div>
@@ -238,21 +235,21 @@ export default async function HomePage() {
 
         {/* Toko Service Laptop Feature Banner */}
         <HomeSection direction="left" delay={0.15}>
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-violet-950/40 via-zinc-900/90 to-cyan-950/40 border border-white/10 p-6 sm:p-8 backdrop-blur-xl shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6 group hover:border-violet-500/40 transition">
+        <div className="relative overflow-hidden rounded-3xl bg-slate-50 dark:bg-zinc-900/90 border border-slate-200 dark:border-white/10 p-6 sm:p-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 group hover:border-violet-500/40 transition">
           <div className="space-y-2 max-w-2xl">
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30">
                 <Wrench className="w-3.5 h-3.5" />
                 <span>Fitur Baru: Lapmatch Care Service Hub</span>
               </span>
-              <span className="text-xs text-zinc-400 font-mono hidden sm:inline">
+              <span className="text-xs text-zinc-500 dark:text-zinc-400 font-mono hidden sm:inline">
                 Terverifikasi di Berbagai Kota
               </span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white tracking-tight">
               Laptop Lemot, Panas, Layar Rusak, atau Butuh Upgrade SSD &amp; RAM?
             </h2>
-            <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+            <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">
               Temukan rekomendasi toko servis laptop terpercaya di kota Anda dengan simulasi diagnosa kerusakan cepat, estimasi biaya transparan, dan garansi pengerjaan 90 hari.
             </p>
           </div>
