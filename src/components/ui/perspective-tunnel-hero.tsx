@@ -152,6 +152,7 @@ function TunnelCard({ card, progress, pointer, total, stage }: TunnelCardProps) 
             className="pointer-events-auto absolute left-1/2 top-1/2 aspect-[4/5] will-change-transform select-none cursor-pointer"
         >
             <div className="group relative h-full w-full overflow-hidden rounded-2xl bg-neutral-200 dark:bg-neutral-900 shadow-2xl shadow-neutral-950/20 dark:shadow-black/90 ring-1 ring-black/10 dark:ring-white/15 transition-all duration-500 hover:ring-indigo-500/70 dark:hover:ring-indigo-400/70 hover:shadow-indigo-500/25">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                     src={card.item.src}
                     alt={card.item.title}

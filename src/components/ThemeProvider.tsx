@@ -23,17 +23,20 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    try {
-      const saved = localStorage.getItem('lapmatch-theme') as Theme | null;
-      if (saved === 'light' || saved === 'dark') {
-        setTheme(saved);
-      } else {
+    const timer = setTimeout(() => {
+      setMounted(true);
+      try {
+        const saved = localStorage.getItem('lapmatch-theme') as Theme | null;
+        if (saved === 'light' || saved === 'dark') {
+          setTheme(saved);
+        } else {
+          setTheme('light');
+        }
+      } catch {
         setTheme('light');
       }
-    } catch {
-      setTheme('light');
-    }
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {

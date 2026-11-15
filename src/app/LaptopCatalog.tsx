@@ -4,19 +4,15 @@ import { useState, useMemo, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getLaptopImageUrl, formatRupiah } from '@/lib/laptop-utils';
-import ScrollReveal, { StaggerContainer, StaggerItem } from '@/components/ScrollReveal';
+import { StaggerContainer, StaggerItem } from '@/components/ScrollReveal';
 import {
   Zap,
   Search,
-  Filter,
-  ArrowUpDown,
   Scale,
   Info,
   X,
-  SlidersHorizontal,
   Heart,
   Star,
-  MessageSquare,
   ChevronDown,
   PhoneCall,
 } from 'lucide-react';
@@ -434,9 +430,9 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
         </div>
 
         {/* Status Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/5 text-xs">
-          <span className="text-zinc-400">
-            Menampilkan <strong className="text-white">{filteredAndSorted.length}</strong> dari{' '}
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-200 dark:border-white/5 text-xs">
+          <span className="text-zinc-500 dark:text-zinc-400">
+            Menampilkan <strong className="text-zinc-900 dark:text-white">{filteredAndSorted.length}</strong> dari{' '}
             {laptops.length} laptop tersedia
           </span>
 
@@ -496,7 +492,6 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
 
                 {/* Laptop Image with Heart Favorite Button */}
                 <div className="relative w-full h-40 rounded-2xl bg-zinc-950 overflow-hidden flex items-center justify-center p-3 border border-white/5 group-hover:border-violet-500/30 transition">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <motion.img
                     onClick={() => setSelectedDetailLaptop(laptop as unknown as LaptopDetailItem)}
                     src={imgUrl}

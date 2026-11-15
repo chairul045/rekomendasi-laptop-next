@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, X, CheckCircle2, MessageSquare } from 'lucide-react';
+import { Star, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface LaptopReviewModalProps {

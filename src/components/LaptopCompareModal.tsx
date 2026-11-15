@@ -121,7 +121,6 @@ export default function LaptopCompareModal({
                           <X className="w-3.5 h-3.5" />
                         </button>
                         <div className="w-full h-24 rounded-xl bg-zinc-900 overflow-hidden flex items-center justify-center p-2">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <motion.img
                             src={imgUrl}
                             alt={laptop.name}

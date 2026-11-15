@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, HelpCircle, Layers, CheckCircle2, ChevronRight, Calculator } from 'lucide-react';
+import { X, Sparkles, Layers, CheckCircle2, Calculator } from 'lucide-react';
 
 export interface CriterionInfo {
   kode: string;

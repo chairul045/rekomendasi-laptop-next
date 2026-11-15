@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Loader2, Mail, Sparkles, X, ArrowRight } from 'lucide-react';
+import { Loader2, Mail, X, ArrowRight } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 interface GoogleButtonProps {

@@ -5,16 +5,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Laptop,
   LogOut,
   Shield,
-  User as UserIcon,
   Menu,
   X,
   ChevronRight,
   Sparkles,
-  LogIn,
-  UserPlus,
   Sun,
   Moon,
 } from 'lucide-react';
@@ -125,6 +121,7 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
           <Link href="/" className="flex items-center gap-3 group">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 via-indigo-600 to-cyan-500 p-0.5 shadow-[0_0_20px_rgba(124,58,237,0.35)] group-hover:shadow-[0_0_30px_rgba(124,58,237,0.6)] transition duration-300 overflow-hidden shrink-0">
               <div className="w-full h-full bg-white dark:bg-[#09090d] rounded-[9px] overflow-hidden flex items-center justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/logo.svg"
                   alt="Lapmatch Logo"
@@ -197,7 +194,7 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
           <button
             type="button"
             onClick={toggleTheme}
-            className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 dark:hover:bg-white/10 border border-white/10 dark:border-white/10 transition cursor-pointer"
+            className="p-2 rounded-xl text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 transition cursor-pointer"
             aria-label={theme === 'dark' ? 'Ganti ke mode terang' : 'Ganti ke mode gelap'}
             title={theme === 'dark' ? 'Mode Terang' : 'Mode Gelap'}
           >
@@ -209,7 +206,7 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
               {/* Profile Shortcut */}
               <Link
                 href="/profile"
-                className="flex items-center gap-2.5 pl-2 sm:pl-3 border-l border-white/10 hover:opacity-90 transition group"
+                className="flex items-center gap-2.5 pl-2 sm:pl-3 border-l border-slate-200 dark:border-white/10 hover:opacity-90 transition group"
                 title="Buka Profil Akun"
               >
                 <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-600 p-[1px] shadow-sm shrink-0">
@@ -388,12 +385,12 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
             </div>
 
             {/* Theme Switcher in Mobile Menu */}
-            <div className="pt-2 border-t border-white/10 flex items-center justify-between px-1">
-              <span className="text-xs text-zinc-400 font-medium">Tema Tampilan</span>
+            <div className="pt-2 border-t border-slate-200 dark:border-white/10 flex items-center justify-between px-1">
+              <span className="text-xs text-zinc-600 dark:text-zinc-400 font-medium">Tema Tampilan</span>
               <button
                 type="button"
                 onClick={toggleTheme}
-                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-zinc-200 transition cursor-pointer"
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 text-xs font-semibold text-zinc-700 dark:text-zinc-200 transition cursor-pointer"
               >
                 {theme === 'dark' ? (
                   <>
@@ -411,7 +408,7 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
 
             {/* Logout Button */}
             {currentUser && (
-              <div className="pt-2 border-t border-white/10">
+              <div className="pt-2 border-t border-slate-200 dark:border-white/10">
                 <button
                   type="button"
                   onClick={handleSignOut}

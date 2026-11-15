@@ -97,7 +97,6 @@ export default function LaptopDetailModal({
         {/* Top Info Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 pb-6 border-b border-white/10">
           <div className="w-28 h-28 rounded-2xl bg-zinc-950 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center p-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <motion.img
               src={imgUrl}
               alt={laptop.name}
