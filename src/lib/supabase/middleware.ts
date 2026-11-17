@@ -45,12 +45,10 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
-  // Rute yang wajib login (Protected Routes ala Shopee)
-  // Pengunjung bebas menjelajahi Beranda (/), Katalog, Servis Laptop, Metode SPK, dan Penjelasan Kuesioner
+  // Rute yang wajib login (Protected Routes)
+  // Pengunjung bebas menjelajahi Beranda (/), Katalog, Kuisioner, Riwayat, Rekomendasi, Servis Laptop, Metode SPK
   const protectedRoutes = [
     '/profile',
-    '/history',
-    '/recommendation',
     '/admin',
   ];
 

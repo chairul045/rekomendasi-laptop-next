@@ -26,7 +26,6 @@ import {
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { createClient } from '@/lib/supabase/client';
-import { useAuthPrompt } from '@/components/auth/AuthPromptModal';
 
 // ── Kriteria Standar SPK ──────────────────────────────────────────────────────
 const PERUNTUKAN_PRESETS: Record<string, string[]> = {
@@ -151,15 +150,39 @@ function formatRupiahShort(amount: number): string {
 
 // ── Main Page Content ─────────────────────────────────────────────────────────
 
+interface GuestLaptopItem {
+  peringkat: number;
+  skor: number;
+  laptop: {
+    id: number;
+    name: string;
+    brand: string;
+    price: number;
+    ramGb: number | null;
+    storageGb: number | null;
+    batteryHours: number | null;
+    weightKg: number | null;
+    imageUrl?: string | null;
+  } | null;
+}
+
+interface GuestResponse {
+  isGuest: boolean;
+  peruntukan: string;
+  totalFound: number;
+  previewResults: GuestLaptopItem[];
+  message?: string;
+}
+
 function QuestionnaireContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { openAuthPrompt } = useAuthPrompt();
 
   const [currentUser, setCurrentUser] = useState<{ id: string; name: string; email: string; role: string } | null>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [showExplanation, setShowExplanation] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [guestResult, setGuestResult] = useState<GuestResponse | null>(null);
 
   // Multi-step Wizard State: 1 soal per tampilan
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -341,14 +364,36 @@ function QuestionnaireContent() {
     const computedRanking = computeRankingKriteria(selectedPeruntukan, frekuensiPemakaian);
     const peruntukanText = selectedPeruntukan.join(' & ');
 
+    // Mode Tamu: Hitung melalui endpoint guest langsung tanpa halangan popup login
     if (!currentUser) {
-      setLoading(false);
-      openAuthPrompt({
-        title: 'Masuk Akun untuk Memulai Kuesioner',
-        message: 'Silakan login terlebih dahulu untuk menggunakan fitur ini.',
-        featureName: 'Memulai kuesioner rekomendasi laptop',
-        returnUrl: '/questionnaire',
-      });
+      try {
+        const res = await fetch('/api/questionnaire/guest', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            budgetMin,
+            budgetMax,
+            peruntukan: peruntukanText,
+            kondisiPilihan,
+            merekPilihan: selectedBrands,
+            rankingKriteria: computedRanking,
+          }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          toast.error(data.error || 'Gagal memproses rekomendasi.');
+          return;
+        }
+
+        setGuestResult(data);
+        toast.success('Rekomendasi laptop terbaik berhasil dianalisis!');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch {
+        toast.error('Terjadi gangguan jaringan saat memproses kuisioner.');
+      } finally {
+        setLoading(false);
+      }
       return;
     }
 
@@ -397,24 +442,154 @@ function QuestionnaireContent() {
     );
   }
 
-  // === TAMPILAN PANDUAN PENJELASAN KUESIONER ===
-  if (!currentUser || showExplanation) {
+  // === TAMPILAN HASIL REKOMENDASI TAMU (GUEST MODE) ===
+  if (guestResult) {
     return (
       <div className="min-h-screen flex flex-col bg-white dark:bg-[#09090d] text-zinc-900 dark:text-zinc-100 transition-colors">
         <Navbar user={currentUser} />
 
-        <main className="flex-grow max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
-          {currentUser && showExplanation && (
-            <div>
+        <main className="flex-grow max-w-5xl lg:max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8">
+          <div className="text-center space-y-2 max-w-2xl mx-auto">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-violet-500/10 text-violet-700 dark:text-violet-300 border border-violet-500/30">
+              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Hasil Rekomendasi Laptop Pilihan</span>
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white">
+              Laptop Paling Cocok untuk Kebutuhan Anda
+            </h1>
+            <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
+              Berdasarkan analisis algoritma ROC &amp; TOPSIS untuk kebutuhan <strong>{guestResult.peruntukan}</strong> dengan rentang budget yang Anda tentukan.
+            </p>
+          </div>
+
+          {/* Cards Rekomendasi */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {guestResult.previewResults.map((item, index) => {
+              const laptop = item.laptop;
+              if (!laptop) return null;
+              const isTop = index === 0;
+              return (
+                <div
+                  key={laptop.id}
+                  className={`p-6 rounded-3xl bg-white dark:bg-[#0e0e15] border transition shadow-sm space-y-4 flex flex-col justify-between ${
+                    isTop
+                      ? 'border-violet-500 ring-2 ring-violet-500/20 shadow-violet-500/10'
+                      : 'border-slate-200 dark:border-white/10'
+                  }`}
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-mono font-bold ${
+                          isTop
+                            ? 'bg-amber-400 text-zinc-950'
+                            : 'bg-slate-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
+                        }`}
+                      >
+                        {isTop ? '🥇 #1 Rekomendasi Utama' : `Peringkat #${item.peringkat}`}
+                      </span>
+                      <span className="text-[11px] font-mono text-zinc-500">
+                        Skor: {(item.skor * 100).toFixed(1)}%
+                      </span>
+                    </div>
+
+                    <div className="w-full h-40 rounded-2xl bg-slate-50 dark:bg-zinc-950 overflow-hidden flex items-center justify-center p-3 border border-slate-100 dark:border-white/5">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={laptop.imageUrl || '/logo.svg'}
+                        alt={laptop.name}
+                        className="max-h-full max-w-full object-contain"
+                        loading="lazy"
+                      />
+                    </div>
+
+                    <div>
+                      <span className="text-[10px] font-mono uppercase text-violet-600 dark:text-violet-400 font-bold">
+                        {laptop.brand}
+                      </span>
+                      <h3 className="font-bold text-sm text-zinc-900 dark:text-white line-clamp-2 mt-0.5">
+                        {laptop.name}
+                      </h3>
+                      <div className="text-base font-extrabold font-mono text-emerald-600 dark:text-emerald-400 mt-1">
+                        Rp {laptop.price.toLocaleString('id-ID')}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-[11px] text-zinc-600 dark:text-zinc-400 pt-1">
+                      <div className="p-2 rounded-xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-white/5">
+                        <span className="block text-[10px] text-zinc-400 font-mono">RAM</span>
+                        <strong className="text-zinc-800 dark:text-zinc-200">{laptop.ramGb ? `${laptop.ramGb} GB` : '-'}</strong>
+                      </div>
+                      <div className="p-2 rounded-xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-white/5">
+                        <span className="block text-[10px] text-zinc-400 font-mono">SSD</span>
+                        <strong className="text-zinc-800 dark:text-zinc-200">{laptop.storageGb ? `${laptop.storageGb} GB` : '-'}</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  <a
+                    href={`https://wa.me/6287851164239?text=${encodeURIComponent(
+                      `Halo LaptopSeber, saya tertarik dengan rekomendasi laptop "${laptop.name}" seharga Rp ${laptop.price.toLocaleString('id-ID')}. Apakah unit ini tersedia?`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition active:scale-95 cursor-pointer"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>Tanya Stok via WhatsApp</span>
+                  </a>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="p-6 rounded-3xl bg-slate-50 dark:bg-zinc-900/50 border border-slate-200 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="space-y-1 text-center sm:text-left">
+              <h4 className="text-sm font-bold text-zinc-900 dark:text-white">Ingin Coba Kriteria Berbeda atau Simpan Riwayat?</h4>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                Anda dapat mengisi ulang kuesioner kapan saja, atau mendaftar akun untuk menyimpan riwayat konsultasi permanen.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={() => setShowExplanation(false)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-semibold border border-slate-200 dark:border-white/10 transition cursor-pointer"
+                onClick={() => setGuestResult(null)}
+                className="px-4 py-2.5 rounded-xl bg-slate-200 dark:bg-zinc-800 hover:bg-slate-300 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-bold transition cursor-pointer"
               >
-                ← Kembali ke Pengisian Kuesioner
+                Ulangi Kuesioner
               </button>
+              <Link
+                href="/register"
+                className="px-5 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold transition shadow-sm"
+              >
+                Daftar Akun
+              </Link>
             </div>
-          )}
+          </div>
+        </main>
+
+        <Footer />
+      </div>
+    );
+  }
+
+  // === TAMPILAN PANDUAN PENJELASAN KUESIONER ===
+  if (showExplanation) {
+    return (
+      <div className="min-h-screen flex flex-col bg-white dark:bg-[#09090d] text-zinc-900 dark:text-zinc-100 transition-colors">
+        <Navbar user={currentUser} />
+
+        <main className="flex-grow max-w-5xl lg:max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
+          <div>
+            <button
+              type="button"
+              onClick={() => setShowExplanation(false)}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-semibold border border-slate-200 dark:border-white/10 transition cursor-pointer"
+            >
+              ← Kembali ke Pengisian Kuesioner
+            </button>
+          </div>
 
           {/* Hero Header Penjelasan */}
           <div className="text-center space-y-3 max-w-2xl mx-auto">
@@ -455,18 +630,7 @@ function QuestionnaireContent() {
           <div className="pt-4 text-center space-y-3">
             <button
               type="button"
-              onClick={() => {
-                if (!currentUser) {
-                  openAuthPrompt({
-                    title: 'Masuk Akun untuk Memulai Kuesioner',
-                    message: 'Silakan login terlebih dahulu untuk menggunakan fitur ini.',
-                    featureName: 'Memulai kuesioner rekomendasi laptop',
-                    returnUrl: '/questionnaire',
-                  });
-                } else {
-                  setShowExplanation(false);
-                }
-              }}
+              onClick={() => setShowExplanation(false)}
               className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-extrabold text-sm shadow-lg shadow-violet-600/25 transition active:scale-95 cursor-pointer"
             >
               <Sparkles className="w-4 h-4 text-cyan-300" />
@@ -486,7 +650,7 @@ function QuestionnaireContent() {
     <div className="min-h-screen flex flex-col bg-white dark:bg-[#09090d] text-zinc-900 dark:text-zinc-100 transition-colors">
       <Navbar user={currentUser} />
 
-      <main className="flex-grow max-w-3xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6">
+      <main className="flex-grow max-w-5xl lg:max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6">
         {/* Top Wizard Progress Bar */}
         <div className="p-4 sm:p-5 rounded-3xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200 dark:border-white/10 space-y-3">
           <div className="flex items-center justify-between text-xs">
@@ -711,7 +875,7 @@ function QuestionnaireContent() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {PERUNTUKAN_OPTIONS.map((opt) => {
                     const isSelected = selectedPeruntukan.includes(opt.value);
                     return (
@@ -953,7 +1117,7 @@ function QuestionnaireContent() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {FREKUENSI_PEMAKAIAN_OPTIONS.map((f) => {
                     const isSelected = frekuensiPemakaian === f.value;
                     return (

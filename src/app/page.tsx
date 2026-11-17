@@ -203,10 +203,10 @@ export default async function HomePage() {
   const activeBanners = await getActiveBanners();
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-[#09090d] text-zinc-900 dark:text-zinc-100 transition-colors">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-[#09090d] text-zinc-900 dark:text-zinc-100 transition-colors overflow-x-hidden">
       <Navbar user={profile} historyCount={consultationsSerialized.length} />
 
-      <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-8 sm:space-y-12">
+      <main className="flex-grow max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-10 overflow-x-hidden">
         {/* Iklan Slider Laptop Terbaru & Terbaik (Multi-Slide, Editable by Admin) */}
         <HomeSection direction="zoom">
           <FeaturedLaptopAdBanner initialBanners={activeBanners} userEmail={profile.email} />

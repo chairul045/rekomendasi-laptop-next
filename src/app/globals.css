@@ -329,6 +329,76 @@ body {
   box-shadow: 0 16px 36px -8px rgba(124, 58, 237, 0.22);
 }
 
+/* ===== MOBILE RESPONSIVE FIXES ===== */
+
+/* Prevent horizontal overflow on mobile */
+html, body {
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Safe area insets for iPhone notch */
+@supports (padding: max(0px)) {
+  .safe-top { padding-top: max(0px, env(safe-area-inset-top)); }
+  .safe-bottom { padding-bottom: max(0px, env(safe-area-inset-bottom)); }
+}
+
+/* Mobile: prevent text from being too small or too large */
+@media (max-width: 640px) {
+  .text-3xl { font-size: 1.5rem !important; line-height: 2rem !important; }
+  .text-5xl { font-size: 2rem !important; line-height: 2.5rem !important; }
+  .text-6xl { font-size: 2.25rem !important; line-height: 2.75rem !important; }
+  
+  /* Fix touch scrolling on iOS */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Ensure buttons are at least 44px tall for touch targets */
+  button, a[role="button"], .btn {
+    min-height: 36px;
+  }
+  
+  /* Fix table overflow on mobile */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Mobile grid fixes for catalog */
+  .mobile-grid-fix {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Smooth page transitions */
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.page-transition {
+  animation: pageFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ===== SHOP AD BANNER ===== */
+@keyframes marqueeScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  animation: marqueeScroll 20s linear infinite;
+  display: flex;
+  width: max-content;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
 /* Print styling for PDF export */
 @media print {
   body {

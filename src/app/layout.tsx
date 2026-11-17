@@ -1,9 +1,16 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import { AuthPromptProvider } from '@/components/auth/AuthPromptModal';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import ShopAdBanner from '@/components/ShopAdBanner';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+};
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -41,6 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="fixed top-60 left-0 w-[450px] h-[350px] bg-gradient-to-tr from-pink-500/10 via-purple-600/10 to-transparent blur-[110px] pointer-events-none z-0 opacity-0 dark:opacity-100 transition-opacity" />
 
           <div className="relative z-10 flex flex-col min-h-screen">
+            <ShopAdBanner />
             <AuthPromptProvider>
               {children}
             </AuthPromptProvider>

@@ -92,6 +92,14 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
 
   // Fetch current user & load stored favorites
   useEffect(() => {
+    // Muat favorit lokal tamu terlebih dahulu
+    try {
+      const guestFavs = localStorage.getItem('lapmatch_guest_favorites');
+      if (guestFavs) {
+        setFavorites(JSON.parse(guestFavs));
+      }
+    } catch {}
+
     const supabase = createClient();
     supabase.auth.getSession().then(({ data }) => {
       const u = data.session?.user;
@@ -108,16 +116,6 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
   }, []);
 
   const handleToggleFavorite = (laptopId: number, laptopName: string) => {
-    if (!currentUser) {
-      openAuthPrompt({
-        title: 'Masuk Diperlukan',
-        message: 'Silakan login terlebih dahulu untuk menggunakan fitur ini.',
-        featureName: 'Menyimpan laptop ke daftar favorit',
-        returnUrl: typeof window !== 'undefined' ? window.location.pathname : '/',
-      });
-      return;
-    }
-
     const isFav = favorites.includes(laptopId);
     let updated: number[];
     if (isFav) {
@@ -129,7 +127,8 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
     }
     setFavorites(updated);
     try {
-      localStorage.setItem(`lapmatch_favs_${currentUser.id}`, JSON.stringify(updated));
+      const storageKey = currentUser?.id ? `lapmatch_favs_${currentUser.id}` : 'lapmatch_guest_favorites';
+      localStorage.setItem(storageKey, JSON.stringify(updated));
     } catch {}
   };
 
@@ -253,7 +252,7 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
     sortBy !== 'recommended';
 
   return (
-    <div id="katalog" className="space-y-6">
+    <div id="katalog" className="space-y-6 overflow-x-hidden">
       {/* Catalog Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 dark:border-white/10 pb-5">
         <div>
@@ -317,18 +316,7 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
           </button>
           <button
             type="button"
-            onClick={() => {
-              if (!currentUser) {
-                openAuthPrompt({
-                  title: 'Masuk Diperlukan',
-                  message: 'Silakan login terlebih dahulu untuk menggunakan fitur ini.',
-                  featureName: 'Melihat daftar laptop favorit',
-                  returnUrl: typeof window !== 'undefined' ? window.location.pathname : '/',
-                });
-                return;
-              }
-              setActiveCategory('favorites');
-            }}
+            onClick={() => setActiveCategory('favorites')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition cursor-pointer flex items-center gap-1.5 ${
               activeCategory === 'favorites'
                 ? 'bg-rose-500/20 text-rose-600 dark:text-rose-300 border border-rose-500/40 shadow-sm'
@@ -342,7 +330,7 @@ export default function LaptopCatalog({ laptops }: { laptops: LaptopCatalogItem[
       </div>
 
       {/* Advanced Filter & Search Toolbar */}
-      <div className="p-4 sm:p-5 rounded-3xl bg-slate-50 dark:bg-[#0e0e15]/90 border border-slate-200 dark:border-white/10 space-y-3">
+      <div className="p-4 sm:p-5 rounded-3xl bg-slate-50 dark:bg-[#0e0e15]/90 border border-slate-200 dark:border-white/10 space-y-3 overflow-x-hidden">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
           {/* Search Box */}
           <div className="relative lg:col-span-2">

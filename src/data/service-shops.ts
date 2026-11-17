@@ -297,7 +297,7 @@ export const LAPTOPSEBER_SHOP: ServiceShop = {
   id: 'laptopseber-palembang',
   name: 'LaptopSeber Palembang',
   city: 'Palembang',
-  area: 'DC Kuliner Pakjo, Palembang',
+  area: 'Kota Palembang',
   rating: 5.0,
   reviewCount: 385,
   phone: '081368583338',
@@ -306,15 +306,15 @@ export const LAPTOPSEBER_SHOP: ServiceShop = {
   openHours: 'Buka Setiap Hari: 10.00 – 20.00 WIB',
   isVerified: true,
   specialties: [
-    'Pusat Laptop Second Bergaransi Resmi Toko di Palembang',
     'Servis Laptop Mati Total, Korsleting & IC Power',
     'Ganti LCD Express, Baterai Original, Keyboard & Engsel',
     'Deep Cleaning Heatsink Fan & Re-pasting Thermal Paste',
     'Upgrade SSD NVMe & RAM Bergaransi',
+    'Pusat Laptop Second Bergaransi Resmi Toko',
     'Layanan Lacak Status Servis Online (Tracking Servis)',
   ],
   imageUrl: '/images/laptops/laptopseber/lenovo-thinkpad-t480.jpg',
-  mapsUrl: 'https://maps.app.goo.gl/sM6fWqBBvyDjiq319',
+  mapsUrl: 'https://laptopseber.com',
   websiteUrl: 'https://laptopseber.com',
 };
 

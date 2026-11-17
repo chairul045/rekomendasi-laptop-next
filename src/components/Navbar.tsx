@@ -15,7 +15,6 @@ import {
   Moon,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { useAuthPrompt } from '@/components/auth/AuthPromptModal';
 import { useTheme } from '@/components/ThemeProvider';
 
 interface NavbarProps {
@@ -30,46 +29,77 @@ interface NavbarProps {
 
 export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarProps) {
   const pathname = usePathname();
-  const { openAuthPrompt } = useAuthPrompt();
   const { theme, toggleTheme } = useTheme();
+  
+  // Inisialisasi user dari initialUser jika ada, atau fallback aman
   const [currentUser, setCurrentUser] = useState(initialUser ?? null);
   const [prevInitialUser, setPrevInitialUser] = useState(initialUser);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
 
   if (initialUser !== undefined && initialUser !== prevInitialUser) {
     setPrevInitialUser(initialUser);
     setCurrentUser(initialUser);
+    if (initialUser) {
+      try {
+        localStorage.setItem('lapmatch_user_session', JSON.stringify(initialUser));
+      } catch {}
+      setIsAuthLoading(false);
+    }
   }
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (initialUser !== undefined) {
-      return;
-    }
+    // 1. Baca cache lokal terlebih dahulu secara instan (0 milidetik, tanpa flicker)
+    try {
+      const cached = localStorage.getItem('lapmatch_user_session');
+      if (cached && !currentUser?.id) {
+        const parsed = JSON.parse(cached);
+        if (parsed?.id) {
+          setCurrentUser(parsed);
+          setIsAuthLoading(false);
+        }
+      }
+    } catch {}
 
-    // Auto-fetch profile jika tidak dipassing dari parent server component
+    // 2. Verifikasi di background secara transparan
     let isMounted = true;
     fetch('/api/auth/profile')
-      .then((res) => (res.ok ? res.json() : null))
+      .then((res) => {
+        if (res.ok) return res.json();
+        if (res.status === 401) {
+          try { localStorage.removeItem('lapmatch_user_session'); } catch {}
+          if (isMounted) setCurrentUser(null);
+        }
+        return null;
+      })
       .then((data) => {
         if (isMounted && data && data.id) {
-          setCurrentUser({
+          const updatedUser = {
             id: data.id,
             name: data.name,
             email: data.email,
             role: data.role,
-          });
+          };
+          setCurrentUser(updatedUser);
+          try {
+            localStorage.setItem('lapmatch_user_session', JSON.stringify(updatedUser));
+          } catch {}
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        if (isMounted) setIsAuthLoading(false);
+      });
 
     return () => {
       isMounted = false;
     };
-  }, [initialUser]);
+  }, []);
 
   const handleSignOut = async () => {
     try {
+      localStorage.removeItem('lapmatch_user_session');
       const supabase = createClient();
       await supabase.auth.signOut();
       await fetch('/api/auth/signout', { method: 'POST' });
@@ -85,30 +115,16 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
   };
 
   const navLinks = [
-    { href: '/', label: 'Katalog & Beranda', active: pathname === '/', guestAccessible: true },
-    { href: '/questionnaire', label: 'Kuisioner', active: pathname === '/questionnaire', guestAccessible: true },
+    { href: '/', label: 'Katalog & Beranda', active: pathname === '/' },
+    { href: '/questionnaire', label: 'Kuisioner', active: pathname === '/questionnaire' },
     {
       href: '/history',
       label: 'Riwayat',
       active: pathname.startsWith('/history') || pathname.startsWith('/recommendation'),
       badge: historyCount > 0 ? historyCount : null,
-      guestAccessible: false,
     },
-    { href: '/service-laptop', label: 'Servis Laptop', active: pathname === '/service-laptop', guestAccessible: true },
+    { href: '/service-laptop', label: 'Servis Laptop', active: pathname === '/service-laptop' },
   ];
-
-  const handleRestrictedNavClick = (e: React.MouseEvent, link: typeof navLinks[0]) => {
-    if (!currentUser && !link.guestAccessible) {
-      e.preventDefault();
-      setMobileMenuOpen(false);
-      openAuthPrompt({
-        title: 'Masuk Diperlukan',
-        message: 'Silakan login terlebih dahulu untuk menggunakan fitur ini.',
-        featureName: `Mengakses ${link.label}`,
-        returnUrl: link.href,
-      });
-    }
-  };
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200 dark:border-white/10 bg-white/95 dark:bg-[#09090d]/90 backdrop-blur-md transition-all shadow-sm">
@@ -150,7 +166,6 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
               <Link
                 key={link.href}
                 href={link.href}
-                onClick={(e) => handleRestrictedNavClick(e, link)}
                 className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
                   link.active
                     ? 'text-violet-700 dark:text-white bg-violet-50 dark:bg-gradient-to-r dark:from-violet-500/20 dark:to-indigo-500/20 border border-violet-200 dark:border-violet-500/40 shadow-sm font-semibold'
@@ -238,20 +253,22 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
                 <span>Keluar</span>
               </button>
             </>
+          ) : isAuthLoading ? (
+            <div className="w-14 h-7 rounded-xl bg-zinc-800/40 animate-pulse" />
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
               <Link
                 href="/login"
-                className="text-xs font-medium text-zinc-300 hover:text-white px-3 py-1.5 rounded-xl hover:bg-white/[0.06] border border-white/10 transition"
+                className="text-xs font-semibold text-zinc-300 hover:text-white px-2.5 sm:px-3 py-1.5 rounded-xl hover:bg-white/[0.06] border border-white/10 transition whitespace-nowrap"
               >
                 Masuk
               </Link>
               <Link
                 href="/register"
-                className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-semibold bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white shadow-[0_0_15px_rgba(124,58,237,0.35)] hover:shadow-[0_0_25px_rgba(124,58,237,0.55)] transition active:scale-[0.98]"
+                className="hidden sm:inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white shadow-[0_0_15px_rgba(124,58,237,0.35)] transition active:scale-[0.98] whitespace-nowrap"
               >
                 <span>Daftar</span>
-                <ChevronRight className="w-3.5 h-3.5 hidden sm:inline" />
+                <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           )}
@@ -330,20 +347,7 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
                 <Link
                   key={link.href}
                   href={link.href}
-                  onClick={(e) => {
-                    if (!currentUser && !link.guestAccessible) {
-                      e.preventDefault();
-                      setMobileMenuOpen(false);
-                      openAuthPrompt({
-                        title: 'Masuk Diperlukan',
-                        message: 'Silakan login terlebih dahulu untuk menggunakan fitur ini.',
-                        featureName: `Mengakses ${link.label}`,
-                        returnUrl: link.href,
-                      });
-                    } else {
-                      setMobileMenuOpen(false);
-                    }
-                  }}
+                  onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl transition ${
                     link.active
                       ? 'bg-violet-600/20 text-white font-bold border border-violet-500/30'

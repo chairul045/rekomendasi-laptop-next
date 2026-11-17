@@ -127,7 +127,7 @@ export const DEFAULT_BANNERS: BannerAd[] = [
     vga: 'Mendukung ThinkPad, HP, Dell, Asus, Acer, MacBook',
     ramGb: 16,
     storageGb: 512,
-    display: 'DC Kuliner Pakjo, Kota Palembang',
+    display: 'Kota Palembang (Layanan Servis & Online)',
     imageUrl: '/images/laptops/laptopseber/lenovo-thinkpad-t480.jpg',
     tokopediaUrl: '/service-laptop',
     shopeeUrl: '/service-laptop',

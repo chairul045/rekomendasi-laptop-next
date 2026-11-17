@@ -311,7 +311,7 @@ export default function LoginPage() {
                   {successMessage && <AuthAlert type="success" message={successMessage} />}
                 </div>
 
-                {/* Tombol OAuth Google */}
+                {/* Tombol OAuth Google - Login langsung via Google */}
                 <div className="mb-5">
                   <GoogleButton
                     label="Masuk dengan Google"

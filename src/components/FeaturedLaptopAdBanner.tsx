@@ -7,14 +7,14 @@ import {
   Sparkles,
   Zap,
   Flame,
-  CheckCircle2,
   Tag,
   ChevronLeft,
   ChevronRight,
   Settings,
   Wrench,
-  PhoneCall,
   ShieldCheck,
+  MapPin,
+  Clock,
 } from 'lucide-react';
 import { formatRupiah } from '@/lib/laptop-utils';
 import { BannerAd } from '@/lib/banner-store';
@@ -32,7 +32,6 @@ export default function FeaturedLaptopAdBanner({
   const [direction, setDirection] = useState<'next' | 'prev'>('next');
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Fetch active banners if not passed initially
   useEffect(() => {
     if (!initialBanners || initialBanners.length === 0) {
       fetch('/api/banners')
@@ -46,282 +45,322 @@ export default function FeaturedLaptopAdBanner({
     }
   }, [initialBanners]);
 
-  // Auto-play timer
   useEffect(() => {
     if (banners.length <= 1 || isPaused) return;
-
     timerRef.current = setInterval(() => {
       setDirection('next');
       setCurrentIndex((prev) => (prev + 1) % banners.length);
     }, 6000);
-
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [banners.length, isPaused]);
 
   if (!banners || banners.length === 0) return null;
 
   const currentBanner = banners[currentIndex] || banners[0];
   const isSuperAdmin = userEmail?.toLowerCase() === 'chairulanwarr003@gmail.com';
-
-  const handlePrev = () => {
-    setDirection('prev');
-    setCurrentIndex((prev) => (prev - 1 + banners.length) % banners.length);
-  };
-
-  const handleNext = () => {
-    setDirection('next');
-    setCurrentIndex((prev) => (prev + 1) % banners.length);
-  };
-
   const isServisBanner = currentBanner.brand.toLowerCase().includes('care') || currentBanner.brand.toLowerCase().includes('servis');
-  const waContactUrl = `https://wa.me/6287851164239?text=${encodeURIComponent(
+
+  const waUrl = `https://wa.me/6281368583338?text=${encodeURIComponent(
     isServisBanner
-      ? `Halo Lapmatch Care, saya ingin konsultasi mengenai servis/perbaikan laptop.`
-      : `Halo, saya tertarik dengan unit laptop ${currentBanner.title} (${formatRupiah(currentBanner.price)}). Apakah masih tersedia?`
+      ? `Halo LaptopSeber, saya ingin konsultasi mengenai servis/perbaikan laptop.`
+      : `Halo LaptopSeber, saya tertarik dengan laptop ${currentBanner.title} (${formatRupiah(currentBanner.price)}). Apakah masih tersedia?`
   )}`;
+
+  const handlePrev = () => { setDirection('prev'); setCurrentIndex((prev) => (prev - 1 + banners.length) % banners.length); };
+  const handleNext = () => { setDirection('next'); setCurrentIndex((prev) => (prev + 1) % banners.length); };
 
   return (
     <div
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#120f24] via-[#0c0d18] to-[#0a1120] border-2 border-violet-500/30 p-6 sm:p-8 backdrop-blur-2xl shadow-[0_0_50px_rgba(124,58,237,0.18)] transition-all hover:border-cyan-500/40"
+      className="relative overflow-hidden rounded-3xl"
+      style={{
+        background: 'linear-gradient(135deg, #0f0a1e 0%, #0d1535 40%, #091220 100%)',
+        boxShadow: '0 0 0 1.5px rgba(139,92,246,0.5), 0 0 60px rgba(124,58,237,0.25), 0 0 120px rgba(6,182,212,0.1)',
+      }}
     >
-      {/* Background Neon Blurs */}
-      <div className="absolute -top-24 -left-24 w-80 h-80 bg-violet-600/20 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
+      {/* ── Animated gradient border ── */}
+      <div
+        className="absolute inset-0 rounded-3xl pointer-events-none"
+        style={{
+          padding: '1.5px',
+          background: 'linear-gradient(135deg, rgba(139,92,246,0.8) 0%, rgba(6,182,212,0.6) 50%, rgba(139,92,246,0.4) 100%)',
+          WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+          WebkitMaskComposite: 'xor',
+          maskComposite: 'exclude',
+        }}
+      />
 
-      {/* Top Floating Badge Bar */}
-      <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 pb-5 border-b border-white/10">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 uppercase tracking-wide shadow-sm animate-pulse">
-            <Flame className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-            <span>REKOMENDASI RESMI LAPTOPSEBER PALEMBANG</span>
-          </span>
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-violet-500/20 text-violet-300 border border-violet-500/30">
-            <Sparkles className="w-3 h-3 text-violet-400" />
-            <span>{currentBanner.badge || 'Pilihan Editor 2026'}</span>
-          </span>
-          {isSuperAdmin && (
-            <Link
-              href="/admin?tab=banners"
-              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/30 transition"
-              title="Kelola banner iklan di panel admin"
-            >
-              <Settings className="w-3 h-3" />
-              <span>Kelola Iklan (Admin)</span>
-            </Link>
-          )}
-        </div>
+      {/* ── Background glow blobs ── */}
+      <div className="absolute -top-32 -left-32 w-96 h-96 bg-violet-600/20 rounded-full blur-[80px] pointer-events-none" />
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-cyan-500/15 rounded-full blur-[80px] pointer-events-none" />
+      <div className="absolute top-0 right-1/3 w-64 h-64 bg-indigo-500/10 rounded-full blur-[60px] pointer-events-none" />
 
-        {/* Carousel Slide Indicators & Navigation Controls */}
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-mono text-zinc-400">
-            Slide <strong className="text-white">{currentIndex + 1}</strong> / {banners.length}
-          </span>
-          <div className="flex items-center gap-1">
-            <button
-              onClick={handlePrev}
-              aria-label="Slide sebelumnya"
-              className="w-7 h-7 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 flex items-center justify-center text-zinc-300 hover:text-white transition cursor-pointer"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
-              onClick={handleNext}
-              aria-label="Slide berikutnya"
-              className="w-7 h-7 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 flex items-center justify-center text-zinc-300 hover:text-white transition cursor-pointer"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
+      <div className="relative z-10 p-5 sm:p-7">
+        {/* ── Top Bar ── */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-white/10">
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Hot badge */}
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500/30 to-orange-500/20 border border-amber-400/50 shadow-[0_0_16px_rgba(251,191,36,0.3)]">
+              <Flame className="w-3.5 h-3.5 fill-amber-300 text-amber-300 animate-pulse" />
+              <span className="text-[11px] font-black text-amber-200 uppercase tracking-wider">
+                Rekomendasi LaptopSeber Palembang
+              </span>
+            </div>
+
+            {/* Editor pick badge */}
+            <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-violet-500/20 border border-violet-500/40">
+              <Sparkles className="w-3 h-3 text-violet-400" />
+              <span className="text-[10px] font-semibold text-violet-300 font-mono">
+                {currentBanner.badge || 'Pilihan Editor 2026'}
+              </span>
+            </div>
+
+            {isSuperAdmin && (
+              <Link
+                href="/admin?tab=banners"
+                className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 text-[10px] font-mono hover:bg-cyan-500/30 transition"
+              >
+                <Settings className="w-3 h-3" />
+                Kelola Iklan
+              </Link>
+            )}
+          </div>
+
+          {/* Slide controls */}
+          <div className="flex items-center gap-2.5">
+            <span className="text-xs font-mono text-zinc-500">
+              <strong className="text-zinc-300">{currentIndex + 1}</strong>/{banners.length}
+            </span>
+            <div className="flex gap-1">
+              <button onClick={handlePrev} aria-label="Sebelumnya" className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/15 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition cursor-pointer">
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button onClick={handleNext} aria-label="Berikutnya" className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/15 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition cursor-pointer">
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Main Animated Slide */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentBanner.id}
-          initial={{ opacity: 0, x: direction === 'next' ? 24 : -24 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: direction === 'next' ? -24 : 24 }}
-          transition={{ duration: 0.35, ease: 'easeInOut' }}
-          className="relative z-10 grid lg:grid-cols-12 gap-6 pt-6 items-center"
-        >
-          {/* Left Col: Specs & Direct Order */}
-          <div className="lg:col-span-5 space-y-4">
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 font-mono text-[10px] uppercase font-bold border border-cyan-500/30">
-                  {currentBanner.brand}
-                </span>
-                <span className="text-[11px] text-zinc-400 font-mono">
-                  {isServisBanner
-                    ? 'Layanan Servis & Reparasi Resmi'
-                    : 'Unit Pilihan Resmi Toko LaptopSeber Palembang'}
-                </span>
+        {/* ── Main Slide ── */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentBanner.id}
+            initial={{ opacity: 0, x: direction === 'next' ? 30 : -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: direction === 'next' ? -30 : 30 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="grid lg:grid-cols-12 gap-5 sm:gap-7 pt-5 items-center"
+          >
+            {/* ── LEFT: Info & CTA ── */}
+            <div className="lg:col-span-5 space-y-4">
+              {/* Title area */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="px-2.5 py-0.5 rounded-lg bg-cyan-500/25 text-cyan-300 font-mono text-[10px] uppercase font-bold border border-cyan-500/40 tracking-widest">
+                    {currentBanner.brand}
+                  </span>
+                  <span className="text-[11px] text-zinc-500 font-mono">
+                    {isServisBanner ? 'Layanan Servis & Reparasi' : 'Unit Resmi Toko LaptopSeber'}
+                  </span>
+                </div>
+
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight leading-tight break-words">
+                  {currentBanner.title}
+                </h2>
+
+                <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+                  {currentBanner.subtitle}
+                </p>
               </div>
 
-              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-tight">
-                {currentBanner.title}
-              </h2>
-
-              <p className="text-xs text-zinc-300 leading-relaxed pt-0.5">
-                {currentBanner.subtitle}
-              </p>
-            </div>
-
-            {/* Key Specs Matrix */}
-            <div className="grid grid-cols-2 gap-2 pt-1">
-              <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md">
-                <div className="text-[10px] text-zinc-400 font-mono uppercase flex items-center gap-1">
-                  <Zap className="w-3 h-3 text-cyan-400" />
-                  <span>Processor</span>
-                </div>
-                <div className="text-xs font-bold text-white mt-0.5 line-clamp-1" title={currentBanner.processor}>
-                  {currentBanner.processor}
-                </div>
+              {/* Specs grid */}
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { icon: <Zap className="w-3 h-3 text-cyan-400" />, label: 'Processor', value: currentBanner.processor, color: 'text-white' },
+                  { icon: <Flame className="w-3 h-3 text-amber-400" />, label: 'GPU / Layanan', value: currentBanner.vga, color: 'text-amber-300' },
+                  { icon: <Tag className="w-3 h-3 text-emerald-400" />, label: 'RAM', value: `${currentBanner.ramGb}GB RAM`, color: 'text-emerald-300' },
+                  { icon: <Sparkles className="w-3 h-3 text-violet-400" />, label: 'Storage', value: `${currentBanner.storageGb}GB SSD`, color: 'text-violet-300' },
+                ].map((spec, i) => (
+                  <div key={i} className="p-2.5 rounded-xl border border-white/10 backdrop-blur-sm" style={{ background: 'rgba(0,0,0,0.35)' }}>
+                    <div className="flex items-center gap-1 text-[10px] text-zinc-500 font-mono uppercase mb-0.5">
+                      {spec.icon}
+                      <span>{spec.label}</span>
+                    </div>
+                    <div className={`text-xs font-bold line-clamp-1 ${spec.color}`} title={spec.value}>
+                      {spec.value}
+                    </div>
+                  </div>
+                ))}
               </div>
 
-              <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md">
-                <div className="text-[10px] text-zinc-400 font-mono uppercase flex items-center gap-1">
-                  <Flame className="w-3 h-3 text-amber-400" />
-                  <span>GPU / Layanan</span>
-                </div>
-                <div className="text-xs font-bold text-amber-300 mt-0.5 line-clamp-1" title={currentBanner.vga}>
-                  {currentBanner.vga}
-                </div>
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md">
-                <div className="text-[10px] text-zinc-400 font-mono uppercase flex items-center gap-1">
-                  <Tag className="w-3 h-3 text-emerald-400" />
-                  <span>RAM</span>
-                </div>
-                <div className="text-xs font-bold text-emerald-300 mt-0.5">
-                  {currentBanner.ramGb}GB RAM
-                </div>
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-md">
-                <div className="text-[10px] text-zinc-400 font-mono uppercase flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 text-violet-400" />
-                  <span>Storage</span>
-                </div>
-                <div className="text-xs font-bold text-violet-300 mt-0.5">
-                  {currentBanner.storageGb}GB SSD
-                </div>
-              </div>
-            </div>
-
-            {/* Compact Professional Price & Contact CTA */}
-            <div className="pt-2 space-y-3">
-              <div className="p-3 rounded-2xl bg-zinc-950/70 border border-white/10 flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <div className="text-[10px] text-zinc-400 font-mono uppercase">Harga Penawaran</div>
-                  <div className="flex items-baseline gap-2 mt-0.5">
-                    <span className="text-lg sm:text-xl font-black text-emerald-400 font-mono">
-                      {formatRupiah(currentBanner.price)}
-                    </span>
-                    {currentBanner.originalPrice > currentBanner.price && (
-                      <span className="text-xs text-zinc-500 line-through font-mono">
-                        {formatRupiah(currentBanner.originalPrice)}
+              {/* Price + CTA */}
+              <div className="space-y-3">
+                {/* Price card */}
+                <div
+                  className="p-3.5 rounded-2xl border border-white/10 flex flex-wrap items-center justify-between gap-2"
+                  style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(12px)' }}
+                >
+                  <div>
+                    <div className="text-[10px] text-zinc-500 font-mono uppercase tracking-wider mb-0.5">Harga Penawaran</div>
+                    <div className="flex items-baseline gap-2">
+                      <span
+                        className="text-2xl sm:text-3xl font-black font-mono"
+                        style={{ color: '#34d399', textShadow: '0 0 20px rgba(52,211,153,0.4)' }}
+                      >
+                        {formatRupiah(currentBanner.price)}
                       </span>
-                    )}
-                    {currentBanner.discount && (
-                      <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
-                        {currentBanner.discount}
-                      </span>
-                    )}
+                      {currentBanner.originalPrice > currentBanner.price && (
+                        <span className="text-xs text-zinc-600 line-through font-mono">
+                          {formatRupiah(currentBanner.originalPrice)}
+                        </span>
+                      )}
+                      {currentBanner.discount && (
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-rose-500/25 text-rose-300 border border-rose-500/40">
+                          {currentBanner.discount}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 text-[10px] text-zinc-400">
+                    <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Garansi Resmi QC</span>
                   </div>
                 </div>
 
-                <div className="text-[10px] text-zinc-400 flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Garansi Resmi QC</span>
-                </div>
-              </div>
-
-              {/* WhatsApp Action Button */}
-              <div className="flex flex-col sm:flex-row items-center gap-2.5">
+                {/* WA Button */}
                 <a
-                  href={waContactUrl}
+                  href={waUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-bold text-xs sm:text-sm transition shadow-lg shadow-emerald-600/30 active:scale-95 cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2.5 px-5 py-3.5 rounded-2xl font-black text-sm text-white transition active:scale-95 cursor-pointer"
+                  style={{
+                    background: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #0d9488 100%)',
+                    boxShadow: '0 4px 24px rgba(16,185,129,0.5), 0 0 0 1px rgba(16,185,129,0.4)',
+                  }}
                 >
-                  <PhoneCall className="w-4 h-4 animate-bounce" />
-                  <span>Hubungi Penjual (WhatsApp 087851164239)</span>
+                  <svg className="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                  </svg>
+                  <span>Hubungi WhatsApp — 081368583338</span>
                 </a>
 
                 {isServisBanner && (
                   <Link
                     href="/service-laptop"
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/10 text-xs font-semibold transition"
+                    className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/10 text-xs font-semibold transition"
                   >
                     <Wrench className="w-3.5 h-3.5" />
-                    <span>Info Servis</span>
+                    Info Servis Laptop
                   </Link>
                 )}
-              </div>
-            </div>
-          </div>
 
-          {/* Right Col: Expanded High-Impact Animated Laptop Showcase */}
-          <div className="lg:col-span-7">
-            <div className="relative group rounded-3xl overflow-hidden border border-white/15 bg-gradient-to-b from-white/10 via-zinc-950/70 to-black/80 p-4 sm:p-6 backdrop-blur-xl shadow-2xl">
-              <div className="absolute top-4 right-4 z-20">
-                <span className="px-3 py-1 rounded-full text-[10px] font-mono font-black bg-gradient-to-r from-rose-500 via-amber-500 to-orange-500 text-white shadow-lg shadow-rose-500/40 uppercase">
-                  {currentBanner.badge}
-                </span>
-              </div>
-
-              {/* Large Extended Visual Area with Dynamic Floating Motion */}
-              <div className="relative w-full aspect-[16/10] sm:aspect-[16/9] rounded-2xl overflow-hidden bg-black/50 dark:bg-black/50 light:bg-slate-100 flex items-center justify-center p-4">
-                <motion.img
-                  src={currentBanner.imageUrl}
-                  alt={currentBanner.title}
-                  className="w-full h-full object-contain cursor-pointer drop-shadow-xl transition-transform duration-300"
-                  loading="lazy"
-                  whileHover={{ scale: 1.05, y: -4 }}
-                />
-
-                {/* Subtle Ambient Floor Glow */}
-                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-cyan-500/20 blur-xl rounded-full pointer-events-none" />
-
-                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[11px] font-mono text-zinc-300 pointer-events-none">
-                  <span className="px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-md border border-white/10">
-                    {currentBanner.display}
+                {/* Store info row */}
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-0.5">
+                  <span className="inline-flex items-center gap-1 text-[11px] text-zinc-500">
+                    <MapPin className="w-3 h-3 text-amber-400 shrink-0" />
+                    DC Kuliner Pakjo, Palembang
                   </span>
-                  <span className="px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-md border border-white/10 text-cyan-300 font-bold">
-                    Slide {currentIndex + 1} dari {banners.length}
+                  <span className="inline-flex items-center gap-1 text-[11px] text-zinc-500">
+                    <Clock className="w-3 h-3 text-cyan-400 shrink-0" />
+                    10.00–20.00 WIB, Setiap Hari
                   </span>
                 </div>
               </div>
             </div>
-          </div>
-        </motion.div>
-      </AnimatePresence>
 
-      {/* Bottom Slide Navigation Dots */}
-      <div className="relative z-10 flex items-center justify-center gap-2 pt-6">
-        {banners.map((b, idx) => (
-          <button
-            key={b.id}
-            onClick={() => {
-              setDirection(idx > currentIndex ? 'next' : 'prev');
-              setCurrentIndex(idx);
-            }}
-            aria-label={`Ke slide ${idx + 1}`}
-            className={`transition-all rounded-full cursor-pointer ${
-              idx === currentIndex
-                ? 'w-8 h-2.5 bg-gradient-to-r from-cyan-400 to-violet-500 shadow-md shadow-cyan-400/40'
-                : 'w-2.5 h-2.5 bg-white/20 hover:bg-white/40'
-            }`}
-          />
-        ))}
+            {/* ── RIGHT: Laptop Showcase ── */}
+            <div className="lg:col-span-7">
+              <div
+                className="relative group rounded-3xl overflow-hidden p-4 sm:p-6"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.7) 100%)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  backdropFilter: 'blur(20px)',
+                }}
+              >
+                {/* Badge top-right */}
+                <div className="absolute top-4 right-4 z-20">
+                  <span
+                    className="px-3 py-1 rounded-full text-[10px] font-black text-white uppercase tracking-wide"
+                    style={{
+                      background: 'linear-gradient(90deg, #ef4444, #f97316, #f59e0b)',
+                      boxShadow: '0 4px 16px rgba(239,68,68,0.5)',
+                    }}
+                  >
+                    {currentBanner.badge}
+                  </span>
+                </div>
+
+                {/* Image area */}
+                <div
+                  className="relative w-full rounded-2xl overflow-hidden flex items-center justify-center p-4"
+                  style={{
+                    aspectRatio: '16/9',
+                    background: 'radial-gradient(ellipse at center, rgba(99,102,241,0.12) 0%, rgba(0,0,0,0.6) 70%)',
+                  }}
+                >
+                  <motion.img
+                    src={currentBanner.imageUrl}
+                    alt={currentBanner.title}
+                    className="w-full h-full object-contain drop-shadow-2xl"
+                    loading="lazy"
+                    whileHover={{ scale: 1.06, y: -6 }}
+                    transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                  />
+
+                  {/* Floor glow */}
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-10 bg-violet-500/20 blur-2xl rounded-full pointer-events-none" />
+
+                  {/* Bottom info bar */}
+                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[11px] font-mono text-zinc-300 pointer-events-none">
+                    <span
+                      className="px-2.5 py-1 rounded-lg"
+                      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.1)' }}
+                    >
+                      {currentBanner.display}
+                    </span>
+                    <span
+                      className="px-2.5 py-1 rounded-lg text-cyan-300 font-bold"
+                      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)', border: '1px solid rgba(6,182,212,0.3)' }}
+                    >
+                      {currentIndex + 1} / {banners.length}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Scan lines decoration */}
+                <div
+                  className="absolute inset-0 rounded-3xl pointer-events-none opacity-[0.03]"
+                  style={{
+                    backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,1) 2px, rgba(255,255,255,1) 3px)',
+                  }}
+                />
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* ── Dot Navigation ── */}
+        <div className="flex items-center justify-center gap-2 pt-5">
+          {banners.map((b, idx) => (
+            <button
+              key={b.id}
+              onClick={() => { setDirection(idx > currentIndex ? 'next' : 'prev'); setCurrentIndex(idx); }}
+              aria-label={`Slide ${idx + 1}`}
+              className="transition-all rounded-full cursor-pointer"
+              style={{
+                width: idx === currentIndex ? '2rem' : '0.5rem',
+                height: '0.5rem',
+                background: idx === currentIndex
+                  ? 'linear-gradient(90deg, #8b5cf6, #06b6d4)'
+                  : 'rgba(255,255,255,0.2)',
+                boxShadow: idx === currentIndex ? '0 0 8px rgba(139,92,246,0.6)' : 'none',
+              }}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
