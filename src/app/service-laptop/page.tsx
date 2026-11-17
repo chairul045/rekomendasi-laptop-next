@@ -19,8 +19,6 @@ import {
   X,
   Laptop,
   Check,
-  MapPin,
-  Clock,
   Phone,
 } from 'lucide-react';
 import {
@@ -116,33 +114,30 @@ export default function ServiceLaptopPage() {
                   ⭐ REKOMENDASI TERPERCAYA
                 </span>
                 <span className="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-white/10 text-cyan-300 border border-white/20 backdrop-blur-md">
-                  Palembang &amp; Sekitarnya
+                  Layanan Servis &amp; Penjualan
                 </span>
               </div>
 
               <div className="space-y-2">
                 <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-white leading-tight">
-                  LaptopSeber Palembang: Servis Laptop Cepat &amp; Laptop Second Bergaransi
+                  LaptopSeber: Servis Laptop Cepat &amp; Laptop Second Bergaransi
                 </h2>
                 <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed max-w-xl">
                   Solusi terpercaya untuk perbaikan laptop mati total, ganti LCD &amp; baterai, upgrade performa, hingga pilihan laptop second berkualitas tinggi siap pakai untuk kuliah dan kerja.
                 </p>
               </div>
 
-              {/* Info Lokasi, Jam Buka & Kontak */}
+              {/* Kontak */}
               <div className="flex flex-wrap gap-3 text-xs text-zinc-200">
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md">
-                  <MapPin className="w-3.5 h-3.5 text-cyan-300 shrink-0" />
-                  <span>{shop.address}</span>
-                </div>
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md">
-                  <Clock className="w-3.5 h-3.5 text-emerald-300 shrink-0" />
-                  <span>{shop.openHours}</span>
-                </div>
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md">
+                <a
+                  href={`https://wa.me/${shop.whatsapp}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md hover:bg-white/20 transition"
+                >
                   <Phone className="w-3.5 h-3.5 text-amber-300 shrink-0" />
-                  <span>{shop.phone}</span>
-                </div>
+                  <span>WhatsApp: {shop.phone}</span>
+                </a>
               </div>
 
               {/* Key Benefits Grid */}
@@ -165,7 +160,7 @@ export default function ServiceLaptopPage() {
               {/* Promotional Action Buttons */}
               <div className="flex flex-wrap items-center gap-3 pt-3">
                 <a
-                  href={`https://wa.me/${shop.whatsapp}?text=Halo%20LaptopSeber%20Palembang,%20saya%20tertarik%20dengan%20layanan%20servis%20dan%20katalog%20laptop%20second%20Anda.`}
+                  href={`https://wa.me/${shop.whatsapp}?text=Halo%20LaptopSeber,%20saya%20tertarik%20dengan%20layanan%20servis%20dan%20katalog%20laptop%20second%20Anda.`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-emerald-500/30 transition active:scale-95 cursor-pointer"
@@ -196,11 +191,6 @@ export default function ServiceLaptopPage() {
                     className="w-full h-full object-cover"
                     loading="lazy"
                   />
-                  <div className="absolute top-3 left-3">
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-black/70 text-white backdrop-blur-md border border-white/20">
-                      📍 Palembang
-                    </span>
-                  </div>
                 </div>
 
                 <div className="space-y-1.5">
@@ -212,7 +202,7 @@ export default function ServiceLaptopPage() {
                     </div>
                   </div>
                   <p className="text-xs text-zinc-300 leading-relaxed">
-                    Mitra terverifikasi resmi Lapmatch untuk servis dan rekomendasi laptop terpercaya di Kota Palembang.
+                    Mitra terverifikasi resmi Lapmatch untuk servis dan rekomendasi laptop terpercaya.
                   </p>
                 </div>
               </div>

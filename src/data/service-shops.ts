@@ -287,23 +287,23 @@ export function diagnoseCustomProblem(description: string, brand?: string): Serv
       'Perlu pengecekan fisik langsung oleh teknisi menggunakan multimeter & software diagnostik',
     ],
     recommendedSolution:
-      'Pemeriksaan komponen secara menyeluruh oleh teknisi LaptopSeber Palembang untuk memastikan titik kendala.',
+      'Pemeriksaan komponen secara menyeluruh oleh teknisi berpengalaman untuk memastikan titik kendala.',
     urgency: 'Sedang',
   };
 }
 
-// Hanya satu toko resmi: LaptopSeber Palembang
+// Pusat Servis Resmi
 export const LAPTOPSEBER_SHOP: ServiceShop = {
-  id: 'laptopseber-palembang',
-  name: 'LaptopSeber Palembang',
-  city: 'Palembang',
-  area: 'Kota Palembang',
+  id: 'laptopseber',
+  name: 'LaptopSeber',
+  city: 'Indonesia',
+  area: 'Layanan Servis & Laptop',
   rating: 5.0,
   reviewCount: 385,
-  phone: '081368583338',
-  whatsapp: '6281368583338',
-  address: 'DC Kuliner Pakjo, Kota Palembang, Sumatera Selatan',
-  openHours: 'Buka Setiap Hari: 10.00 – 20.00 WIB',
+  phone: '087851164239',
+  whatsapp: '6287851164239',
+  address: 'Layanan Servis & Laptop Second Bergaransi Resmi',
+  openHours: 'Layanan & Konsultasi Online Aktif',
   isVerified: true,
   specialties: [
     'Servis Laptop Mati Total, Korsleting & IC Power',

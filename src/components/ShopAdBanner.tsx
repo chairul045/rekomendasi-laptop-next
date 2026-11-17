@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MapPin, Clock, X, Zap, PhoneCall } from 'lucide-react';
+import { X, Zap, PhoneCall } from 'lucide-react';
 
 const SESSION_KEY = 'laptopseber_banner_v3_dismissed';
 
@@ -57,7 +57,7 @@ export default function ShopAdBanner() {
                     <path d="M20 18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/>
                   </svg>
                   <span className="font-black text-white text-xs sm:text-sm tracking-wide">
-                    LaptopSeber Palembang
+                    LaptopSeber
                   </span>
                 </div>
 
@@ -67,24 +67,16 @@ export default function ShopAdBanner() {
                 </div>
               </div>
 
-              {/* Lokasi, Jam Buka, No Telepon */}
+              {/* No Telepon / WhatsApp */}
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-white text-[11px] sm:text-xs font-semibold">
-                <span className="inline-flex items-center gap-1 text-amber-100">
-                  <MapPin className="w-3.5 h-3.5 text-amber-200 shrink-0" />
-                  <span>DC Kuliner Pakjo, Kota Palembang, Sumatera Selatan</span>
-                </span>
-                <span className="inline-flex items-center gap-1 text-amber-100">
-                  <Clock className="w-3.5 h-3.5 text-amber-200 shrink-0" />
-                  <span>Setiap Hari: 10.00 – 20.00 WIB</span>
-                </span>
                 <a
-                  href="https://wa.me/6281368583338"
+                  href="https://wa.me/6287851164239"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-white font-mono hover:underline"
                 >
                   <PhoneCall className="w-3.5 h-3.5 text-emerald-200 shrink-0" />
-                  <span>081368583338</span>
+                  <span>087851164239</span>
                 </a>
               </div>
             </div>
@@ -92,7 +84,7 @@ export default function ShopAdBanner() {
             {/* Right Block: Tombol WhatsApp & Dismiss */}
             <div className="flex items-center gap-2 shrink-0 self-end md:self-auto">
               <a
-                href="https://wa.me/6281368583338"
+                href="https://wa.me/6287851164239"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-black text-xs text-orange-700 bg-white hover:bg-amber-50 active:scale-95 transition shadow-md whitespace-nowrap border border-amber-200"

@@ -529,7 +529,7 @@ function QuestionnaireContent() {
 
                   <a
                     href={`https://wa.me/6287851164239?text=${encodeURIComponent(
-                      `Halo LaptopSeber, saya tertarik dengan rekomendasi laptop "${laptop.name}" seharga Rp ${laptop.price.toLocaleString('id-ID')}. Apakah unit ini tersedia?`
+                      `Halo, saya tertarik dengan rekomendasi laptop "${laptop.name}" seharga Rp ${laptop.price.toLocaleString('id-ID')}. Apakah unit ini tersedia?`
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"

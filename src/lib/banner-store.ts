@@ -28,13 +28,13 @@ export const DEFAULT_BANNERS: BannerAd[] = [
   {
     id: 'banner-1',
     title: 'Lenovo ThinkPad X13 - AMD Ryzen 5 PRO + 16GB RAM Bisnis Tangguh',
-    brand: 'LaptopSeber Palembang',
+    brand: 'Lenovo',
     subtitle:
-      'Unit second berkualitas tinggi lolos uji QC 30+ titik bergaransi resmi toko LaptopSeber Palembang. Bodi magnesium kokoh standar militer, ringan dan kencang untuk kerja & skripsi.',
+      'Unit second berkualitas tinggi lolos uji QC 30+ titik bergaransi resmi toko. Bodi magnesium kokoh standar militer, ringan dan kencang untuk kerja & skripsi.',
     price: 5850000,
     originalPrice: 6500000,
     discount: 'Hemat 10%',
-    badge: '🔥 Rekomendasi Utama LaptopSeber',
+    badge: '🔥 Rekomendasi Utama',
     processor: 'AMD Ryzen 5 PRO 4650U (6 Cores, 12 Threads)',
     vga: 'AMD Radeon Graphics',
     ramGb: 16,
@@ -50,9 +50,9 @@ export const DEFAULT_BANNERS: BannerAd[] = [
   {
     id: 'banner-2',
     title: 'HP Elitebook 840 G8 - Intel Core i5 Slim Aluminium Elegan & Bertenaga',
-    brand: 'LaptopSeber Palembang',
+    brand: 'HP',
     subtitle:
-      'Laptop second kelas enterprise bodi aluminium presisi dari LaptopSeber Palembang. Desain mewah, keyboard empuk ternyaman, performa responsif bergaransi toko.',
+      'Laptop second kelas enterprise bodi aluminium presisi. Desain mewah, keyboard empuk ternyaman, performa responsif bergaransi toko.',
     price: 5350000,
     originalPrice: 6000000,
     discount: 'Hemat 11%',
@@ -72,9 +72,9 @@ export const DEFAULT_BANNERS: BannerAd[] = [
   {
     id: 'banner-3',
     title: 'Lenovo ThinkPad L13 Yoga - Layar Sentuh Flip 360° + Intel Core i5',
-    brand: 'LaptopSeber Palembang',
+    brand: 'Lenovo',
     subtitle:
-      'Bisa mode laptop dan tablet fleksibel. Sangat praktis untuk presentasi, membuat catatan kuliah, dan multitasking dengan jaminan garansi LaptopSeber Palembang.',
+      'Bisa mode laptop dan tablet fleksibel. Sangat praktis untuk presentasi, membuat catatan kuliah, dan multitasking dengan jaminan garansi toko.',
     price: 5850000,
     originalPrice: 6500000,
     discount: 'Hemat 10%',
@@ -94,9 +94,9 @@ export const DEFAULT_BANNERS: BannerAd[] = [
   {
     id: 'banner-4',
     title: 'DELL LATITUDE 3390 2-in-1 - Touchscreen Fleksibel & Intel Core i5',
-    brand: 'LaptopSeber Palembang',
+    brand: 'Dell',
     subtitle:
-      'Layar lipat 360 derajat responsif, performa kencang dengan SSD NVMe, bodi kokoh khas seri Latitude. Solusi laptop fleksibel berkualitas dari LaptopSeber.',
+      'Layar lipat 360 derajat responsif, performa kencang dengan SSD NVMe, bodi kokoh khas seri Latitude. Solusi laptop fleksibel berkualitas bergaransi.',
     price: 5450000,
     originalPrice: 6200000,
     discount: 'Hemat 12%',
@@ -115,19 +115,19 @@ export const DEFAULT_BANNERS: BannerAd[] = [
   },
   {
     id: 'banner-5',
-    title: 'LaptopSeber Care: Pusat Servis, Reparasi & Upgrade Laptop Palembang',
-    brand: 'LaptopSeber Palembang',
+    title: 'Pusat Servis, Reparasi & Upgrade Laptop',
+    brand: 'Layanan Servis',
     subtitle:
-      'Laptop mati total, layar bergaris, panas berisik, atau lemot? Teknisi berpengalaman siap melayani perbaikan hardware, ganti sparepart original, serta tracking servis online.',
+      'Laptop mati total, layar bergaris, panas berisik, atau lemot? Teknisi berpengalaman siap melayani perbaikan hardware, ganti sparepart original, serta konsultasi cepat.',
     price: 50000,
     originalPrice: 100000,
     discount: 'Cek Kerusakan',
-    badge: '🛠️ Pusat Servis Resmi LaptopSeber',
+    badge: '🛠️ Layanan Servis Terpercaya',
     processor: 'Teknisi Handal & Profesional',
     vga: 'Mendukung ThinkPad, HP, Dell, Asus, Acer, MacBook',
     ramGb: 16,
     storageGb: 512,
-    display: 'Kota Palembang (Layanan Servis & Online)',
+    display: 'Layanan Servis & Online',
     imageUrl: '/images/laptops/laptopseber/lenovo-thinkpad-t480.jpg',
     tokopediaUrl: '/service-laptop',
     shopeeUrl: '/service-laptop',
