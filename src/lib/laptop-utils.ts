@@ -171,3 +171,31 @@ export function getMarketplaceLinks(
     blibli: `https://www.blibli.com/cari/${query}${blibliPriceFilter}`,
   };
 }
+
+const NEW_LAPTOP_NAMES = [
+  'dell latitude 3350',
+  'asus x441u',
+  'lenovo thinkpad t470s',
+  'hp probook 640 g1',
+];
+
+/**
+ * Menentukan apakah sebuah laptop merupakan unit baru yang baru ditambahkan ke katalog
+ */
+export function isNewLaptopArrival(laptop: {
+  name?: string | null;
+  createdAt?: string | Date | null;
+  isNew?: boolean | null;
+}): boolean {
+  if (laptop.isNew) return true;
+  const name = (laptop.name ?? '').toLowerCase().trim();
+  if (NEW_LAPTOP_NAMES.some((n) => name.includes(n))) return true;
+  if (laptop.createdAt) {
+    const createdTime = new Date(laptop.createdAt).getTime();
+    if (!isNaN(createdTime)) {
+      const cutoff = new Date('2026-11-15T00:00:00.000Z').getTime();
+      return createdTime >= cutoff;
+    }
+  }
+  return false;
+}

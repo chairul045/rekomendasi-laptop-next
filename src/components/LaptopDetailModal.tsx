@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Cpu, HardDrive, Battery, Gauge, Monitor, ShieldCheck, Sparkles, Scale, Heart, Star, PhoneCall } from 'lucide-react';
-import { getLaptopImageUrl, formatRupiah } from '@/lib/laptop-utils';
+import { getLaptopImageUrl, formatRupiah, isNewLaptopArrival } from '@/lib/laptop-utils';
 
 export interface LaptopDetailItem {
   id: number;
@@ -111,6 +111,12 @@ export default function LaptopDetailModal({
               <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-violet-500/20 text-violet-300 border border-violet-500/30 uppercase">
                 {laptop.brand}
               </span>
+              {isNewLaptopArrival(laptop) && (
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1 shadow-sm shadow-emerald-500/10">
+                  <Sparkles className="w-3 h-3 text-amber-300" />
+                  Baru Masuk
+                </span>
+              )}
               <span
                 className={`px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold uppercase ${
                   laptop.condition === 'second'

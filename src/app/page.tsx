@@ -5,7 +5,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import LaptopCatalog from './LaptopCatalog';
 import LandingPage from '@/components/LandingPage';
-import { getLaptopImageUrl, formatRupiah } from '@/lib/laptop-utils';
+import { getLaptopImageUrl, formatRupiah, isNewLaptopArrival } from '@/lib/laptop-utils';
 import { ClipboardList, ArrowRight, Clock, Wrench } from 'lucide-react';
 import FeaturedLaptopAdBanner from '@/components/FeaturedLaptopAdBanner';
 import { getActiveBanners } from '@/lib/banner-store';
@@ -39,6 +39,8 @@ export default async function HomePage() {
     condition: string;
     category: string | null;
     imageUrl: string | null;
+    createdAt?: string;
+    isNew?: boolean;
   }[] = [];
 
   try {
@@ -60,6 +62,7 @@ export default async function HomePage() {
         condition: true,
         category: true,
         imageUrl: true,
+        createdAt: true,
       },
       orderBy: [{ performaKomposit: 'desc' }, { price: 'asc' }],
       take: 150,
@@ -82,6 +85,8 @@ export default async function HomePage() {
       condition: l.condition,
       category: l.category,
       imageUrl: l.imageUrl,
+      createdAt: l.createdAt ? l.createdAt.toISOString() : undefined,
+      isNew: isNewLaptopArrival({ name: l.name, createdAt: l.createdAt }),
     }));
   } catch (err) {
     console.warn('[HomePage] Database query failed (check DATABASE_URL in Vercel):', err);
@@ -361,6 +366,11 @@ export default async function HomePage() {
                                   {laptop.name}
                                 </div>
                                 <div className="flex items-center gap-1.5 mt-0.5">
+                                  {isNewLaptopArrival({ name: laptop.name }) && (
+                                    <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                      Baru
+                                    </span>
+                                  )}
                                   <span
                                     className={`px-1.5 py-0.5 rounded text-[9px] font-mono uppercase ${
                                       laptop.condition === 'second'

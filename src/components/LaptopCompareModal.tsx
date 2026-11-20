@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Trophy, CheckCircle, Scale, Trash2, PhoneCall } from 'lucide-react';
-import { getLaptopImageUrl, formatRupiah } from '@/lib/laptop-utils';
+import { getLaptopImageUrl, formatRupiah, isNewLaptopArrival } from '@/lib/laptop-utils';
 import { LaptopDetailItem } from './LaptopDetailModal';
 
 interface LaptopCompareModalProps {
@@ -129,9 +129,16 @@ export default function LaptopCompareModal({
                             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                           />
                         </div>
-                        <span className="inline-block text-[10px] font-mono px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 font-bold uppercase">
-                          {laptop.brand}
-                        </span>
+                        <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                          <span className="inline-block text-[10px] font-mono px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 font-bold uppercase">
+                            {laptop.brand}
+                          </span>
+                          {isNewLaptopArrival(laptop) && (
+                            <span className="inline-block text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold uppercase border border-emerald-500/30">
+                              Baru
+                            </span>
+                          )}
+                        </div>
                         <h4 className="font-extrabold text-white text-xs line-clamp-2 leading-snug">
                           {laptop.name}
                         </h4>

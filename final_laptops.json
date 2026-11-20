@@ -15,7 +15,8 @@
     "weightKg": 1.55,
     "mobilityScore": 74,
     "image": "/images/laptops/lapmatch/lenovo-ideapad-slim-1.jpg",
-    "imageUrl": "/images/laptops/lapmatch/lenovo-ideapad-slim-1.jpg"
+    "imageUrl": "/images/laptops/lapmatch/lenovo-ideapad-slim-1.jpg",
+    "isNew": false
   },
   {
     "name": "ACER ASPIRE 3",
@@ -33,7 +34,8 @@
     "weightKg": 1.85,
     "mobilityScore": 68,
     "image": "/images/laptops/lapmatch/acer-aspire-3.jpg",
-    "imageUrl": "/images/laptops/lapmatch/acer-aspire-3.jpg"
+    "imageUrl": "/images/laptops/lapmatch/acer-aspire-3.jpg",
+    "isNew": false
   },
   {
     "name": "HP Elitebook 840 G8",
@@ -51,7 +53,8 @@
     "weightKg": 1.45,
     "mobilityScore": 84,
     "image": "/images/laptops/lapmatch/hp-elitebook-840-g7.jpg",
-    "imageUrl": "/images/laptops/lapmatch/hp-elitebook-840-g7.jpg"
+    "imageUrl": "/images/laptops/lapmatch/hp-elitebook-840-g7.jpg",
+    "isNew": false
   },
   {
     "name": "Lenovo Thinkpad T470",
@@ -69,7 +72,8 @@
     "weightKg": 1.48,
     "mobilityScore": 83,
     "image": "/images/laptops/lapmatch/lenovo-thinkpad-t470.jpg",
-    "imageUrl": "/images/laptops/lapmatch/lenovo-thinkpad-t470.jpg"
+    "imageUrl": "/images/laptops/lapmatch/lenovo-thinkpad-t470.jpg",
+    "isNew": false
   },
   {
     "name": "Lenovo Thinkpad T460s",
@@ -87,7 +91,8 @@
     "weightKg": 1.48,
     "mobilityScore": 83,
     "image": "/images/laptops/lapmatch/lenovo-thinkpad-t460s.jpg",
-    "imageUrl": "/images/laptops/lapmatch/lenovo-thinkpad-t460s.jpg"
+    "imageUrl": "/images/laptops/lapmatch/lenovo-thinkpad-t460s.jpg",
+    "isNew": false
   },
   {
     "name": "Lenovo Thinkpad L490",
@@ -105,7 +110,8 @@
     "weightKg": 1.45,
     "mobilityScore": 82,
     "image": "/images/laptops/lapmatch/lenovo-thinkpad-l490.jpg",
-    "imageUrl": "/images/laptops/lapmatch/lenovo-thinkpad-l490.jpg"
+    "imageUrl": "/images/laptops/lapmatch/lenovo-thinkpad-l490.jpg",
+    "isNew": false
   },
   {
     "name": "Lenovo Thinkpad T480",
@@ -123,7 +129,8 @@
     "weightKg": 1.48,
     "mobilityScore": 83,
     "image": "/images/laptops/lapmatch/lenovo-thinkpad-t480.jpg",
-    "imageUrl": "/images/laptops/lapmatch/lenovo-thinkpad-t480.jpg"
+    "imageUrl": "/images/laptops/lapmatch/lenovo-thinkpad-t480.jpg",
+    "isNew": false
   },
   {
     "name": "Lenovo Thinkpad L13 YOGA",
@@ -141,7 +148,8 @@
     "weightKg": 1.45,
     "mobilityScore": 82,
     "image": "/images/laptops/lapmatch/lenovo-thinkpad-l13-yoga.jpg",
-    "imageUrl": "/images/laptops/lapmatch/lenovo-thinkpad-l13-yoga.jpg"
+    "imageUrl": "/images/laptops/lapmatch/lenovo-thinkpad-l13-yoga.jpg",
+    "isNew": false
   },
   {
     "name": "Thinkpad X270",
@@ -159,7 +167,8 @@
     "weightKg": 1.28,
     "mobilityScore": 89,
     "image": "/images/laptops/lapmatch/thinkpad-x270.jpg",
-    "imageUrl": "/images/laptops/lapmatch/thinkpad-x270.jpg"
+    "imageUrl": "/images/laptops/lapmatch/thinkpad-x270.jpg",
+    "isNew": false
   },
   {
     "name": "Dell Latitude E5450",
@@ -177,7 +186,8 @@
     "weightKg": 1.45,
     "mobilityScore": 84,
     "image": "/images/laptops/lapmatch/dell-latitude-e5450.jpg",
-    "imageUrl": "/images/laptops/lapmatch/dell-latitude-e5450.jpg"
+    "imageUrl": "/images/laptops/lapmatch/dell-latitude-e5450.jpg",
+    "isNew": false
   },
   {
     "name": "DELL LATITUDE 5400",
@@ -195,7 +205,8 @@
     "weightKg": 1.25,
     "mobilityScore": 88,
     "image": "/images/laptops/lapmatch/dell-latitude-5400.jpg",
-    "imageUrl": "/images/laptops/lapmatch/dell-latitude-5400.jpg"
+    "imageUrl": "/images/laptops/lapmatch/dell-latitude-5400.jpg",
+    "isNew": false
   },
   {
     "name": "LENOVO THINKPAD X13 YOGA",
@@ -213,7 +224,8 @@
     "weightKg": 1.28,
     "mobilityScore": 89,
     "image": "/images/laptops/lapmatch/lenovo-thinkpad-x13-yoga.jpg",
-    "imageUrl": "/images/laptops/lapmatch/lenovo-thinkpad-x13-yoga.jpg"
+    "imageUrl": "/images/laptops/lapmatch/lenovo-thinkpad-x13-yoga.jpg",
+    "isNew": false
   },
   {
     "name": "LENOVO THINKPAD L13",
@@ -231,7 +243,8 @@
     "weightKg": 1.45,
     "mobilityScore": 82,
     "image": "/images/laptops/lapmatch/thinkpad-l13.jpg",
-    "imageUrl": "/images/laptops/lapmatch/thinkpad-l13.jpg"
+    "imageUrl": "/images/laptops/lapmatch/thinkpad-l13.jpg",
+    "isNew": false
   },
   {
     "name": "DELL LATITUDE 3390 2-in-1",
@@ -249,7 +262,8 @@
     "weightKg": 1.25,
     "mobilityScore": 88,
     "image": "/images/laptops/lapmatch/dell-latitude-3390-2-in-1.jpg",
-    "imageUrl": "/images/laptops/lapmatch/dell-latitude-3390-2-in-1.jpg"
+    "imageUrl": "/images/laptops/lapmatch/dell-latitude-3390-2-in-1.jpg",
+    "isNew": false
   },
   {
     "name": "LENOVO THINKPAD X390 (RAM 16GB)",
@@ -267,7 +281,8 @@
     "weightKg": 1.28,
     "mobilityScore": 89,
     "image": "/images/laptops/lapmatch/thinkpad-x390-ram-16gb.jpg",
-    "imageUrl": "/images/laptops/lapmatch/thinkpad-x390-ram-16gb.jpg"
+    "imageUrl": "/images/laptops/lapmatch/thinkpad-x390-ram-16gb.jpg",
+    "isNew": false
   },
   {
     "name": "LENOVO THINKPAD X390 (RAM 8GB)",
@@ -285,7 +300,8 @@
     "weightKg": 1.28,
     "mobilityScore": 89,
     "image": "/images/laptops/lapmatch/thinkpad-x390-ram-8gb.jpg",
-    "imageUrl": "/images/laptops/lapmatch/thinkpad-x390-ram-8gb.jpg"
+    "imageUrl": "/images/laptops/lapmatch/thinkpad-x390-ram-8gb.jpg",
+    "isNew": false
   },
   {
     "name": "LENOVO THINKPAD X13 G1",
@@ -303,7 +319,8 @@
     "weightKg": 1.28,
     "mobilityScore": 89,
     "image": "/images/laptops/lapmatch/thinkpad-x13-g1.jpg",
-    "imageUrl": "/images/laptops/lapmatch/thinkpad-x13-g1.jpg"
+    "imageUrl": "/images/laptops/lapmatch/thinkpad-x13-g1.jpg",
+    "isNew": false
   },
   {
     "name": "LENOVO THINKPAD X13 (RYZEN 5)",
@@ -321,7 +338,8 @@
     "weightKg": 1.28,
     "mobilityScore": 89,
     "image": "/images/laptops/lapmatch/thinkpad-x13-ryzen-5.jpg",
-    "imageUrl": "/images/laptops/lapmatch/thinkpad-x13-ryzen-5.jpg"
+    "imageUrl": "/images/laptops/lapmatch/thinkpad-x13-ryzen-5.jpg",
+    "isNew": false
   },
   {
     "name": "SURFACE GO",
@@ -339,7 +357,8 @@
     "weightKg": 0.52,
     "mobilityScore": 98,
     "image": "/images/laptops/lapmatch/surface-go.jpg",
-    "imageUrl": "/images/laptops/lapmatch/surface-go.jpg"
+    "imageUrl": "/images/laptops/lapmatch/surface-go.jpg",
+    "isNew": false
   },
   {
     "name": "Dell Latitude 5310",
@@ -357,7 +376,8 @@
     "weightKg": 1.25,
     "mobilityScore": 88,
     "image": "/images/laptops/lapmatch/dell-latitude-5310.jpg",
-    "imageUrl": "/images/laptops/lapmatch/dell-latitude-5310.jpg"
+    "imageUrl": "/images/laptops/lapmatch/dell-latitude-5310.jpg",
+    "isNew": false
   },
   {
     "name": "Dell Latitude 3350",
@@ -375,7 +395,8 @@
     "weightKg": 1.7,
     "mobilityScore": 72,
     "image": "/images/laptops/lapmatch/dell-latitude-3350.jpg",
-    "imageUrl": "/images/laptops/lapmatch/dell-latitude-3350.jpg"
+    "imageUrl": "/images/laptops/lapmatch/dell-latitude-3350.jpg",
+    "isNew": true
   },
   {
     "name": "ASUS X441U",
@@ -393,7 +414,8 @@
     "weightKg": 1.75,
     "mobilityScore": 68,
     "image": "/images/laptops/lapmatch/asus-x441u.jpg",
-    "imageUrl": "/images/laptops/lapmatch/asus-x441u.jpg"
+    "imageUrl": "/images/laptops/lapmatch/asus-x441u.jpg",
+    "isNew": true
   },
   {
     "name": "Lenovo Thinkpad T470s",
@@ -411,7 +433,8 @@
     "weightKg": 1.36,
     "mobilityScore": 86,
     "image": "/images/laptops/lapmatch/lenovo-thinkpad-t470s.jpg",
-    "imageUrl": "/images/laptops/lapmatch/lenovo-thinkpad-t470s.jpg"
+    "imageUrl": "/images/laptops/lapmatch/lenovo-thinkpad-t470s.jpg",
+    "isNew": true
   },
   {
     "name": "HP Probook 640 G1",
@@ -429,6 +452,7 @@
     "weightKg": 2.0,
     "mobilityScore": 65,
     "image": "/images/laptops/lapmatch/hp-probook-640-g1.jpg",
-    "imageUrl": "/images/laptops/lapmatch/hp-probook-640-g1.jpg"
+    "imageUrl": "/images/laptops/lapmatch/hp-probook-640-g1.jpg",
+    "isNew": true
   }
 ]
