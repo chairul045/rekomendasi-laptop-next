@@ -1,4 +1,4 @@
-// prisma/seed.ts - Seed data kriteria & laptop dari LaptopSeber Palembang
+// prisma/seed.ts - Seed data kriteria & laptop dari LapMatch
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import dotenv from 'dotenv';
@@ -41,11 +41,11 @@ async function main() {
   }
   console.log(`✅ ${kriteria.length} kriteria seeded`);
 
-  // 2. Load scraped laptops from LaptopSeber Palembang
-  const jsonPath = path.join(__dirname, '..', 'final_laptopseber_laptops.json');
+  // 2. Load scraped laptops from LapMatch
+  const jsonPath = path.join(__dirname, '..', 'final_laptops.json');
   if (fs.existsSync(jsonPath)) {
     const rawData = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-    console.log(`📥 Seeding ${rawData.length} laptop dari laptopseber.com...`);
+    console.log(`📥 Seeding ${rawData.length} laptop dari LapMatch...`);
     for (const item of rawData) {
       const brand = item.brand === 'Microsoft Surface' ? 'Microsoft' : item.brand;
       const existing = await prisma.laptop.findFirst({

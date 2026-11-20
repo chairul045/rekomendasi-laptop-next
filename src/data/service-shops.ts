@@ -293,16 +293,16 @@ export function diagnoseCustomProblem(description: string, brand?: string): Serv
 }
 
 // Pusat Servis Resmi
-export const LAPTOPSEBER_SHOP: ServiceShop = {
-  id: 'laptopseber',
-  name: 'LaptopSeber',
+export const LAPMATCH_SHOP: ServiceShop = {
+  id: 'lapmatch',
+  name: 'LapMatch',
   city: 'Indonesia',
   area: 'Layanan Servis & Laptop',
   rating: 5.0,
   reviewCount: 385,
   phone: '087851164239',
   whatsapp: '6287851164239',
-  address: 'Layanan Servis & Laptop Second Bergaransi Resmi',
+  address: 'Layanan Servis & Rekomendasi Laptop Bergaransi Resmi',
   openHours: 'Layanan & Konsultasi Online Aktif',
   isVerified: true,
   specialties: [
@@ -310,12 +310,12 @@ export const LAPTOPSEBER_SHOP: ServiceShop = {
     'Ganti LCD Express, Baterai Original, Keyboard & Engsel',
     'Deep Cleaning Heatsink Fan & Re-pasting Thermal Paste',
     'Upgrade SSD NVMe & RAM Bergaransi',
-    'Pusat Laptop Second Bergaransi Resmi Toko',
+    'Pusat Laptop Pilihan Bergaransi Resmi Toko',
     'Layanan Lacak Status Servis Online (Tracking Servis)',
   ],
-  imageUrl: '/images/laptops/laptopseber/lenovo-thinkpad-t480.jpg',
-  mapsUrl: 'https://laptopseber.com',
-  websiteUrl: 'https://laptopseber.com',
+  imageUrl: '/images/laptops/lapmatch/lenovo-thinkpad-t480.jpg',
+  mapsUrl: 'https://lapmatch.com',
+  websiteUrl: 'https://lapmatch.com',
 };
 
-export const SERVICE_SHOPS: ServiceShop[] = [LAPTOPSEBER_SHOP];
+export const SERVICE_SHOPS: ServiceShop[] = [LAPMATCH_SHOP];

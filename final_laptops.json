@@ -14,8 +14,8 @@
     "batteryHours": 6.5,
     "weightKg": 1.55,
     "mobilityScore": 74,
-    "image": "/images/laptops/laptopseber/lenovo-ideapad-slim-1.jpg",
-    "imageUrl": "/images/laptops/laptopseber/lenovo-ideapad-slim-1.jpg"
+    "image": "/images/laptops/lapmatch/lenovo-ideapad-slim-1.jpg",
+    "imageUrl": "/images/laptops/lapmatch/lenovo-ideapad-slim-1.jpg"
   },
   {
     "name": "ACER ASPIRE 3",
@@ -32,8 +32,8 @@
     "batteryHours": 6.5,
     "weightKg": 1.85,
     "mobilityScore": 68,
-    "image": "/images/laptops/laptopseber/acer-aspire-3.jpg",
-    "imageUrl": "/images/laptops/laptopseber/acer-aspire-3.jpg"
+    "image": "/images/laptops/lapmatch/acer-aspire-3.jpg",
+    "imageUrl": "/images/laptops/lapmatch/acer-aspire-3.jpg"
   },
   {
     "name": "HP Elitebook 840 G8",
@@ -50,8 +50,8 @@
     "batteryHours": 8.5,
     "weightKg": 1.45,
     "mobilityScore": 84,
-    "image": "/images/laptops/laptopseber/hp-elitebook-840-g7.jpg",
-    "imageUrl": "/images/laptops/laptopseber/hp-elitebook-840-g7.jpg"
+    "image": "/images/laptops/lapmatch/hp-elitebook-840-g7.jpg",
+    "imageUrl": "/images/laptops/lapmatch/hp-elitebook-840-g7.jpg"
   },
   {
     "name": "Lenovo Thinkpad T470",
@@ -68,8 +68,8 @@
     "batteryHours": 8.5,
     "weightKg": 1.48,
     "mobilityScore": 83,
-    "image": "/images/laptops/laptopseber/lenovo-thinkpad-t470.jpg",
-    "imageUrl": "/images/laptops/laptopseber/lenovo-thinkpad-t470.jpg"
+    "image": "/images/laptops/lapmatch/lenovo-thinkpad-t470.jpg",
+    "imageUrl": "/images/laptops/lapmatch/lenovo-thinkpad-t470.jpg"
   },
   {
     "name": "Lenovo Thinkpad T460s",
@@ -86,8 +86,8 @@
     "batteryHours": 8.5,
     "weightKg": 1.48,
     "mobilityScore": 83,
-    "image": "/images/laptops/laptopseber/lenovo-thinkpad-t460s.jpg",
-    "imageUrl": "/images/laptops/laptopseber/lenovo-thinkpad-t460s.jpg"
+    "image": "/images/laptops/lapmatch/lenovo-thinkpad-t460s.jpg",
+    "imageUrl": "/images/laptops/lapmatch/lenovo-thinkpad-t460s.jpg"
   },
   {
     "name": "Lenovo Thinkpad L490",
@@ -104,8 +104,8 @@
     "batteryHours": 8,
     "weightKg": 1.45,
     "mobilityScore": 82,
-    "image": "/images/laptops/laptopseber/lenovo-thinkpad-l490.jpg",
-    "imageUrl": "/images/laptops/laptopseber/lenovo-thinkpad-l490.jpg"
+    "image": "/images/laptops/lapmatch/lenovo-thinkpad-l490.jpg",
+    "imageUrl": "/images/laptops/lapmatch/lenovo-thinkpad-l490.jpg"
   },
   {
     "name": "Lenovo Thinkpad T480",
@@ -122,8 +122,8 @@
     "batteryHours": 8.5,
     "weightKg": 1.48,
     "mobilityScore": 83,
-    "image": "/images/laptops/laptopseber/lenovo-thinkpad-t480.jpg",
-    "imageUrl": "/images/laptops/laptopseber/lenovo-thinkpad-t480.jpg"
+    "image": "/images/laptops/lapmatch/lenovo-thinkpad-t480.jpg",
+    "imageUrl": "/images/laptops/lapmatch/lenovo-thinkpad-t480.jpg"
   },
   {
     "name": "Lenovo Thinkpad L13 YOGA",
@@ -140,8 +140,8 @@
     "batteryHours": 8,
     "weightKg": 1.45,
     "mobilityScore": 82,
-    "image": "/images/laptops/laptopseber/lenovo-thinkpad-l13-yoga.jpg",
-    "imageUrl": "/images/laptops/laptopseber/lenovo-thinkpad-l13-yoga.jpg"
+    "image": "/images/laptops/lapmatch/lenovo-thinkpad-l13-yoga.jpg",
+    "imageUrl": "/images/laptops/lapmatch/lenovo-thinkpad-l13-yoga.jpg"
   },
   {
     "name": "Thinkpad X270",
@@ -158,8 +158,8 @@
     "batteryHours": 9,
     "weightKg": 1.28,
     "mobilityScore": 89,
-    "image": "/images/laptops/laptopseber/thinkpad-x270.jpg",
-    "imageUrl": "/images/laptops/laptopseber/thinkpad-x270.jpg"
+    "image": "/images/laptops/lapmatch/thinkpad-x270.jpg",
+    "imageUrl": "/images/laptops/lapmatch/thinkpad-x270.jpg"
   },
   {
     "name": "Dell Latitude E5450",
@@ -176,8 +176,8 @@
     "batteryHours": 8.5,
     "weightKg": 1.45,
     "mobilityScore": 84,
-    "image": "/images/laptops/laptopseber/dell-latitude-e5450.jpg",
-    "imageUrl": "/images/laptops/laptopseber/dell-latitude-e5450.jpg"
+    "image": "/images/laptops/lapmatch/dell-latitude-e5450.jpg",
+    "imageUrl": "/images/laptops/lapmatch/dell-latitude-e5450.jpg"
   },
   {
     "name": "DELL LATITUDE 5400",
@@ -194,8 +194,8 @@
     "batteryHours": 8.5,
     "weightKg": 1.25,
     "mobilityScore": 88,
-    "image": "/images/laptops/laptopseber/dell-latitude-5400.jpg",
-    "imageUrl": "/images/laptops/laptopseber/dell-latitude-5400.jpg"
+    "image": "/images/laptops/lapmatch/dell-latitude-5400.jpg",
+    "imageUrl": "/images/laptops/lapmatch/dell-latitude-5400.jpg"
   },
   {
     "name": "LENOVO THINKPAD X13 YOGA",
@@ -212,8 +212,8 @@
     "batteryHours": 9,
     "weightKg": 1.28,
     "mobilityScore": 89,
-    "image": "/images/laptops/laptopseber/lenovo-thinkpad-x13-yoga.jpg",
-    "imageUrl": "/images/laptops/laptopseber/lenovo-thinkpad-x13-yoga.jpg"
+    "image": "/images/laptops/lapmatch/lenovo-thinkpad-x13-yoga.jpg",
+    "imageUrl": "/images/laptops/lapmatch/lenovo-thinkpad-x13-yoga.jpg"
   },
   {
     "name": "LENOVO THINKPAD L13",
@@ -230,8 +230,8 @@
     "batteryHours": 8,
     "weightKg": 1.45,
     "mobilityScore": 82,
-    "image": "/images/laptops/laptopseber/thinkpad-l13.jpg",
-    "imageUrl": "/images/laptops/laptopseber/thinkpad-l13.jpg"
+    "image": "/images/laptops/lapmatch/thinkpad-l13.jpg",
+    "imageUrl": "/images/laptops/lapmatch/thinkpad-l13.jpg"
   },
   {
     "name": "DELL LATITUDE 3390 2-in-1",
@@ -248,8 +248,8 @@
     "batteryHours": 8.5,
     "weightKg": 1.25,
     "mobilityScore": 88,
-    "image": "/images/laptops/laptopseber/dell-latitude-3390-2-in-1.jpg",
-    "imageUrl": "/images/laptops/laptopseber/dell-latitude-3390-2-in-1.jpg"
+    "image": "/images/laptops/lapmatch/dell-latitude-3390-2-in-1.jpg",
+    "imageUrl": "/images/laptops/lapmatch/dell-latitude-3390-2-in-1.jpg"
   },
   {
     "name": "LENOVO THINKPAD X390 (RAM 16GB)",
@@ -266,8 +266,8 @@
     "batteryHours": 9,
     "weightKg": 1.28,
     "mobilityScore": 89,
-    "image": "/images/laptops/laptopseber/thinkpad-x390-ram-16gb.jpg",
-    "imageUrl": "/images/laptops/laptopseber/thinkpad-x390-ram-16gb.jpg"
+    "image": "/images/laptops/lapmatch/thinkpad-x390-ram-16gb.jpg",
+    "imageUrl": "/images/laptops/lapmatch/thinkpad-x390-ram-16gb.jpg"
   },
   {
     "name": "LENOVO THINKPAD X390 (RAM 8GB)",
@@ -284,8 +284,8 @@
     "batteryHours": 9,
     "weightKg": 1.28,
     "mobilityScore": 89,
-    "image": "/images/laptops/laptopseber/thinkpad-x390-ram-8gb.jpg",
-    "imageUrl": "/images/laptops/laptopseber/thinkpad-x390-ram-8gb.jpg"
+    "image": "/images/laptops/lapmatch/thinkpad-x390-ram-8gb.jpg",
+    "imageUrl": "/images/laptops/lapmatch/thinkpad-x390-ram-8gb.jpg"
   },
   {
     "name": "LENOVO THINKPAD X13 G1",
@@ -302,8 +302,8 @@
     "batteryHours": 9,
     "weightKg": 1.28,
     "mobilityScore": 89,
-    "image": "/images/laptops/laptopseber/thinkpad-x13-g1.jpg",
-    "imageUrl": "/images/laptops/laptopseber/thinkpad-x13-g1.jpg"
+    "image": "/images/laptops/lapmatch/thinkpad-x13-g1.jpg",
+    "imageUrl": "/images/laptops/lapmatch/thinkpad-x13-g1.jpg"
   },
   {
     "name": "LENOVO THINKPAD X13 (RYZEN 5)",
@@ -320,8 +320,8 @@
     "batteryHours": 9,
     "weightKg": 1.28,
     "mobilityScore": 89,
-    "image": "/images/laptops/laptopseber/thinkpad-x13-ryzen-5.jpg",
-    "imageUrl": "/images/laptops/laptopseber/thinkpad-x13-ryzen-5.jpg"
+    "image": "/images/laptops/lapmatch/thinkpad-x13-ryzen-5.jpg",
+    "imageUrl": "/images/laptops/lapmatch/thinkpad-x13-ryzen-5.jpg"
   },
   {
     "name": "SURFACE GO",
@@ -338,8 +338,8 @@
     "batteryHours": 9,
     "weightKg": 0.52,
     "mobilityScore": 98,
-    "image": "/images/laptops/laptopseber/surface-go.jpg",
-    "imageUrl": "/images/laptops/laptopseber/surface-go.jpg"
+    "image": "/images/laptops/lapmatch/surface-go.jpg",
+    "imageUrl": "/images/laptops/lapmatch/surface-go.jpg"
   },
   {
     "name": "Dell Latitude 5310",
@@ -356,7 +356,79 @@
     "batteryHours": 8.5,
     "weightKg": 1.25,
     "mobilityScore": 88,
-    "image": "/images/laptops/laptopseber/dell-latitude-5310.jpg",
-    "imageUrl": "/images/laptops/laptopseber/dell-latitude-5310.jpg"
+    "image": "/images/laptops/lapmatch/dell-latitude-5310.jpg",
+    "imageUrl": "/images/laptops/lapmatch/dell-latitude-5310.jpg"
+  },
+  {
+    "name": "Dell Latitude 3350",
+    "brand": "Dell",
+    "price": "3350000",
+    "condition": "second",
+    "category": "Kuliah",
+    "performaKomposit": 43,
+    "processorScore": 45,
+    "vgaScore": 40,
+    "ramGb": 8,
+    "storageGb": 128,
+    "displaySize": 13.3,
+    "batteryHours": 6.0,
+    "weightKg": 1.7,
+    "mobilityScore": 72,
+    "image": "/images/laptops/lapmatch/dell-latitude-3350.jpg",
+    "imageUrl": "/images/laptops/lapmatch/dell-latitude-3350.jpg"
+  },
+  {
+    "name": "ASUS X441U",
+    "brand": "Asus",
+    "price": "2750000",
+    "condition": "second",
+    "category": "Kuliah",
+    "performaKomposit": 43,
+    "processorScore": 45,
+    "vgaScore": 40,
+    "ramGb": 4,
+    "storageGb": 128,
+    "displaySize": 14.0,
+    "batteryHours": 5.5,
+    "weightKg": 1.75,
+    "mobilityScore": 68,
+    "image": "/images/laptops/lapmatch/asus-x441u.jpg",
+    "imageUrl": "/images/laptops/lapmatch/asus-x441u.jpg"
+  },
+  {
+    "name": "Lenovo Thinkpad T470s",
+    "brand": "Lenovo",
+    "price": "4500000",
+    "condition": "second",
+    "category": "Bisnis",
+    "performaKomposit": 57,
+    "processorScore": 65,
+    "vgaScore": 48,
+    "ramGb": 8,
+    "storageGb": 256,
+    "displaySize": 14.0,
+    "batteryHours": 8.0,
+    "weightKg": 1.36,
+    "mobilityScore": 86,
+    "image": "/images/laptops/lapmatch/lenovo-thinkpad-t470s.jpg",
+    "imageUrl": "/images/laptops/lapmatch/lenovo-thinkpad-t470s.jpg"
+  },
+  {
+    "name": "HP Probook 640 G1",
+    "brand": "HP",
+    "price": "3550000",
+    "condition": "second",
+    "category": "Kuliah",
+    "performaKomposit": 45,
+    "processorScore": 48,
+    "vgaScore": 42,
+    "ramGb": 8,
+    "storageGb": 128,
+    "displaySize": 14.0,
+    "batteryHours": 5.0,
+    "weightKg": 2.0,
+    "mobilityScore": 65,
+    "image": "/images/laptops/lapmatch/hp-probook-640-g1.jpg",
+    "imageUrl": "/images/laptops/lapmatch/hp-probook-640-g1.jpg"
   }
 ]

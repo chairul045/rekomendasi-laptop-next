@@ -22,7 +22,7 @@ import {
   Phone,
 } from 'lucide-react';
 import {
-  LAPTOPSEBER_SHOP,
+  LAPMATCH_SHOP,
   POPULAR_PROBLEMS,
   ServiceProblem,
   diagnoseCustomProblem,
@@ -71,7 +71,7 @@ export default function ServiceLaptopPage() {
     setCustomInput('');
   };
 
-  const shop = LAPTOPSEBER_SHOP;
+  const shop = LAPMATCH_SHOP;
 
   // Aggregate Urgency: Kritis > Sedang > Ringan
   const overallUrgency = selectedProblems.some((p) => p.urgency === 'Kritis')
@@ -100,30 +100,38 @@ export default function ServiceLaptopPage() {
       <Navbar />
 
       <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8">
-        {/* ====== IKLAN SERVICE BANNER DI ATAS ====== */}
-        <div id="iklan-laptopseber" className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-900 via-indigo-900 to-slate-900 text-white p-6 sm:p-10 shadow-2xl border border-violet-500/30">
-          {/* Ambient decorative lighting */}
-          <div className="absolute top-0 right-0 w-[400px] h-[300px] bg-cyan-500/15 blur-[90px] pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-[350px] h-[250px] bg-violet-600/20 blur-[80px] pointer-events-none" />
+        {/* ====== IKLAN SERVICE BANNER DI ATAS (21st.dev Style) ====== */}
+        <div id="iklan-lapmatch" className="relative overflow-hidden rounded-3xl bg-zinc-950 text-white p-6 sm:p-10 shadow-2xl border border-violet-500/30">
+          {/* Ambient decorative lighting & grid backdrop */}
+          <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none" />
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-cyan-500/20 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-violet-600/25 rounded-full blur-[100px] pointer-events-none" />
+
+          {/* Top highlight beam */}
+          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent pointer-events-none" />
 
           <div className="relative z-10 grid lg:grid-cols-12 gap-8 items-center">
             {/* Left Column: Headline & Value Proposition */}
             <div className="lg:col-span-7 space-y-5">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-400 text-zinc-950 shadow-md">
-                  ⭐ REKOMENDASI TERPERCAYA
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-400 text-zinc-950 shadow-md">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-600 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-950"></span>
+                  </span>
+                  REKOMENDASI TERPERCAYA
                 </span>
                 <span className="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-white/10 text-cyan-300 border border-white/20 backdrop-blur-md">
-                  Layanan Servis &amp; Penjualan
+                  Layanan Servis &amp; Unit Pilihan LapMatch
                 </span>
               </div>
 
               <div className="space-y-2">
                 <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-white leading-tight">
-                  LaptopSeber: Servis Laptop Cepat &amp; Laptop Second Bergaransi
+                  LapMatch: Servis Laptop Cepat &amp; Unit Pilihan Bergaransi
                 </h2>
                 <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed max-w-xl">
-                  Solusi terpercaya untuk perbaikan laptop mati total, ganti LCD &amp; baterai, upgrade performa, hingga pilihan laptop second berkualitas tinggi siap pakai untuk kuliah dan kerja.
+                  Solusi terpercaya untuk perbaikan laptop mati total, ganti LCD &amp; baterai, upgrade performa SSD/RAM, hingga kurasi laptop pilihan berkualitas tinggi siap pakai untuk kuliah dan kerja.
                 </p>
               </div>
 
@@ -133,9 +141,9 @@ export default function ServiceLaptopPage() {
                   href={`https://wa.me/${shop.whatsapp}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md hover:bg-white/20 transition"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md hover:bg-white/20 transition hover:border-emerald-400/40"
                 >
-                  <Phone className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+                  <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                   <span>WhatsApp: {shop.phone}</span>
                 </a>
               </div>
@@ -144,9 +152,9 @@ export default function ServiceLaptopPage() {
               <div className="grid sm:grid-cols-2 gap-3 pt-1">
                 {[
                   'Gratis Pengecekan & Konsultasi Kerusakan Awal',
-                  'Garansi Servis Toko & Sparepart Original',
-                  'Koleksi Laptop Second Berkualitas (ThinkPad, Dell, HP)',
-                  'Tracking Servis & Respon Cepat Teknisi Handal',
+                  'Garansi Servis Resmi & Sparepart Asli',
+                  'Koleksi Laptop Berkualitas (ThinkPad, Dell, HP, ASUS)',
+                  'Lacak Status Servis & Respon Cepat Teknisi',
                 ].map((benefit, i) => (
                   <div key={i} className="flex items-center gap-2 text-xs text-zinc-200">
                     <div className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 text-[10px]">
@@ -160,7 +168,7 @@ export default function ServiceLaptopPage() {
               {/* Promotional Action Buttons */}
               <div className="flex flex-wrap items-center gap-3 pt-3">
                 <a
-                  href={`https://wa.me/${shop.whatsapp}?text=Halo%20LaptopSeber,%20saya%20tertarik%20dengan%20layanan%20servis%20dan%20katalog%20laptop%20second%20Anda.`}
+                  href={`https://wa.me/${shop.whatsapp}?text=Halo%20LapMatch,%20saya%20tertarik%20dengan%20layanan%20servis%20dan%20katalog%20laptop%20Anda.`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-emerald-500/30 transition active:scale-95 cursor-pointer"
@@ -171,7 +179,7 @@ export default function ServiceLaptopPage() {
 
                 <Link
                   href="/#katalog"
-                  className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs sm:text-sm transition backdrop-blur-md cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs sm:text-sm transition backdrop-blur-md cursor-pointer hover:border-cyan-400/40"
                 >
                   <Laptop className="w-4 h-4 text-cyan-300" />
                   <span>Lihat Etalase Laptop</span>
@@ -202,7 +210,7 @@ export default function ServiceLaptopPage() {
                     </div>
                   </div>
                   <p className="text-xs text-zinc-300 leading-relaxed">
-                    Mitra terverifikasi resmi Lapmatch untuk servis dan rekomendasi laptop terpercaya.
+                    Layanan resmi LapMatch untuk servis, upgrade perangkat, dan kurasi rekomendasi laptop terpercaya.
                   </p>
                 </div>
               </div>

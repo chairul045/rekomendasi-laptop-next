@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Zap, PhoneCall } from 'lucide-react';
+import { X, Sparkles, PhoneCall, ArrowRight, ShieldCheck, Wrench } from 'lucide-react';
 
-const SESSION_KEY = 'laptopseber_banner_v3_dismissed';
+const SESSION_KEY = 'lapmatch_banner_v3_dismissed';
 
 export default function ShopAdBanner() {
   const [visible, setVisible] = useState(false);
@@ -18,88 +18,91 @@ export default function ShopAdBanner() {
 
   const handleDismiss = () => {
     setVisible(false);
-    try { sessionStorage.setItem(SESSION_KEY, '1'); } catch {}
+    try {
+      sessionStorage.setItem(SESSION_KEY, '1');
+    } catch {}
   };
 
   if (!visible) return null;
 
   return (
-    <div className="relative z-50 w-full px-2 sm:px-4 pt-1.5 sm:pt-2 pb-1 bg-white dark:bg-[#09090d] transition-colors">
-      {/* ── Kotak Iklan dengan BORDER DI SELURUH ISI DI DALAMNYA ── */}
-      <div
-        className="relative overflow-hidden rounded-2xl border-2 sm:border-[3px] border-amber-400 dark:border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.35)]"
-        style={{
-          background: 'linear-gradient(90deg, #d97706 0%, #ea580c 45%, #dc2626 100%)',
-        }}
-      >
-        {/* Animated shimmer highlight */}
+    <aside
+      aria-label="Pengumuman LapMatch"
+      className="relative z-50 w-full px-2 sm:px-4 pt-2 pb-1 bg-white/80 dark:bg-[#09090d]/80 backdrop-blur-md transition-colors"
+    >
+      {/* ── 21st.dev Style Floating Glass Announcement Banner ── */}
+      <div className="relative overflow-hidden rounded-2xl border border-violet-500/25 dark:border-violet-500/30 bg-gradient-to-r from-zinc-950 via-[#0e1122] to-zinc-950 text-white shadow-[0_4px_30px_rgba(139,92,246,0.18)]">
+        {/* Animated Moving Light Beam (21st.dev signature) */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              'linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.22) 50%, transparent 65%)',
+              'linear-gradient(105deg, transparent 20%, rgba(139,92,246,0.12) 35%, rgba(6,182,212,0.18) 50%, rgba(139,92,246,0.12) 65%, transparent 80%)',
             backgroundSize: '200% 100%',
-            animation: 'bannerShimmer 3.5s ease-in-out infinite',
+            animation: 'beamSlide 5s cubic-bezier(0.4, 0, 0.2, 1) infinite',
           }}
         />
 
-        {/* Inner Content dengan border keliling aksen */}
-        <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-5 py-2 sm:py-2.5">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 md:gap-4">
+        {/* Ambient Top Glow Line */}
+        <div className="absolute top-0 inset-x-0 h-[1.5px] bg-gradient-to-r from-transparent via-cyan-400/70 to-violet-500/70 pointer-events-none" />
 
-            {/* Left Block: Info Toko LaptopSeber */}
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-              {/* Badge Nama Toko */}
+        {/* Inner Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-3.5 sm:px-5 py-2.5">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2.5 md:gap-4">
+            {/* Left Block: LapMatch Brand & Message */}
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+              {/* Brand & Live Status Badge */}
               <div className="flex items-center gap-1.5 shrink-0">
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-black/30 border border-white/30 backdrop-blur-sm">
-                  {/* Laptop Icon SVG */}
-                  <svg className="w-4 h-4 text-amber-200 shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20 18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/>
-                  </svg>
-                  <span className="font-black text-white text-xs sm:text-sm tracking-wide">
-                    LaptopSeber
+                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 backdrop-blur-md shadow-inner">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <span className="font-black text-white text-xs sm:text-sm tracking-wide bg-gradient-to-r from-white via-cyan-100 to-violet-200 bg-clip-text">
+                    LapMatch
                   </span>
                 </div>
 
-                <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-300 text-amber-950 font-black text-[10px] tracking-wider uppercase shadow-sm">
-                  <Zap className="w-3 h-3 fill-amber-950" />
-                  <span>Toko Resmi</span>
+                <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-400/20 to-orange-400/20 border border-amber-400/40 text-amber-300 font-bold text-[10px] sm:text-[11px] tracking-wide">
+                  <Sparkles className="w-3 h-3 text-amber-300 shrink-0" />
+                  <span>Pusat Servis &amp; Laptop Resmi</span>
                 </div>
               </div>
 
-              {/* No Telepon / WhatsApp */}
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-white text-[11px] sm:text-xs font-semibold">
-                <a
-                  href="https://wa.me/6287851164239"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-white font-mono hover:underline"
-                >
-                  <PhoneCall className="w-3.5 h-3.5 text-emerald-200 shrink-0" />
-                  <span>087851164239</span>
-                </a>
+              {/* Tagline / Value Proposition */}
+              <div className="hidden lg:flex items-center gap-2 text-xs text-zinc-300">
+                <span className="text-zinc-600 dark:text-zinc-500">|</span>
+                <span className="inline-flex items-center gap-1 text-zinc-300">
+                  <Wrench className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                  <span>Servis Kilat &amp; Ganti Sparepart</span>
+                </span>
+                <span className="text-zinc-600 dark:text-zinc-500">•</span>
+                <span className="inline-flex items-center gap-1 text-zinc-300">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>Garansi Resmi QC 30+ Titik</span>
+                </span>
               </div>
             </div>
 
-            {/* Right Block: Tombol WhatsApp & Dismiss */}
-            <div className="flex items-center gap-2 shrink-0 self-end md:self-auto">
+            {/* Right Block: Actions */}
+            <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 self-end md:self-auto">
               <a
-                href="https://wa.me/6287851164239"
+                href="https://wa.me/6287851164239?text=Halo%20LapMatch,%20saya%20ingin%20konsultasi%20mengenai%20rekomendasi%20laptop%20atau%20servis."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-black text-xs text-orange-700 bg-white hover:bg-amber-50 active:scale-95 transition shadow-md whitespace-nowrap border border-amber-200"
+                className="group relative inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-500 shadow-[0_2px_15px_rgba(16,185,129,0.35)] hover:shadow-[0_4px_20px_rgba(16,185,129,0.5)] active:scale-95 transition-all whitespace-nowrap border border-emerald-400/30"
               >
-                <svg className="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                </svg>
-                <span>Hubungi WA</span>
+                <PhoneCall className="w-3.5 h-3.5 text-white shrink-0 group-hover:rotate-12 transition-transform" />
+                <span>Konsultasi WA</span>
+                <span className="hidden sm:inline font-mono font-normal opacity-90 text-[11px]">(087851164239)</span>
+                <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
               </a>
 
               <button
                 type="button"
                 onClick={handleDismiss}
-                aria-label="Tutup iklan"
-                className="p-1 rounded-xl bg-black/20 hover:bg-black/40 text-white/80 hover:text-white transition active:scale-95 cursor-pointer border border-white/20"
+                aria-label="Tutup pengumuman"
+                className="p-1.5 rounded-xl bg-white/5 hover:bg-white/15 text-zinc-400 hover:text-white transition active:scale-90 cursor-pointer border border-white/10"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -109,11 +112,11 @@ export default function ShopAdBanner() {
       </div>
 
       <style>{`
-        @keyframes bannerShimmer {
-          0%   { background-position: -200% center; }
+        @keyframes beamSlide {
+          0% { background-position: -200% center; }
           100% { background-position: 200% center; }
         }
       `}</style>
-    </div>
+    </aside>
   );
 }
