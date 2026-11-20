@@ -21,6 +21,8 @@ import {
 import Navbar from './Navbar';
 import Footer from './Footer';
 import LaptopCatalog, { LaptopCatalogItem } from '@/app/LaptopCatalog';
+import FeaturedLaptopAdBanner from '@/components/FeaturedLaptopAdBanner';
+import { BannerAd } from '@/lib/banner-store';
 import dynamic from 'next/dynamic';
 
 const PerspectiveTunnelHero = dynamic(
@@ -71,7 +73,13 @@ const cardVariants = {
   }),
 };
 
-export default function LandingPage({ previewLaptops = [] }: { previewLaptops?: LaptopCatalogItem[] }) {
+export default function LandingPage({
+  previewLaptops = [],
+  initialBanners = [],
+}: {
+  previewLaptops?: LaptopCatalogItem[];
+  initialBanners?: BannerAd[];
+}) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const toggleFaq = (idx: number) => {
@@ -324,6 +332,34 @@ export default function LandingPage({ previewLaptops = [] }: { previewLaptops?: 
 
           <PerspectiveTunnelHero />
         </section>
+
+        {/* BANNER IKLAN PROMO PILIHAN */}
+        {initialBanners && initialBanners.length > 0 && (
+          <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full space-y-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="space-y-1"
+            >
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                <span className="text-xs font-mono font-bold text-cyan-500 dark:text-cyan-400 uppercase tracking-widest">
+                  Promo &amp; Rekomendasi Terhangat
+                </span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white">
+                Rekomendasi Laptop Pilihan Editor
+              </h2>
+              <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
+                Laptop pilihan terbaik dengan harga promo spesial, garansi resmi, dan QC 30+ titik siap pakai.
+              </p>
+            </motion.div>
+
+            <FeaturedLaptopAdBanner initialBanners={initialBanners} userEmail={null} />
+          </section>
+        )}
 
         {/* PREVIEW KATALOG */}
         {previewLaptops.length > 0 && (

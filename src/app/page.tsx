@@ -92,9 +92,12 @@ export default async function HomePage() {
     console.warn('[HomePage] Database query failed (check DATABASE_URL in Vercel):', err);
   }
 
+  // Fetch active promo banners for both guest and logged-in users
+  const activeBanners = await getActiveBanners();
+
   // === GUEST MODE: Show landing page ===
   if (!user) {
-    return <LandingPage previewLaptops={laptops} />;
+    return <LandingPage previewLaptops={laptops} initialBanners={activeBanners} />;
   }
 
   // === LOGGED-IN MODE: Fetch profile & consultation history ===
@@ -204,8 +207,6 @@ export default async function HomePage() {
 
   const latestSession = consultationsSerialized[0];
   const latestBest = latestSession?.hasilTopsis[0]?.laptop;
-
-  const activeBanners = await getActiveBanners();
 
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-[#09090d] text-zinc-900 dark:text-zinc-100 transition-colors overflow-x-hidden">

@@ -11,13 +11,18 @@ import {
   Eye,
   EyeOff,
   Sparkles,
-  ExternalLink,
   Layers,
   ArrowUpDown,
-  ShoppingBag,
+  Flame,
+  Zap,
+  Tag,
+  Monitor,
+  Cpu,
+  RefreshCw,
+  ExternalLink,
 } from 'lucide-react';
 import { BannerAd } from '@/lib/banner-store';
-import { formatRupiah } from '@/lib/laptop-utils';
+import { formatRupiah, getLaptopImageUrl } from '@/lib/laptop-utils';
 
 interface BannerFormData {
   title: string;
@@ -52,12 +57,135 @@ const EMPTY_FORM: BannerFormData = {
   ramGb: '16',
   storageGb: '512',
   display: '15.6" IPS High Refresh Rate',
-  imageUrl: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800&auto=format&fit=crop&q=80',
+  imageUrl: '/images/laptops/gaming-laptop.jpg',
   tokopediaUrl: '',
   shopeeUrl: '',
   isActive: true,
   sortOrder: '1',
 };
+
+const BANNER_PRESETS = [
+  {
+    name: 'ASUS VivoBook 15 OLED',
+    data: {
+      title: 'ASUS VivoBook 15 OLED - Layar 2.8K OLED Nyaman & Baterai Awet Seharian',
+      brand: 'ASUS',
+      subtitle: 'Rekomendasi #1 mahasiswa untuk skripsi, coding, dan multitasking. Layar OLED 100% DCI-P3 akurat dengan sertifikasi Eye Care anti mata lelah.',
+      price: '11999000',
+      originalPrice: '13499000',
+      discount: 'Hemat 11%',
+      badge: '🏆 Pilihan #1 Kuliah & Skripsi',
+      processor: 'Intel Core i5-1335U (10 Cores, up to 4.6 GHz)',
+      vga: 'Intel Iris Xe Graphics 80EU',
+      ramGb: '16',
+      storageGb: '512',
+      display: '15.6" FHD OLED 100% DCI-P3 600 nits Peak',
+      imageUrl: '/images/laptops/asus-vivobook.jpg',
+      tokopediaUrl: 'https://www.tokopedia.com/search?q=asus+vivobook+15+oled',
+      shopeeUrl: 'https://shopee.co.id/search?keyword=asus+vivobook+15+oled',
+    },
+  },
+  {
+    name: 'Lenovo LOQ 15 Gaming',
+    data: {
+      title: 'Lenovo LOQ 15 Gaming - Intel Core i5 13th Gen + RTX 4050 6GB',
+      brand: 'Lenovo',
+      subtitle: 'Performa buas paling rasional untuk mahasiswa teknik informatika & multimedia. Libas rendering Blender 3D, machine learning, dan gaming esport.',
+      price: '14999000',
+      originalPrice: '16999000',
+      discount: 'Hemat 12%',
+      badge: '⚡ Best Value Gaming & Render',
+      processor: 'Intel Core i5-13420H (8 Cores, 12 Threads)',
+      vga: 'NVIDIA GeForce RTX 4050 6GB GDDR6 (95W TGP)',
+      ramGb: '16',
+      storageGb: '512',
+      display: '15.6" FHD IPS 144Hz 100% sRGB G-SYNC',
+      imageUrl: '/images/laptops/gaming-laptop.jpg',
+      tokopediaUrl: 'https://www.tokopedia.com/search?q=lenovo+loq+15',
+      shopeeUrl: 'https://shopee.co.id/search?keyword=lenovo+loq+15',
+    },
+  },
+  {
+    name: 'Apple MacBook Air M3 15"',
+    data: {
+      title: 'Apple MacBook Air M3 15-inch - Desain Ultra Tipis & Baterai 18 Jam',
+      brand: 'Apple',
+      subtitle: 'Standar emas produktivitas mahasiswa modern. Desain elegan tanpa kipas, performa Neural Engine AI kencang, dan ketahanan baterai tembus 18 jam.',
+      price: '18999000',
+      originalPrice: '21499000',
+      discount: 'Hemat 12%',
+      badge: '✨ Favorit Desain & Mobilitas',
+      processor: 'Apple M3 Chip (8-Core CPU, 10-Core GPU, 16-Core Neural Engine)',
+      vga: 'Apple 10-Core Integrated GPU with Hardware Ray Tracing',
+      ramGb: '16',
+      storageGb: '512',
+      display: '15.3" Liquid Retina True Tone (500 nits, P3 Wide Color)',
+      imageUrl: '/images/laptops/macbook.jpg',
+      tokopediaUrl: 'https://www.tokopedia.com/search?q=macbook+air+m3',
+      shopeeUrl: 'https://shopee.co.id/search?keyword=macbook+air+m3',
+    },
+  },
+  {
+    name: 'Acer Swift Go 14 AI',
+    data: {
+      title: 'Acer Swift Go 14 AI - Intel Core Ultra 5 dengan Intel AI Boost NPU',
+      brand: 'Acer',
+      subtitle: 'Laptop bertenaga AI generasi terbaru bersertifikasi Intel Evo. Bobot super ringan hanya 1.32 kg, siap diajak kuliah seharian tanpa pusing cari colokan.',
+      price: '13499000',
+      originalPrice: '14999000',
+      discount: 'Hemat 10%',
+      badge: '🚀 Next-Gen AI Laptop 2026',
+      processor: 'Intel Core Ultra 5 125H (14 Cores, 18 Threads)',
+      vga: 'Intel Arc Graphics (Dedicated-Class iGPU)',
+      ramGb: '16',
+      storageGb: '512',
+      display: '14.0" 2.8K OLED (2880x1800) 90Hz 100% DCI-P3',
+      imageUrl: '/images/laptops/acer-aspire.jpg',
+      tokopediaUrl: 'https://www.tokopedia.com/search?q=acer+swift+go+14',
+      shopeeUrl: 'https://shopee.co.id/search?keyword=acer+swift+go+14',
+    },
+  },
+  {
+    name: 'Lenovo ThinkPad T490 (Second)',
+    data: {
+      title: 'Lenovo ThinkPad T490 Grade A+ - Bandel, Awet & Siap Tempur Skripsi',
+      brand: 'Lenovo',
+      subtitle: 'Pilihan paling cerdas mahasiswa berbudget hemat 4 jutaan. Keyboard legendaris ternyaman di dunia, bodi standar militer MIL-STD-810G tahan banting.',
+      price: '4750000',
+      originalPrice: '6200000',
+      discount: 'Diskon 23%',
+      badge: '💡 Rekomendasi Second Terlaris',
+      processor: 'Intel Core i5-8365U vPro (4 Cores, 8 Threads)',
+      vga: 'Intel UHD Graphics 620',
+      ramGb: '16',
+      storageGb: '512',
+      display: '14.0" FHD IPS Anti-Glare 300 nits',
+      imageUrl: '/images/laptops/thinkpad.jpg',
+      tokopediaUrl: 'https://www.tokopedia.com/search?q=thinkpad+t490',
+      shopeeUrl: 'https://shopee.co.id/search?keyword=thinkpad+t490',
+    },
+  },
+  {
+    name: 'Lapmatch Care: Servis & Upgrade',
+    data: {
+      title: 'Lapmatch Care: Paket Servis Kilat, Bersih Kipas & Upgrade SSD RAM',
+      brand: 'Lapmatch Care',
+      subtitle: 'Laptop lemot, cepat panas, atau baterai drop? Konsultasi kerusakan gratis, upgrade kilat ditunggu, dan garansi resmi servis 90 hari.',
+      price: '75000',
+      originalPrice: '150000',
+      discount: 'Promo 50%',
+      badge: '🛠️ Servis & Upgrade Resmi',
+      processor: 'Mendukung Semua Merek: ASUS, Lenovo, HP, Acer, Apple, MSI',
+      vga: 'Teknisi Profesional & Sparepart Original Bergaransi',
+      ramGb: '16',
+      storageGb: '512',
+      display: 'Diagnosa Cepat & Estimasi Biaya Transparan',
+      imageUrl: '/images/laptops/lapmatch/lenovo-thinkpad-t480.jpg',
+      tokopediaUrl: '/service-laptop',
+      shopeeUrl: '/service-laptop',
+    },
+  },
+];
 
 export default function AdminBannerManager() {
   const [banners, setBanners] = useState<BannerAd[]>([]);
@@ -67,30 +195,22 @@ export default function AdminBannerManager() {
   const [form, setForm] = useState<BannerFormData>(EMPTY_FORM);
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    let ignore = false;
-    async function load() {
-      try {
-        const res = await fetch('/api/admin/banners');
-        if (!res.ok) throw new Error('Gagal memuat banner.');
-        const data = await res.json();
-        if (!ignore) {
-          setBanners(data.banners || []);
-        }
-      } catch {
-        if (!ignore) {
-          toast.error('Gagal mengambil daftar banner iklan.');
-        }
-      } finally {
-        if (!ignore) {
-          setLoading(false);
-        }
-      }
+  const fetchBanners = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/banners');
+      if (!res.ok) throw new Error('Gagal memuat banner.');
+      const data = await res.json();
+      setBanners(data.banners || []);
+    } catch {
+      toast.error('Gagal mengambil daftar banner iklan.');
+    } finally {
+      setLoading(false);
     }
-    load();
-    return () => {
-      ignore = true;
-    };
+  };
+
+  useEffect(() => {
+    fetchBanners();
   }, []);
 
   const handleOpenCreate = () => {
@@ -124,6 +244,14 @@ export default function AdminBannerManager() {
       sortOrder: String(b.sortOrder || 1),
     });
     setShowModal(true);
+  };
+
+  const handleApplyPreset = (presetData: (typeof BANNER_PRESETS)[0]['data']) => {
+    setForm((prev) => ({
+      ...prev,
+      ...presetData,
+    }));
+    toast.success('Template berhasil dimuat ke formulir! ✨');
   };
 
   const handleToggle = async (id: string) => {
@@ -197,80 +325,115 @@ export default function AdminBannerManager() {
     }
   };
 
+  const activeCount = banners.filter((b) => b.isActive).length;
+  const inactiveCount = banners.length - activeCount;
+
   return (
     <div className="space-y-6">
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md shadow-xl">
-        <div>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 rounded-3xl bg-white dark:bg-[#0e0e15]/80 border border-slate-200 dark:border-white/10 shadow-sm dark:shadow-xl">
+        <div className="space-y-1">
           <div className="flex items-center gap-2 mb-1">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-            <span className="font-mono text-xs text-cyan-300">Pengaturan Slider Iklan Dashboard</span>
+            <span className="w-2 h-2 rounded-full bg-cyan-500 dark:bg-cyan-400 animate-pulse" />
+            <span className="font-mono text-xs font-bold text-cyan-600 dark:text-cyan-300">
+              Pengaturan Slider Iklan LapMatch
+            </span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-black text-white">
+          <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white">
             Kelola Banner &amp; Iklan Slide
           </h2>
-          <p className="text-xs text-zinc-400">
-            Iklan aktif akan langsung tayang pada carousel slider di dashboard utama pengguna.
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Slide yang aktif akan langsung tampil di beranda utama untuk pengguna dan tamu.
           </p>
+          <div className="flex flex-wrap items-center gap-2 pt-2">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono font-medium bg-slate-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700">
+              <Layers className="w-3.5 h-3.5 text-violet-500" />
+              <span>Total: <strong>{banners.length}</strong> Slide</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span>{activeCount} Tayang Aktif</span>
+            </span>
+            {inactiveCount > 0 && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono font-medium bg-slate-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-slate-200 dark:border-zinc-700">
+                <EyeOff className="w-3.5 h-3.5" />
+                <span>{inactiveCount} Nonaktif</span>
+              </span>
+            )}
+          </div>
         </div>
 
-        <button
-          onClick={handleOpenCreate}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-violet-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-bold text-xs sm:text-sm transition shadow-lg shadow-violet-600/25 active:scale-95 cursor-pointer shrink-0"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Tambah Slide Iklan Baru</span>
-        </button>
-      </div>
-
-      {/* Banner Cards List */}
-      {loading ? (
-        <div className="text-center py-20">
-          <div className="w-8 h-8 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-xs text-zinc-400 mt-3 font-mono">Memuat daftar slide iklan...</p>
-        </div>
-      ) : banners.length === 0 ? (
-        <div className="p-12 text-center rounded-3xl bg-[#0e0e15]/80 border border-white/10">
-          <Layers className="w-10 h-10 text-zinc-500 mx-auto mb-3" />
-          <h3 className="text-base font-bold text-white">Belum Ada Banner Iklan</h3>
-          <p className="text-xs text-zinc-400 mt-1 mb-4">Tambahkan slide pertama Anda sekarang.</p>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={fetchBanners}
+            title="Muat Ulang"
+            className="p-2.5 rounded-2xl bg-slate-100 dark:bg-zinc-900 hover:bg-slate-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border border-slate-200 dark:border-white/10 transition cursor-pointer"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          </button>
           <button
             onClick={handleOpenCreate}
-            className="px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-violet-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-bold text-xs sm:text-sm transition shadow-lg shadow-violet-600/25 active:scale-95 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Tambah Slide Baru</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Banner Cards Grid */}
+      {loading ? (
+        <div className="text-center py-20 bg-white dark:bg-[#0e0e15]/80 rounded-3xl border border-slate-200 dark:border-white/10">
+          <div className="w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-3 font-mono">Memuat daftar slide iklan...</p>
+        </div>
+      ) : banners.length === 0 ? (
+        <div className="p-12 text-center rounded-3xl bg-white dark:bg-[#0e0e15]/80 border border-slate-200 dark:border-white/10">
+          <Layers className="w-10 h-10 text-zinc-400 dark:text-zinc-500 mx-auto mb-3" />
+          <h3 className="text-base font-bold text-zinc-900 dark:text-white">Belum Ada Banner Iklan</h3>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 mb-4">Tambahkan slide pertama Anda sekarang.</p>
+          <button
+            onClick={handleOpenCreate}
+            className="px-5 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs shadow-md"
           >
             + Buat Slide Baru
           </button>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 gap-4">
-          {banners.map((b, idx) => (
+          {banners.map((b) => (
             <div
               key={b.id}
               className={`p-5 rounded-3xl border transition duration-200 flex flex-col justify-between ${
                 b.isActive
-                  ? 'bg-[#0e0e15]/90 border-white/10 hover:border-violet-500/40'
-                  : 'bg-zinc-950/40 border-white/5 opacity-60'
+                  ? 'bg-white dark:bg-[#0e0e15]/90 border-slate-200 dark:border-white/10 hover:border-violet-500/40 shadow-sm dark:shadow-none'
+                  : 'bg-slate-50 dark:bg-zinc-950/40 border-slate-200 dark:border-white/5 opacity-60'
               }`}
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                    <span className="px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold bg-cyan-50 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-500/30">
                       {b.brand}
                     </span>
-                    <span className="text-[10px] font-mono text-zinc-400">
+                    <span className="text-[10px] font-mono text-zinc-500 dark:text-zinc-400">
                       Urutan: <strong>#{b.sortOrder}</strong>
                     </span>
+                    {b.badge && (
+                      <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-amber-50 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30">
+                        {b.badge}
+                      </span>
+                    )}
                   </div>
 
                   <span
                     className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold ${
                       b.isActive
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                        : 'bg-zinc-800 text-zinc-400'
+                        ? 'bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30'
+                        : 'bg-slate-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400'
                     }`}
                   >
-                    <span className={`w-1.5 h-1.5 rounded-full ${b.isActive ? 'bg-emerald-400' : 'bg-zinc-500'}`} />
+                    <span className={`w-1.5 h-1.5 rounded-full ${b.isActive ? 'bg-emerald-500' : 'bg-zinc-400'}`} />
                     <span>{b.isActive ? 'Tayang' : 'Nonaktif'}</span>
                   </span>
                 </div>
@@ -280,40 +443,55 @@ export default function AdminBannerManager() {
                   <img
                     src={b.imageUrl}
                     alt={b.title}
-                    className="w-20 h-16 rounded-xl object-cover border border-white/10 shrink-0 bg-zinc-900"
+                    className="w-24 h-20 rounded-xl object-contain border border-slate-200 dark:border-white/10 shrink-0 bg-slate-50 dark:bg-zinc-900 p-1"
+                    onError={(e) => {
+                      e.currentTarget.src = getLaptopImageUrl(b.brand, b.title);
+                    }}
                   />
                   <div className="min-w-0">
-                    <h3 className="font-bold text-sm text-white line-clamp-1">{b.title}</h3>
-                    <p className="text-xs text-zinc-400 line-clamp-2 mt-0.5">{b.subtitle}</p>
-                    <div className="text-sm font-mono font-black text-emerald-400 mt-1">
-                      {formatRupiah(b.price)}
+                    <h3 className="font-bold text-sm text-zinc-900 dark:text-white line-clamp-1">{b.title}</h3>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2 mt-0.5">{b.subtitle}</p>
+                    <div className="flex items-baseline gap-2 mt-1">
+                      <span className="text-sm font-mono font-black text-emerald-600 dark:text-emerald-400">
+                        {formatRupiah(b.price)}
+                      </span>
+                      {b.originalPrice > b.price && (
+                        <span className="text-xs text-zinc-400 line-through font-mono">
+                          {formatRupiah(b.originalPrice)}
+                        </span>
+                      )}
+                      {b.discount && (
+                        <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400">
+                          {b.discount}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 {/* Specs Pill List */}
-                <div className="flex flex-wrap gap-1.5 pt-1 text-[10px] font-mono text-zinc-300">
-                  <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800">
+                <div className="flex flex-wrap gap-1.5 pt-1 text-[10px] font-mono">
+                  <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300">
                     {b.processor}
                   </span>
-                  <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-amber-300">
+                  <span className="px-2 py-0.5 rounded bg-amber-50 dark:bg-zinc-900 border border-amber-200 dark:border-zinc-800 text-amber-700 dark:text-amber-300">
                     {b.vga}
                   </span>
-                  <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-cyan-300">
+                  <span className="px-2 py-0.5 rounded bg-cyan-50 dark:bg-zinc-900 border border-cyan-200 dark:border-zinc-800 text-cyan-700 dark:text-cyan-300">
                     {b.ramGb}GB RAM / {b.storageGb}GB SSD
                   </span>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-between pt-4 mt-4 border-t border-white/5">
+              <div className="flex items-center justify-between pt-4 mt-4 border-t border-slate-100 dark:border-white/5">
                 <button
                   type="button"
                   onClick={() => handleToggle(b.id)}
                   className={`text-xs font-semibold px-3 py-1.5 rounded-xl border transition flex items-center gap-1.5 cursor-pointer ${
                     b.isActive
-                      ? 'bg-zinc-900 text-zinc-300 border-zinc-800 hover:bg-zinc-800'
-                      : 'bg-emerald-950/40 text-emerald-300 border-emerald-800/40 hover:bg-emerald-900/40'
+                      ? 'bg-slate-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-800'
+                      : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/40'
                   }`}
                 >
                   {b.isActive ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
@@ -324,7 +502,7 @@ export default function AdminBannerManager() {
                   <button
                     type="button"
                     onClick={() => handleOpenEdit(b)}
-                    className="p-2 rounded-xl bg-cyan-950/40 hover:bg-cyan-900/40 text-cyan-300 border border-cyan-800/40 transition cursor-pointer"
+                    className="p-2 rounded-xl bg-cyan-50 dark:bg-cyan-950/40 hover:bg-cyan-100 dark:hover:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800/40 transition cursor-pointer"
                     title="Edit banner"
                   >
                     <Pencil className="w-3.5 h-3.5" />
@@ -332,7 +510,7 @@ export default function AdminBannerManager() {
                   <button
                     type="button"
                     onClick={() => handleDelete(b.id, b.title)}
-                    className="p-2 rounded-xl bg-rose-950/40 hover:bg-rose-900/40 text-rose-300 border border-rose-800/40 transition cursor-pointer"
+                    className="p-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/40 transition cursor-pointer"
                     title="Hapus banner"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -346,184 +524,275 @@ export default function AdminBannerManager() {
 
       {/* Modal Form Tambah / Edit Banner */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
-          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-8 rounded-3xl bg-[#0e0e15] border border-cyan-500/40 shadow-2xl space-y-6">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
-              <h3 className="font-extrabold text-lg text-white">
-                {editingId ? 'Edit Slide Iklan Banner' : 'Tambah Slide Iklan Baru'}
-              </h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in">
+          <div className="relative w-full max-w-3xl max-h-[92vh] overflow-y-auto p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#0e0e15] border border-slate-200 dark:border-cyan-500/40 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10">
+              <div>
+                <h3 className="font-extrabold text-lg text-zinc-900 dark:text-white">
+                  {editingId ? 'Edit Slide Iklan Banner' : 'Tambah Slide Iklan Baru'}
+                </h3>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  Isi data di bawah atau muat dari template preset.
+                </p>
+              </div>
               <button
                 onClick={() => setShowModal(false)}
-                className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800"
+                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
+            {/* Quick Preset Selector */}
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200 dark:border-white/10 space-y-2">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                <Sparkles className="w-3.5 h-3.5 text-cyan-500" />
+                <span>Pilih Template Cepat (Isi Otomatis):</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {BANNER_PRESETS.map((preset, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleApplyPreset(preset.data)}
+                    className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-white dark:bg-zinc-800 hover:bg-violet-50 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 border border-slate-200 dark:border-zinc-700 transition cursor-pointer"
+                  >
+                    + {preset.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Live Preview Card */}
+            <div className="p-4 rounded-2xl bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-white/10 space-y-2">
+              <span className="text-[10px] font-mono uppercase text-zinc-500 font-bold tracking-wider">
+                Live Preview Mini:
+              </span>
+              <div className="flex items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={form.imageUrl || '/images/laptops/gaming-laptop.jpg'}
+                  alt="Preview"
+                  className="w-20 h-16 rounded-xl object-contain bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 p-1 shrink-0"
+                  onError={(e) => {
+                    e.currentTarget.src = getLaptopImageUrl(form.brand, form.title);
+                  }}
+                />
+                <div className="min-w-0 flex-grow">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-bold font-mono px-1.5 py-0.5 rounded bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300">
+                      {form.brand || 'BRAND'}
+                    </span>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">
+                      {form.badge || 'PROMO'}
+                    </span>
+                  </div>
+                  <h4 className="font-bold text-xs text-zinc-900 dark:text-white truncate mt-1">
+                    {form.title || 'Judul Laptop Banner'}
+                  </h4>
+                  <div className="flex items-baseline gap-2 mt-0.5">
+                    <span className="text-xs font-mono font-black text-emerald-600 dark:text-emerald-400">
+                      {form.price ? formatRupiah(Number(form.price)) : 'Rp 0'}
+                    </span>
+                    {form.discount && (
+                      <span className="text-[9px] text-rose-500 font-bold">{form.discount}</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="font-semibold text-zinc-300">Judul Banner Laptop *</label>
+                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">Judul Banner Laptop *</label>
                   <input
                     type="text"
                     required
                     value={form.title}
                     onChange={(e) => setForm({ ...form, title: e.target.value })}
                     placeholder="Contoh: ASUS ROG Strix G16 AI 2026"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-zinc-300">Merek / Brand *</label>
+                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">Merek / Brand *</label>
                   <input
                     type="text"
                     required
                     value={form.brand}
                     onChange={(e) => setForm({ ...form, brand: e.target.value })}
                     placeholder="Contoh: ASUS, Apple, Lenovo, MSI"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-300">Deskripsi / Subtitle Iklan</label>
+                <label className="font-semibold text-zinc-700 dark:text-zinc-300">Deskripsi / Subtitle Iklan</label>
                 <textarea
                   rows={2}
                   value={form.subtitle}
                   onChange={(e) => setForm({ ...form, subtitle: e.target.value })}
                   placeholder="Deskripsi keunggulan laptop untuk memikat pengguna..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white focus:outline-none focus:border-cyan-400"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500"
                 />
               </div>
 
               <div className="grid sm:grid-cols-3 gap-4">
                 <div className="space-y-1">
-                  <label className="font-semibold text-zinc-300">Harga Promo (Rp) *</label>
+                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">Harga Promo (Rp) *</label>
                   <input
                     type="number"
                     required
                     value={form.price}
                     onChange={(e) => setForm({ ...form, price: e.target.value })}
                     placeholder="Contoh: 21999000"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-zinc-300">Harga Asli Coret (Rp)</label>
+                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">Harga Asli Coret (Rp)</label>
                   <input
                     type="number"
                     value={form.originalPrice}
                     onChange={(e) => setForm({ ...form, originalPrice: e.target.value })}
                     placeholder="Contoh: 24999000"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-zinc-300">Label Diskon</label>
+                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">Label Diskon</label>
                   <input
                     type="text"
                     value={form.discount}
                     onChange={(e) => setForm({ ...form, discount: e.target.value })}
                     placeholder="Contoh: Hemat 15%"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500"
                   />
                 </div>
               </div>
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="font-semibold text-zinc-300">Processor</label>
+                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">Processor</label>
                   <input
                     type="text"
                     value={form.processor}
                     onChange={(e) => setForm({ ...form, processor: e.target.value })}
                     placeholder="Contoh: AMD Ryzen 9 7845HX"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-zinc-300">VGA / GPU</label>
+                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">VGA / GPU</label>
                   <input
                     type="text"
                     value={form.vga}
                     onChange={(e) => setForm({ ...form, vga: e.target.value })}
                     placeholder="Contoh: NVIDIA RTX 4070 8GB"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500"
                   />
                 </div>
               </div>
 
               <div className="grid sm:grid-cols-3 gap-4">
                 <div className="space-y-1">
-                  <label className="font-semibold text-zinc-300">RAM (GB)</label>
+                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">RAM (GB)</label>
                   <input
                     type="number"
                     value={form.ramGb}
                     onChange={(e) => setForm({ ...form, ramGb: e.target.value })}
                     placeholder="16"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-zinc-300">Storage SSD (GB)</label>
+                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">Storage SSD (GB)</label>
                   <input
                     type="number"
                     value={form.storageGb}
                     onChange={(e) => setForm({ ...form, storageGb: e.target.value })}
                     placeholder="1000"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-zinc-300">Urutan Slide (1, 2, ...)</label>
+                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">Urutan Slide (1, 2, ...)</label>
                   <input
                     type="number"
                     value={form.sortOrder}
                     onChange={(e) => setForm({ ...form, sortOrder: e.target.value })}
                     placeholder="1"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">Badge Penawaran</label>
+                  <input
+                    type="text"
+                    value={form.badge}
+                    onChange={(e) => setForm({ ...form, badge: e.target.value })}
+                    placeholder="Contoh: 🔥 Promo Terbaru"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">Layar / Display</label>
+                  <input
+                    type="text"
+                    value={form.display}
+                    onChange={(e) => setForm({ ...form, display: e.target.value })}
+                    placeholder='Contoh: 15.6" IPS 144Hz'
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-300">URL Gambar Banner</label>
+                <label className="font-semibold text-zinc-700 dark:text-zinc-300">URL Gambar Banner</label>
                 <input
-                  type="url"
+                  type="text"
                   value={form.imageUrl}
                   onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-                  placeholder="https://..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white focus:outline-none focus:border-cyan-400"
+                  placeholder="/images/laptops/gaming-laptop.jpg atau https://..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500 font-mono text-[11px]"
                 />
+                <span className="text-[10px] text-zinc-500 block">
+                  Tip: Anda dapat menggunakan gambar lokal seperti <code className="text-cyan-600 dark:text-cyan-400">/images/laptops/asus-vivobook.jpg</code>, <code className="text-cyan-600 dark:text-cyan-400">/images/laptops/gaming-laptop.jpg</code>, dll.
+                </span>
               </div>
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="font-semibold text-zinc-300">Link Tokopedia (Opsional)</label>
+                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">Link Tokopedia (Opsional)</label>
                   <input
                     type="text"
                     value={form.tokopediaUrl}
                     onChange={(e) => setForm({ ...form, tokopediaUrl: e.target.value })}
                     placeholder="Kosongkan untuk otomatis cari di Tokopedia"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-zinc-300">Link Shopee (Opsional)</label>
+                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">Link Shopee (Opsional)</label>
                   <input
                     type="text"
                     value={form.shopeeUrl}
                     onChange={(e) => setForm({ ...form, shopeeUrl: e.target.value })}
                     placeholder="Kosongkan untuk otomatis cari di Shopee"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:border-cyan-500"
                   />
                 </div>
               </div>
@@ -534,25 +803,25 @@ export default function AdminBannerManager() {
                   id="isActive"
                   checked={form.isActive}
                   onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
-                  className="w-4 h-4 rounded text-cyan-500 focus:ring-0 bg-zinc-900 border-zinc-700"
+                  className="w-4 h-4 rounded text-cyan-500 focus:ring-0 bg-slate-100 dark:bg-zinc-900 border-slate-300 dark:border-zinc-700"
                 />
-                <label htmlFor="isActive" className="text-zinc-300 font-semibold cursor-pointer">
-                  Langsung Tayangkan Slide ini di Dashboard
+                <label htmlFor="isActive" className="text-zinc-700 dark:text-zinc-300 font-semibold cursor-pointer">
+                  Langsung Tayangkan Slide ini di Dashboard &amp; Beranda
                 </label>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-white/10">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-semibold cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-zinc-900 hover:bg-slate-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold cursor-pointer transition"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 text-white font-bold disabled:opacity-50 cursor-pointer shadow-lg shadow-cyan-500/20"
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 text-white font-bold disabled:opacity-50 cursor-pointer shadow-lg shadow-cyan-500/20 active:scale-95 transition"
                 >
                   {submitting ? 'Menyimpan...' : 'Simpan Slide Iklan'}
                 </button>

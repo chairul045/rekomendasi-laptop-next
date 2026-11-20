@@ -101,14 +101,14 @@ export default function ServiceLaptopPage() {
 
       <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8">
         {/* ====== IKLAN SERVICE BANNER DI ATAS (21st.dev Style) ====== */}
-        <div id="iklan-lapmatch" className="relative overflow-hidden rounded-3xl bg-zinc-950 text-white p-6 sm:p-10 shadow-2xl border border-violet-500/30">
-          {/* Ambient decorative lighting & grid backdrop */}
-          <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none" />
-          <div className="absolute -top-24 -right-24 w-96 h-96 bg-cyan-500/20 rounded-full blur-[100px] pointer-events-none" />
-          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-violet-600/25 rounded-full blur-[100px] pointer-events-none" />
+        <div id="iklan-lapmatch" className="relative overflow-hidden rounded-3xl bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white p-6 sm:p-10 shadow-xl dark:shadow-2xl border border-slate-200 dark:border-violet-500/30">
+          {/* Ambient decorative lighting & grid backdrop (dark only) */}
+          <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none hidden dark:block" />
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-cyan-500/20 rounded-full blur-[100px] pointer-events-none hidden dark:block" />
+          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-violet-600/25 rounded-full blur-[100px] pointer-events-none hidden dark:block" />
 
           {/* Top highlight beam */}
-          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent pointer-events-none" />
+          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-violet-500 via-cyan-500 to-indigo-500 pointer-events-none" />
 
           <div className="relative z-10 grid lg:grid-cols-12 gap-8 items-center">
             {/* Left Column: Headline & Value Proposition */}
@@ -121,30 +121,30 @@ export default function ServiceLaptopPage() {
                   </span>
                   REKOMENDASI TERPERCAYA
                 </span>
-                <span className="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-white/10 text-cyan-300 border border-white/20 backdrop-blur-md">
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-cyan-50 dark:bg-white/10 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-white/20 backdrop-blur-md">
                   Layanan Servis &amp; Unit Pilihan LapMatch
                 </span>
               </div>
 
               <div className="space-y-2">
-                <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-white leading-tight">
+                <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-zinc-900 dark:text-white leading-tight">
                   LapMatch: Servis Laptop Cepat &amp; Unit Pilihan Bergaransi
                 </h2>
-                <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed max-w-xl">
+                <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed max-w-xl">
                   Solusi terpercaya untuk perbaikan laptop mati total, ganti LCD &amp; baterai, upgrade performa SSD/RAM, hingga kurasi laptop pilihan berkualitas tinggi siap pakai untuk kuliah dan kerja.
                 </p>
               </div>
 
               {/* Kontak */}
-              <div className="flex flex-wrap gap-3 text-xs text-zinc-200">
+              <div className="flex flex-wrap gap-3 text-xs text-zinc-700 dark:text-zinc-200">
                 <a
                   href={`https://wa.me/${shop.whatsapp}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md hover:bg-white/20 transition hover:border-emerald-400/40"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-white/10 border border-slate-200 dark:border-white/15 backdrop-blur-md hover:bg-slate-100 dark:hover:bg-white/20 transition hover:border-emerald-400/40"
                 >
-                  <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span>WhatsApp: {shop.phone}</span>
+                  <Phone className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400 shrink-0" />
+                  <span className="font-medium">WhatsApp: {shop.phone}</span>
                 </a>
               </div>
 
@@ -156,8 +156,8 @@ export default function ServiceLaptopPage() {
                   'Koleksi Laptop Berkualitas (ThinkPad, Dell, HP, ASUS)',
                   'Lacak Status Servis & Respon Cepat Teknisi',
                 ].map((benefit, i) => (
-                  <div key={i} className="flex items-center gap-2 text-xs text-zinc-200">
-                    <div className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 text-[10px]">
+                  <div key={i} className="flex items-center gap-2 text-xs text-zinc-700 dark:text-zinc-200">
+                    <div className="w-4 h-4 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 text-[10px]">
                       <Check className="w-3 h-3" />
                     </div>
                     <span>{benefit}</span>
@@ -171,7 +171,7 @@ export default function ServiceLaptopPage() {
                   href={`https://wa.me/${shop.whatsapp}?text=Halo%20LapMatch,%20saya%20tertarik%20dengan%20layanan%20servis%20dan%20katalog%20laptop%20Anda.`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-emerald-500/30 transition active:scale-95 cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-emerald-500/30 transition active:scale-95 cursor-pointer"
                 >
                   <MessageSquare className="w-4 h-4" />
                   <span>Konsultasi WhatsApp Langsung ({shop.phone})</span>
@@ -179,9 +179,9 @@ export default function ServiceLaptopPage() {
 
                 <Link
                   href="/#katalog"
-                  className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs sm:text-sm transition backdrop-blur-md cursor-pointer hover:border-cyan-400/40"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 border border-slate-200 dark:border-white/20 text-zinc-800 dark:text-white font-bold text-xs sm:text-sm transition backdrop-blur-md cursor-pointer hover:border-cyan-400/40"
                 >
-                  <Laptop className="w-4 h-4 text-cyan-300" />
+                  <Laptop className="w-4 h-4 text-cyan-500 dark:text-cyan-300" />
                   <span>Lihat Etalase Laptop</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
@@ -190,26 +190,29 @@ export default function ServiceLaptopPage() {
 
             {/* Right Column: Visual Feature Card */}
             <div className="lg:col-span-5">
-              <div className="relative rounded-2xl bg-black/40 border border-white/15 p-5 backdrop-blur-md space-y-4">
-                <div className="aspect-[16/10] w-full rounded-xl overflow-hidden bg-zinc-950 border border-white/10 relative">
+              <div className="relative rounded-2xl bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/15 p-5 backdrop-blur-md space-y-4">
+                <div className="aspect-[16/10] w-full rounded-xl overflow-hidden bg-zinc-900 border border-slate-200 dark:border-white/10 relative">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={shop.imageUrl}
                     alt={shop.name}
                     className="w-full h-full object-cover"
                     loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.src = '/images/laptops/thinkpad.jpg';
+                    }}
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-base font-bold text-white">{shop.name}</h3>
-                    <div className="flex items-center gap-1 text-amber-400 text-xs font-mono font-bold">
+                    <h3 className="text-base font-bold text-zinc-900 dark:text-white">{shop.name}</h3>
+                    <div className="flex items-center gap-1 text-amber-500 dark:text-amber-400 text-xs font-mono font-bold">
                       <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                       <span>5.0</span>
                     </div>
                   </div>
-                  <p className="text-xs text-zinc-300 leading-relaxed">
+                  <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
                     Layanan resmi LapMatch untuk servis, upgrade perangkat, dan kurasi rekomendasi laptop terpercaya.
                   </p>
                 </div>

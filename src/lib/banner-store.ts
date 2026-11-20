@@ -40,8 +40,7 @@ export const DEFAULT_BANNERS: BannerAd[] = [
     ramGb: 16,
     storageGb: 512,
     display: '15.6" FHD OLED 100% DCI-P3 600 nits Peak',
-    imageUrl:
-      'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80',
+    imageUrl: '/images/laptops/asus-vivobook.jpg',
     tokopediaUrl: 'https://www.tokopedia.com/search?q=asus+vivobook+15+oled',
     shopeeUrl: 'https://shopee.co.id/search?keyword=asus+vivobook+15+oled',
     isActive: true,
@@ -63,8 +62,7 @@ export const DEFAULT_BANNERS: BannerAd[] = [
     ramGb: 16,
     storageGb: 512,
     display: '15.6" FHD IPS 144Hz 100% sRGB G-SYNC',
-    imageUrl:
-      'https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800&auto=format&fit=crop&q=80',
+    imageUrl: '/images/laptops/gaming-laptop.jpg',
     tokopediaUrl: 'https://www.tokopedia.com/search?q=lenovo+loq+15',
     shopeeUrl: 'https://shopee.co.id/search?keyword=lenovo+loq+15',
     isActive: true,
@@ -86,8 +84,7 @@ export const DEFAULT_BANNERS: BannerAd[] = [
     ramGb: 16,
     storageGb: 512,
     display: '15.3" Liquid Retina True Tone (500 nits, P3 Wide Color)',
-    imageUrl:
-      'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&auto=format&fit=crop&q=80',
+    imageUrl: '/images/laptops/macbook.jpg',
     tokopediaUrl: 'https://www.tokopedia.com/search?q=macbook+air+m3',
     shopeeUrl: 'https://shopee.co.id/search?keyword=macbook+air+m3',
     isActive: true,
@@ -109,8 +106,7 @@ export const DEFAULT_BANNERS: BannerAd[] = [
     ramGb: 16,
     storageGb: 512,
     display: '14.0" 2.8K OLED (2880x1800) 90Hz 100% DCI-P3',
-    imageUrl:
-      'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop&q=80',
+    imageUrl: '/images/laptops/acer-aspire.jpg',
     tokopediaUrl: 'https://www.tokopedia.com/search?q=acer+swift+go+14',
     shopeeUrl: 'https://shopee.co.id/search?keyword=acer+swift+go+14',
     isActive: true,
@@ -132,8 +128,7 @@ export const DEFAULT_BANNERS: BannerAd[] = [
     ramGb: 16,
     storageGb: 512,
     display: '14.0" FHD IPS Anti-Glare 300 nits',
-    imageUrl:
-      'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=800&auto=format&fit=crop&q=80',
+    imageUrl: '/images/laptops/thinkpad.jpg',
     tokopediaUrl: 'https://www.tokopedia.com/search?q=thinkpad+t490',
     shopeeUrl: 'https://shopee.co.id/search?keyword=thinkpad+t490',
     isActive: true,
@@ -155,8 +150,7 @@ export const DEFAULT_BANNERS: BannerAd[] = [
     ramGb: 16,
     storageGb: 512,
     display: 'Diagnosa Cepat & Estimasi Biaya Transparan',
-    imageUrl:
-      'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=800&auto=format&fit=crop&q=80',
+    imageUrl: '/images/laptops/lapmatch/lenovo-thinkpad-t480.jpg',
     tokopediaUrl: '/service-laptop',
     shopeeUrl: '/service-laptop',
     isActive: true,

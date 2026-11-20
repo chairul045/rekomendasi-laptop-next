@@ -17,7 +17,7 @@ import {
   HardDrive,
   Monitor,
 } from 'lucide-react';
-import { formatRupiah } from '@/lib/laptop-utils';
+import { formatRupiah, getLaptopImageUrl } from '@/lib/laptop-utils';
 import { BannerAd } from '@/lib/banner-store';
 
 export default function FeaturedLaptopAdBanner({
@@ -32,6 +32,15 @@ export default function FeaturedLaptopAdBanner({
   const [isPaused, setIsPaused] = useState(false);
   const [direction, setDirection] = useState<'next' | 'prev'>('next');
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const currentBanner = banners[currentIndex] || banners[0];
+  const [imgSrc, setImgSrc] = useState(currentBanner?.imageUrl || '');
+
+  useEffect(() => {
+    if (currentBanner?.imageUrl) {
+      setImgSrc(currentBanner.imageUrl);
+    }
+  }, [currentBanner?.imageUrl]);
 
   useEffect(() => {
     if (!initialBanners || initialBanners.length === 0) {
@@ -57,7 +66,6 @@ export default function FeaturedLaptopAdBanner({
 
   if (!banners || banners.length === 0) return null;
 
-  const currentBanner = banners[currentIndex] || banners[0];
   const isSuperAdmin = userEmail?.toLowerCase() === 'chairulanwarr003@gmail.com';
   const isServisBanner = currentBanner.brand.toLowerCase().includes('care') || currentBanner.brand.toLowerCase().includes('servis');
 
@@ -284,8 +292,14 @@ export default function FeaturedLaptopAdBanner({
                   <div className="absolute inset-0 hidden dark:block" style={{ background: 'radial-gradient(ellipse at center, rgba(99,102,241,0.12) 0%, rgba(0,0,0,0.6) 70%)' }} />
 
                   <motion.img
-                    src={currentBanner.imageUrl}
+                    src={imgSrc || getLaptopImageUrl(currentBanner.brand, currentBanner.title)}
                     alt={currentBanner.title}
+                    onError={() => {
+                      const fallback = getLaptopImageUrl(currentBanner.brand, currentBanner.title);
+                      if (imgSrc !== fallback) {
+                        setImgSrc(fallback);
+                      }
+                    }}
                     className="relative z-10 w-full h-full object-contain drop-shadow-2xl"
                     loading="lazy"
                     whileHover={{ scale: 1.06, y: -6 }}
