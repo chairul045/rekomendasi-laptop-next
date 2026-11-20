@@ -76,6 +76,58 @@ async function main() {
     }
   }
 
+  // 3. Seed Banners from data/banners.json
+  const bannersJsonPath = path.join(__dirname, '..', 'data', 'banners.json');
+  if (fs.existsSync(bannersJsonPath)) {
+    const bannersData = JSON.parse(fs.readFileSync(bannersJsonPath, 'utf8'));
+    console.log(`📥 Seeding ${bannersData.length} banner iklan...`);
+    for (const b of bannersData) {
+      await prisma.banner.upsert({
+        where: { id: b.id },
+        update: {
+          title: b.title,
+          brand: b.brand,
+          subtitle: b.subtitle,
+          price: BigInt(b.price),
+          originalPrice: BigInt(b.originalPrice || b.price),
+          discount: b.discount || '',
+          badge: b.badge || '',
+          processor: b.processor || '',
+          vga: b.vga || '',
+          ramGb: Number(b.ramGb) || 0,
+          storageGb: Number(b.storageGb) || 0,
+          display: b.display || '',
+          imageUrl: b.imageUrl,
+          tokopediaUrl: b.tokopediaUrl || null,
+          shopeeUrl: b.shopeeUrl || null,
+          isActive: b.isActive ?? true,
+          sortOrder: Number(b.sortOrder) || 0,
+        },
+        create: {
+          id: b.id,
+          title: b.title,
+          brand: b.brand,
+          subtitle: b.subtitle,
+          price: BigInt(b.price),
+          originalPrice: BigInt(b.originalPrice || b.price),
+          discount: b.discount || '',
+          badge: b.badge || '',
+          processor: b.processor || '',
+          vga: b.vga || '',
+          ramGb: Number(b.ramGb) || 0,
+          storageGb: Number(b.storageGb) || 0,
+          display: b.display || '',
+          imageUrl: b.imageUrl,
+          tokopediaUrl: b.tokopediaUrl || null,
+          shopeeUrl: b.shopeeUrl || null,
+          isActive: b.isActive ?? true,
+          sortOrder: Number(b.sortOrder) || 0,
+        },
+      });
+    }
+    console.log(`✅ ${bannersData.length} banner iklan synced to database`);
+  }
+
   console.log('🎉 Seeding selesai!');
 }
 
