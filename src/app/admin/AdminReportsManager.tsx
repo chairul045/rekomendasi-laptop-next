@@ -1,4 +1,4 @@
-// src/app/admin/AdminReportsManager.tsx - Laporan Analitik & Ekspor Data Excel/CSV
+// src/app/admin/AdminReportsManager.tsx - Laporan Analitik & Ekspor Data Excel/CSV Modern
 'use client';
 
 import { useState } from 'react';
@@ -51,7 +51,6 @@ export default function AdminReportsManager() {
   const handleExportExcel = async (format: 'xlsx' | 'csv') => {
     setExporting(true);
     try {
-      // Fetch data lengkap laptop dan riwayat kuesioner
       const [resLaptops, resUsers, resQuest] = await Promise.all([
         fetch('/api/admin/laptops').then((r) => r.json()),
         fetch('/api/admin/users').then((r) => r.json()),
@@ -132,16 +131,16 @@ export default function AdminReportsManager() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-[#0e0e15]/90 border border-white/10 backdrop-blur-md">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
-            <span className="font-mono text-xs text-emerald-300 font-bold uppercase tracking-wider">
+            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+            <span className="font-mono text-xs text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider">
               Laporan &amp; Ekspor Data Sistem
             </span>
           </div>
-          <h1 className="text-2xl font-black text-white">Ekspor Data &amp; Ringkasan Analitik</h1>
-          <p className="text-xs text-zinc-400 mt-0.5">
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white">Ekspor Data &amp; Ringkasan Analitik</h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Unduh seluruh database katalog laptop, akun pengguna, dan riwayat kuesioner ke Excel (.xlsx) atau CSV.
           </p>
         </div>
@@ -151,7 +150,7 @@ export default function AdminReportsManager() {
             type="button"
             disabled={exporting}
             onClick={() => handleExportExcel('xlsx')}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs transition shadow-lg shadow-emerald-600/25 active:scale-95 disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs transition shadow-xs disabled:opacity-50 cursor-pointer min-h-[42px]"
           >
             <Download className="w-4 h-4" />
             <span>{exporting ? 'Memproses...' : 'Ekspor ke Excel (.xlsx)'}</span>
@@ -160,7 +159,7 @@ export default function AdminReportsManager() {
             type="button"
             disabled={exporting}
             onClick={() => handleExportExcel('csv')}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/10 text-xs font-semibold transition cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-semibold transition cursor-pointer min-h-[42px]"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Ekspor CSV</span>
@@ -169,40 +168,40 @@ export default function AdminReportsManager() {
       </div>
 
       {/* Ringkasan Data yang Akan Diekspor */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="p-6 rounded-3xl bg-[#0e0e15]/90 border border-white/10 space-y-2">
-          <span className="text-xs font-mono text-zinc-400 uppercase">Sheet 1</span>
-          <h3 className="text-base font-bold text-white">Katalog Laptop Alternatif</h3>
-          <p className="text-xs text-zinc-400 leading-relaxed">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+        <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-2 shadow-xs">
+          <span className="text-xs font-mono font-bold text-blue-600 dark:text-blue-400 uppercase">Sheet 1</span>
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">Katalog Laptop Alternatif</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
             Mencakup ID, merek, spesifikasi teknis prosesor, RAM, SSD, skor performa, baterai, berat, dan harga pasar.
           </p>
         </div>
 
-        <div className="p-6 rounded-3xl bg-[#0e0e15]/90 border border-white/10 space-y-2">
-          <span className="text-xs font-mono text-zinc-400 uppercase">Sheet 2</span>
-          <h3 className="text-base font-bold text-white">Akun Pengguna Terdaftar</h3>
-          <p className="text-xs text-zinc-400 leading-relaxed">
+        <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-2 shadow-xs">
+          <span className="text-xs font-mono font-bold text-indigo-600 dark:text-indigo-400 uppercase">Sheet 2</span>
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">Akun Pengguna Terdaftar</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
             Mencakup profil nama mahasiswa/user, alamat email, role akun, tanggal bergabung, dan frekuensi konsultasi.
           </p>
         </div>
 
-        <div className="p-6 rounded-3xl bg-[#0e0e15]/90 border border-white/10 space-y-2">
-          <span className="text-xs font-mono text-zinc-400 uppercase">Sheet 3</span>
-          <h3 className="text-base font-bold text-white">Riwayat Perhitungan TOPSIS</h3>
-          <p className="text-xs text-zinc-400 leading-relaxed">
+        <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-2 shadow-xs">
+          <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 uppercase">Sheet 3</span>
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">Riwayat Perhitungan TOPSIS</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
             Mencakup rentang anggaran mahasiswa, prioritas kriteria, laptop pemenang peringkat 1, dan nilai preferensi Vi.
           </p>
         </div>
       </div>
 
       {/* Informasi Kesesuaian Laporan */}
-      <div className="p-6 rounded-3xl bg-zinc-950/70 border border-white/10 flex items-start gap-3.5">
-        <div className="w-9 h-9 rounded-2xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center justify-center shrink-0 mt-0.5">
+      <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-start gap-3.5">
+        <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 flex items-center justify-center shrink-0 mt-0.5">
           <CheckCircle2 className="w-5 h-5" />
         </div>
         <div className="space-y-1">
-          <h4 className="text-sm font-bold text-white">Format Laporan Standar Akademik</h4>
-          <p className="text-xs text-zinc-400 leading-relaxed">
+          <h4 className="text-sm font-bold text-slate-900 dark:text-white">Format Laporan Standar Akademik</h4>
+          <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
             File Excel yang diekspor diformat dengan header kolom yang rapi sehingga siap digunakan sebagai lampiran data penelitian, skripsi, tugas akhir, atau laporan berkala pengelola sistem rekomendasi laptop Lapmatch.
           </p>
         </div>

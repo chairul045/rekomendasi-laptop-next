@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
-import Link from 'next/link';
+import { useState, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import {
   Laptop,
@@ -101,14 +100,16 @@ function StatCard({
   color: string;
 }) {
   return (
-    <div className="p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md">
-      <div className="flex items-center justify-between text-xs text-zinc-400 mb-3">
-        <span className="font-mono uppercase text-[11px] tracking-wider text-zinc-400">{label}</span>
+    <div className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs">
+      <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-3">
+        <span className="uppercase text-[11px] font-bold tracking-wider">{label}</span>
         <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${color}`}>
           <Icon className="w-4 h-4" />
         </div>
       </div>
-      <div className="text-3xl font-black text-white font-mono">{value.toLocaleString('id-ID')}</div>
+      <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-mono">
+        {value.toLocaleString('id-ID')}
+      </div>
     </div>
   );
 }
@@ -202,20 +203,20 @@ function LaptopFormModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-[#0e0e15] border border-white/10 rounded-3xl shadow-2xl p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between pb-4 border-b border-white/10">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
+      <div className="relative w-full max-w-2xl bg-white dark:bg-[#0d1527] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
           <div>
-            <h2 className="text-lg font-bold text-white">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
               {mode === 'create' ? 'Tambah Data Laptop Baru' : `Edit: ${initial?.name}`}
             </h2>
-            <p className="text-xs text-zinc-400">
+            <p className="text-xs text-slate-500">
               Masukkan spesifikasi lengkap laptop untuk basis data rekomendasi Lapmatch.
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800 transition"
+            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition min-h-[38px] min-w-[38px] flex items-center justify-center cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -224,24 +225,24 @@ function LaptopFormModal({
         <form onSubmit={handleSubmit} className="space-y-4 text-xs">
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-zinc-300 font-semibold block mb-1">Nama Laptop *</label>
+              <label className="text-slate-700 dark:text-slate-300 font-semibold block mb-1">Nama Laptop *</label>
               <input
                 type="text"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="Contoh: ASUS TUF Gaming A15"
                 required
-                className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950/90 border border-zinc-800 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-cyan-400"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
 
             <div>
-              <label className="text-zinc-300 font-semibold block mb-1">Brand / Merek *</label>
+              <label className="text-slate-700 dark:text-slate-300 font-semibold block mb-1">Brand / Merek *</label>
               <select
                 value={form.brand}
                 onChange={(e) => setForm({ ...form, brand: e.target.value })}
                 required
-                className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950/90 border border-zinc-800 text-zinc-100 focus:outline-none focus:border-cyan-400 cursor-pointer"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer"
               >
                 <option value="">Pilih Brand</option>
                 {BRANDS.map((b) => (
@@ -255,23 +256,23 @@ function LaptopFormModal({
 
           <div className="grid sm:grid-cols-3 gap-4">
             <div>
-              <label className="text-zinc-300 font-semibold block mb-1">Harga (Rp) *</label>
+              <label className="text-slate-700 dark:text-slate-300 font-semibold block mb-1">Harga (Rp) *</label>
               <input
                 type="number"
                 value={form.price}
                 onChange={(e) => setForm({ ...form, price: e.target.value })}
                 placeholder="10000000"
                 required
-                className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950/90 border border-zinc-800 text-zinc-100 font-mono focus:outline-none focus:border-cyan-400"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
             </div>
 
             <div>
-              <label className="text-zinc-300 font-semibold block mb-1">Kondisi *</label>
+              <label className="text-slate-700 dark:text-slate-300 font-semibold block mb-1">Kondisi *</label>
               <select
                 value={form.condition}
                 onChange={(e) => setForm({ ...form, condition: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950/90 border border-zinc-800 text-zinc-100 focus:outline-none focus:border-cyan-400 cursor-pointer"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer"
               >
                 <option value="baru">Baru</option>
                 <option value="second">Second</option>
@@ -279,11 +280,11 @@ function LaptopFormModal({
             </div>
 
             <div>
-              <label className="text-zinc-300 font-semibold block mb-1">Kategori</label>
+              <label className="text-slate-700 dark:text-slate-300 font-semibold block mb-1">Kategori</label>
               <select
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950/90 border border-zinc-800 text-zinc-100 focus:outline-none focus:border-cyan-400 cursor-pointer"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer"
               >
                 {CATEGORIES.map((c) => (
                   <option key={c} value={c}>
@@ -296,95 +297,95 @@ function LaptopFormModal({
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
             <div>
-              <label className="text-zinc-400 block mb-1">RAM (GB)</label>
+              <label className="text-slate-500 block mb-1 font-medium">RAM (GB)</label>
               <input
                 type="number"
                 value={form.ramGb}
                 onChange={(e) => setForm({ ...form, ramGb: e.target.value })}
                 placeholder="16"
-                className="w-full px-3 py-2 rounded-xl bg-zinc-950/90 border border-zinc-800 text-zinc-100 font-mono"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono"
               />
             </div>
             <div>
-              <label className="text-zinc-400 block mb-1">SSD (GB)</label>
+              <label className="text-slate-500 block mb-1 font-medium">SSD (GB)</label>
               <input
                 type="number"
                 value={form.storageGb}
                 onChange={(e) => setForm({ ...form, storageGb: e.target.value })}
                 placeholder="512"
-                className="w-full px-3 py-2 rounded-xl bg-zinc-950/90 border border-zinc-800 text-zinc-100 font-mono"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono"
               />
             </div>
             <div>
-              <label className="text-zinc-400 block mb-1">Baterai (Jam)</label>
+              <label className="text-slate-500 block mb-1 font-medium">Baterai (Jam)</label>
               <input
                 type="number"
                 step="0.5"
                 value={form.batteryHours}
                 onChange={(e) => setForm({ ...form, batteryHours: e.target.value })}
                 placeholder="8"
-                className="w-full px-3 py-2 rounded-xl bg-zinc-950/90 border border-zinc-800 text-zinc-100 font-mono"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono"
               />
             </div>
             <div>
-              <label className="text-zinc-400 block mb-1">Berat (kg)</label>
+              <label className="text-slate-500 block mb-1 font-medium">Berat (kg)</label>
               <input
                 type="number"
                 step="0.05"
                 value={form.weightKg}
                 onChange={(e) => setForm({ ...form, weightKg: e.target.value })}
                 placeholder="1.5"
-                className="w-full px-3 py-2 rounded-xl bg-zinc-950/90 border border-zinc-800 text-zinc-100 font-mono"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono"
               />
             </div>
           </div>
 
           <div className="grid sm:grid-cols-3 gap-3">
             <div>
-              <label className="text-zinc-400 block mb-1">Skor Performa (1-100)</label>
+              <label className="text-slate-500 block mb-1 font-medium">Skor Performa (1-100)</label>
               <input
                 type="number"
                 value={form.performaKomposit}
                 onChange={(e) => setForm({ ...form, performaKomposit: e.target.value })}
                 placeholder="85"
-                className="w-full px-3 py-2 rounded-xl bg-zinc-950/90 border border-zinc-800 text-zinc-100 font-mono"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono"
               />
             </div>
             <div>
-              <label className="text-zinc-400 block mb-1">Layar (Inci)</label>
+              <label className="text-slate-500 block mb-1 font-medium">Layar (Inci)</label>
               <input
                 type="number"
                 step="0.1"
                 value={form.displaySize}
                 onChange={(e) => setForm({ ...form, displaySize: e.target.value })}
                 placeholder="15.6"
-                className="w-full px-3 py-2 rounded-xl bg-zinc-950/90 border border-zinc-800 text-zinc-100 font-mono"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono"
               />
             </div>
             <div>
-              <label className="text-zinc-400 block mb-1">URL Gambar (Opsional)</label>
+              <label className="text-slate-500 block mb-1 font-medium">URL Gambar (Opsional)</label>
               <input
                 type="text"
                 value={form.imageUrl}
                 onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
                 placeholder="images/laptops/asus-tuf.jpg"
-                className="w-full px-3 py-2 rounded-xl bg-zinc-950/90 border border-zinc-800 text-zinc-100"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
               />
             </div>
           </div>
 
-          <div className="pt-4 flex items-center justify-end gap-3 border-t border-white/10">
+          <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-200 dark:border-slate-800">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800 transition"
+              className="px-4 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition min-h-[40px] cursor-pointer"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold transition shadow-lg shadow-violet-600/20 disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow-xs disabled:opacity-50 cursor-pointer min-h-[40px]"
             >
               <Save className="w-4 h-4" />
               <span>{loading ? 'Menyimpan...' : 'Simpan Data'}</span>
@@ -432,7 +433,6 @@ export default function AdminLaptopManager({
       const res = await fetch(`/api/admin/laptops/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Gagal menghapus');
       toast.success(`"${name}" berhasil dihapus.`);
-      // Update state lokal - tidak perlu router.refresh() yang mahal
       setLaptops((prev) => prev.filter((l) => l.id !== id));
     } catch {
       toast.error('Gagal menghapus laptop.');
@@ -445,24 +445,23 @@ export default function AdminLaptopManager({
     } else {
       setLaptops((prev) => [laptop, ...prev]);
     }
-    // Update state lokal - tidak perlu router.refresh() yang mahal
   };
 
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-md shadow-2xl">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-            <span className="font-mono text-xs text-cyan-300 font-bold uppercase tracking-wider">
+            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+            <span className="font-mono text-xs text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider">
               Katalog Alternatif SPK
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             Manajemen Data Laptop Alternatif
           </h1>
-          <p className="text-xs sm:text-sm text-zinc-400">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
             Kelola katalog data laptop untuk algoritma pencocokan cerdas TOPSIS &amp; ROC Lapmatch.
           </p>
         </div>
@@ -470,9 +469,9 @@ export default function AdminLaptopManager({
         <div className="flex flex-wrap items-center gap-2.5">
           <button
             onClick={() => setShowImportModal(true)}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm transition shadow-lg shadow-emerald-600/25 active:scale-[0.98] cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-semibold text-xs transition cursor-pointer min-h-[42px]"
           >
-            <FileSpreadsheet className="w-4 h-4" />
+            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
             <span>Import Excel / CSV</span>
           </button>
           <button
@@ -480,7 +479,7 @@ export default function AdminLaptopManager({
               setEditTarget(undefined);
               setModalMode('create');
             }}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm transition shadow-lg shadow-violet-600/25 active:scale-[0.98] cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs transition shadow-xs cursor-pointer min-h-[42px]"
           >
             <Plus className="w-4 h-4" />
             <span>Tambah Laptop Baru</span>
@@ -488,199 +487,198 @@ export default function AdminLaptopManager({
         </div>
       </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <StatCard
-            icon={Database}
-            label="Total Laptop"
-            value={stats.totalLaptops + (laptops.length - initialLaptops.length)}
-            color="bg-blue-500/10 text-blue-400"
-          />
-          <StatCard
-            icon={Users}
-            label="Total Pengguna"
-            value={stats.totalUsers}
-            color="bg-indigo-500/10 text-indigo-400"
-          />
-          <StatCard
-            icon={ClipboardList}
-            label="Total Konsultasi"
-            value={stats.totalConsultations}
-            color="bg-emerald-500/10 text-emerald-400"
-          />
-        </div>
-
-        {/* Search & Filter */}
-        <div className="p-4 rounded-2xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-sm space-y-3">
-          <div className="relative">
-            <Search className="w-4 h-4 text-zinc-500 absolute left-3 top-3" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari nama atau brand laptop..."
-              className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-zinc-950/90 border border-zinc-800 text-zinc-200 placeholder-zinc-500 text-xs focus:outline-none focus:border-cyan-400 transition"
-            />
-          </div>
-
-          <div className="flex flex-wrap gap-2 items-center">
-            <Filter className="w-4 h-4 text-zinc-500" />
-            <select
-              value={filterBrand}
-              onChange={(e) => setFilterBrand(e.target.value)}
-              className="text-xs bg-zinc-950/90 border border-zinc-800 text-zinc-300 rounded-xl px-3 py-1.5 focus:outline-none focus:border-cyan-400 cursor-pointer"
-            >
-              <option value="">Semua Brand</option>
-              {BRANDS.map((b) => (
-                <option key={b} value={b}>
-                  {b}
-                </option>
-              ))}
-            </select>
-            <select
-              value={filterCondition}
-              onChange={(e) => setFilterCondition(e.target.value)}
-              className="text-xs bg-zinc-950/90 border border-zinc-800 text-zinc-300 rounded-xl px-3 py-1.5 focus:outline-none focus:border-cyan-400 cursor-pointer"
-            >
-              <option value="">Semua Kondisi</option>
-              <option value="baru">Baru</option>
-              <option value="second">Second</option>
-            </select>
-            <span className="ml-auto text-xs text-zinc-400 font-mono">
-              Menampilkan {filtered.length} dari {laptops.length} laptop
-            </span>
-          </div>
-        </div>
-
-        {/* Table */}
-        <div className="rounded-3xl bg-[#0e0e15]/80 border border-white/10 backdrop-blur-xl overflow-hidden shadow-2xl">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs sm:text-sm">
-              <thead>
-                <tr className="border-b border-white/10 bg-black/40 text-zinc-400 font-mono uppercase text-[11px]">
-                  <th className="py-3.5 px-6">Laptop</th>
-                  <th className="py-3.5 px-6">Harga</th>
-                  <th className="py-3.5 px-6 hidden sm:table-cell">Spesifikasi</th>
-                  <th className="py-3.5 px-6 hidden md:table-cell">Skor</th>
-                  <th className="py-3.5 px-6">Kondisi</th>
-                  <th className="py-3.5 px-6 text-right">Aksi</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {filtered.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="text-center py-16 text-zinc-500">
-                      Tidak ada laptop yang cocok dengan filter.
-                    </td>
-                  </tr>
-                ) : (
-                  filtered.map((laptop) => {
-                    const imgUrl = getLaptopImageUrl(laptop.brand, laptop.name, laptop.imageUrl);
-
-                    return (
-                      <tr key={laptop.id} className="hover:bg-white/[0.02] transition">
-                        <td className="py-4 px-6">
-                          <div className="flex items-center gap-3">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={imgUrl}
-                              alt={laptop.name}
-                              className="w-10 h-10 rounded-xl object-cover border border-white/10 flex-shrink-0"
-                              loading="lazy"
-                            />
-                            <div className="min-w-0">
-                              <p className="font-bold text-white text-xs sm:text-sm leading-tight truncate max-w-[200px] sm:max-w-none">
-                                {laptop.name}
-                              </p>
-                              <div className="flex items-center gap-1.5 mt-0.5">
-                                <span className="text-[10px] text-zinc-400 font-mono">{laptop.brand}</span>
-                                {laptop.category && (
-                                  <span className="text-[10px] text-cyan-300 bg-cyan-950/40 px-1.5 py-0.2 rounded font-mono border border-cyan-800/40">
-                                    {laptop.category}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6 font-mono font-bold text-emerald-400 text-xs">
-                          {formatRupiah(laptop.price)}
-                        </td>
-                        <td className="py-4 px-6 hidden sm:table-cell">
-                          <div className="text-xs text-zinc-400 space-y-0.5 font-mono">
-                            {laptop.ramGb && <div>RAM: {laptop.ramGb}GB</div>}
-                            {laptop.storageGb && <div>SSD: {laptop.storageGb}GB</div>}
-                            {laptop.batteryHours && <div>🔋 {laptop.batteryHours} jam</div>}
-                          </div>
-                        </td>
-                        <td className="py-4 px-6 hidden md:table-cell">
-                          <div className="flex items-center gap-1 text-cyan-300 font-mono font-bold text-xs">
-                            <BarChart3 className="w-3.5 h-3.5 text-cyan-400" />
-                            <span>{laptop.performaKomposit ?? '—'} / 100</span>
-                          </div>
-                          {laptop.weightKg && (
-                            <div className="text-[10px] text-zinc-500 font-mono mt-0.5">{laptop.weightKg} kg</div>
-                          )}
-                        </td>
-                        <td className="py-4 px-6">
-                          <span
-                            className={`inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-mono capitalize font-bold ${
-                              laptop.condition === 'baru'
-                                ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
-                                : 'bg-amber-500/10 text-amber-300 border border-amber-500/20'
-                            }`}
-                          >
-                            {laptop.condition}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-right">
-                          <div className="flex items-center justify-end gap-1.5">
-                            <button
-                              onClick={() => {
-                                setEditTarget(laptop);
-                                setModalMode('edit');
-                              }}
-                              className="p-1.5 rounded-lg text-zinc-400 hover:text-cyan-300 hover:bg-zinc-800 transition"
-                              title="Edit"
-                            >
-                              <Pencil className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(laptop.id, laptop.name)}
-                              className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-rose-950/20 transition"
-                              title="Hapus"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Modal Tambah/Edit Manual */}
-        {modalMode && (
-          <LaptopFormModal
-            mode={modalMode}
-            initial={editTarget}
-            onClose={() => setModalMode(null)}
-            onSaved={handleSaved}
-          />
-        )}
-
-        {/* Modal Import Bulk Excel/CSV */}
-        <ImportLaptopModal
-          isOpen={showImportModal}
-          onClose={() => setShowImportModal(false)}
-          onImportSuccess={(latestLaptops) => {
-            setLaptops(latestLaptops);
-          }}
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <StatCard
+          icon={Database}
+          label="Total Laptop"
+          value={stats.totalLaptops + (laptops.length - initialLaptops.length)}
+          color="bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400"
+        />
+        <StatCard
+          icon={Users}
+          label="Total Pengguna"
+          value={stats.totalUsers}
+          color="bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400"
+        />
+        <StatCard
+          icon={ClipboardList}
+          label="Total Konsultasi"
+          value={stats.totalConsultations}
+          color="bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400"
         />
       </div>
-    );
-  }
+
+      {/* Search & Filter */}
+      <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-3 shadow-xs">
+        <div className="relative">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Cari nama atau brand laptop..."
+            className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition min-h-[40px]"
+          />
+        </div>
+
+        <div className="flex flex-wrap gap-2 items-center">
+          <Filter className="w-4 h-4 text-slate-400" />
+          <select
+            value={filterBrand}
+            onChange={(e) => setFilterBrand(e.target.value)}
+            className="text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer min-h-[38px]"
+          >
+            <option value="">Semua Brand</option>
+            {BRANDS.map((b) => (
+              <option key={b} value={b}>
+                {b}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filterCondition}
+            onChange={(e) => setFilterCondition(e.target.value)}
+            className="text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer min-h-[38px]"
+          >
+            <option value="">Semua Kondisi</option>
+            <option value="baru">Baru</option>
+            <option value="second">Second</option>
+          </select>
+          <span className="ml-auto text-xs text-slate-500 font-mono">
+            Menampilkan {filtered.length} dari {laptops.length} laptop
+          </span>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-xs">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse text-xs sm:text-sm">
+            <thead>
+              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 uppercase text-[11px] font-semibold">
+                <th className="py-3.5 px-6">Laptop</th>
+                <th className="py-3.5 px-6">Harga</th>
+                <th className="py-3.5 px-6 hidden sm:table-cell">Spesifikasi</th>
+                <th className="py-3.5 px-6 hidden md:table-cell">Skor</th>
+                <th className="py-3.5 px-6">Kondisi</th>
+                <th className="py-3.5 px-6 text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="text-center py-16 text-slate-500">
+                    Tidak ada laptop yang cocok dengan filter.
+                  </td>
+                </tr>
+              ) : (
+                filtered.map((laptop) => {
+                  const imgUrl = getLaptopImageUrl(laptop.brand, laptop.name, laptop.imageUrl);
+
+                  return (
+                    <tr key={laptop.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition">
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={imgUrl}
+                            alt={laptop.name}
+                            className="w-10 h-10 rounded-xl object-contain bg-slate-50 dark:bg-slate-800 p-1 border border-slate-200 dark:border-slate-700 shrink-0"
+                            loading="lazy"
+                          />
+                          <div className="min-w-0">
+                            <p className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm leading-tight truncate max-w-[200px] sm:max-w-none">
+                              {laptop.name}
+                            </p>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <span className="text-[10px] text-slate-500 uppercase font-semibold">{laptop.brand}</span>
+                              {laptop.category && (
+                                <span className="text-[10px] text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-1.5 py-0.2 rounded font-medium border border-blue-200 dark:border-blue-800">
+                                  {laptop.category}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-4 px-6 font-bold text-blue-700 dark:text-blue-400 text-xs">
+                        {formatRupiah(laptop.price)}
+                      </td>
+                      <td className="py-4 px-6 hidden sm:table-cell">
+                        <div className="text-xs text-slate-600 dark:text-slate-400 space-y-0.5">
+                          {laptop.ramGb && <div>RAM: {laptop.ramGb}GB</div>}
+                          {laptop.storageGb && <div>SSD: {laptop.storageGb}GB</div>}
+                          {laptop.batteryHours && <div>🔋 {laptop.batteryHours} jam</div>}
+                        </div>
+                      </td>
+                      <td className="py-4 px-6 hidden md:table-cell">
+                        <div className="flex items-center gap-1 text-slate-800 dark:text-slate-200 font-bold text-xs">
+                          <BarChart3 className="w-3.5 h-3.5 text-blue-600" />
+                          <span>{laptop.performaKomposit ?? '—'} / 100</span>
+                        </div>
+                        {laptop.weightKg && (
+                          <div className="text-[10px] text-slate-500 mt-0.5">{laptop.weightKg} kg</div>
+                        )}
+                      </td>
+                      <td className="py-4 px-6">
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold capitalize ${
+                            laptop.condition === 'baru'
+                              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                              : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                          }`}
+                        >
+                          {laptop.condition}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => {
+                              setEditTarget(laptop);
+                              setModalMode('edit');
+                            }}
+                            className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-blue-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center"
+                            title="Edit"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(laptop.id, laptop.name)}
+                            className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center"
+                            title="Hapus"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Modal Tambah/Edit Manual */}
+      {modalMode && (
+        <LaptopFormModal
+          mode={modalMode}
+          initial={editTarget}
+          onClose={() => setModalMode(null)}
+          onSaved={handleSaved}
+        />
+      )}
+
+      {/* Modal Import Bulk Excel/CSV */}
+      <ImportLaptopModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onImportSuccess={(latestLaptops) => {
+          setLaptops(latestLaptops);
+        }}
+      />
+    </div>
+  );
+}

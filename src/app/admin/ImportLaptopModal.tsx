@@ -12,7 +12,6 @@ import {
   AlertTriangle,
   FileText,
   Save,
-  Check,
 } from 'lucide-react';
 import { formatRupiah } from '@/lib/laptop-utils';
 
@@ -119,7 +118,6 @@ export default function ImportLaptopModal({
       }
 
       const results: ParsedLaptop[] = rawRows.map((row) => {
-        // Map raw row keys menggunakan normalizeKey
         const mapped: Record<string, unknown> = {};
         for (const [k, v] of Object.entries(row)) {
           mapped[normalizeKey(k)] = v;
@@ -297,26 +295,26 @@ export default function ImportLaptopModal({
   const invalidItems = parsedData.filter((r) => !r.isValid);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
-      <div className="relative w-full max-w-4xl bg-[#0e0e15] border border-white/10 rounded-3xl shadow-2xl p-6 sm:p-8 space-y-6 max-h-[92vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm overflow-y-auto animate-in fade-in">
+      <div className="relative w-full max-w-4xl bg-white dark:bg-[#0d1527] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-7 space-y-5 max-h-[92vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-white/10 shrink-0">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/40 flex items-center justify-center text-blue-600 dark:text-blue-400">
               <FileSpreadsheet className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 Import Data Laptop via Excel / CSV
               </h2>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Tambah banyak data laptop sekaligus dengan mengunggah file spreadsheet (.xlsx, .xls, .csv).
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800 transition cursor-pointer"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -325,12 +323,12 @@ export default function ImportLaptopModal({
         {/* Modal Body - Scrollable */}
         <div className="overflow-y-auto space-y-5 flex-1 pr-1">
           {/* Download Template Banner */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-teal-950/20 to-zinc-950 border border-emerald-500/30 text-xs">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800 text-xs">
             <div>
-              <span className="font-bold text-emerald-300 block mb-0.5">
+              <span className="font-semibold text-slate-900 dark:text-white block mb-0.5">
                 Belum punya format tabel yang sesuai?
               </span>
-              <p className="text-zinc-400 text-[11px]">
+              <p className="text-slate-500 dark:text-slate-400 text-[11px]">
                 Unduh template resmi berikut yang sudah terisi kolom spesifikasi dan contoh data laptop:
               </p>
             </div>
@@ -338,7 +336,7 @@ export default function ImportLaptopModal({
               <button
                 type="button"
                 onClick={() => handleDownloadTemplate('xlsx')}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 font-semibold text-xs transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40 font-medium text-xs transition cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Template Excel (.xlsx)</span>
@@ -346,7 +344,7 @@ export default function ImportLaptopModal({
               <button
                 type="button"
                 onClick={() => handleDownloadTemplate('csv')}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-600/30 hover:bg-teal-600/50 text-teal-300 border border-teal-500/40 font-semibold text-xs transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/40 font-medium text-xs transition cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Template CSV (.csv)</span>
@@ -363,10 +361,10 @@ export default function ImportLaptopModal({
             onDragLeave={() => setIsDragging(false)}
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
-            className={`border-2 border-dashed rounded-3xl p-8 text-center cursor-pointer transition ${
+            className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition ${
               isDragging
-                ? 'border-emerald-400 bg-emerald-950/20 scale-[1.01]'
-                : 'border-zinc-800 hover:border-zinc-700 bg-zinc-950/50'
+                ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/20 scale-[1.01]'
+                : 'border-slate-300 dark:border-slate-700 hover:border-blue-400 bg-slate-50/50 dark:bg-slate-900/20'
             }`}
           >
             <input
@@ -380,23 +378,23 @@ export default function ImportLaptopModal({
                 }
               }}
             />
-            <div className="w-14 h-14 rounded-2xl bg-zinc-900 border border-white/10 flex items-center justify-center mx-auto mb-3 text-emerald-400 shadow-lg">
+            <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center mx-auto mb-3 text-blue-600 dark:text-blue-400 shadow-sm">
               <Upload className="w-6 h-6" />
             </div>
-            <p className="text-sm font-bold text-white mb-1">
+            <p className="text-sm font-semibold text-slate-900 dark:text-white mb-1">
               {file ? file.name : 'Tarik & letakkan file Excel / CSV di sini'}
             </p>
-            <p className="text-xs text-zinc-400 max-w-sm mx-auto">
-              Mendukung format <strong className="text-zinc-200">.XLSX</strong>,{' '}
-              <strong className="text-zinc-200">.XLS</strong>, atau{' '}
-              <strong className="text-zinc-200">.CSV</strong> (Maksimal 10 MB).
+            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+              Mendukung format <strong className="text-slate-700 dark:text-slate-300">.XLSX</strong>,{' '}
+              <strong className="text-slate-700 dark:text-slate-300">.XLS</strong>, atau{' '}
+              <strong className="text-slate-700 dark:text-slate-300">.CSV</strong> (Maksimal 10 MB).
             </p>
           </div>
 
           {/* Status & Preview Table */}
           {isProcessing && (
-            <div className="py-8 text-center text-zinc-400 text-xs">
-              <div className="w-8 h-8 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+            <div className="py-8 text-center text-slate-500 dark:text-slate-400 text-xs">
+              <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
               <span>Memproses dan memvalidasi file spreadsheet...</span>
             </div>
           )}
@@ -405,40 +403,40 @@ export default function ImportLaptopModal({
             <div className="space-y-4 pt-2">
               {/* Summary Stats */}
               <div className="grid grid-cols-3 gap-3 text-xs">
-                <div className="p-3 rounded-2xl bg-zinc-950/80 border border-zinc-800 flex items-center justify-between">
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-zinc-400" />
-                    <span className="text-zinc-400">Total Baris:</span>
+                    <FileText className="w-4 h-4 text-slate-400" />
+                    <span className="text-slate-600 dark:text-slate-400">Total Baris:</span>
                   </div>
-                  <span className="font-bold font-mono text-white text-sm">{parsedData.length}</span>
+                  <span className="font-bold font-mono text-slate-900 dark:text-white text-sm">{parsedData.length}</span>
                 </div>
-                <div className="p-3 rounded-2xl bg-emerald-950/30 border border-emerald-800/40 flex items-center justify-between">
+                <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/40 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span className="text-emerald-300">Baris Valid:</span>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <span className="text-emerald-700 dark:text-emerald-300">Baris Valid:</span>
                   </div>
-                  <span className="font-bold font-mono text-emerald-400 text-sm">{validItems.length}</span>
+                  <span className="font-bold font-mono text-emerald-700 dark:text-emerald-400 text-sm">{validItems.length}</span>
                 </div>
-                <div className="p-3 rounded-2xl bg-amber-950/30 border border-amber-800/40 flex items-center justify-between">
+                <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4 text-amber-400" />
-                    <span className="text-amber-300">Bermasalah:</span>
+                    <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                    <span className="text-amber-700 dark:text-amber-300">Bermasalah:</span>
                   </div>
-                  <span className="font-bold font-mono text-amber-400 text-sm">{invalidItems.length}</span>
+                  <span className="font-bold font-mono text-amber-700 dark:text-amber-400 text-sm">{invalidItems.length}</span>
                 </div>
               </div>
 
               {/* Preview Table (First 5 Rows) */}
-              <div className="border border-white/10 rounded-2xl overflow-hidden bg-zinc-950/60">
-                <div className="p-3 bg-zinc-900/60 border-b border-white/5 flex items-center justify-between text-xs">
-                  <span className="font-semibold text-zinc-300">
+              <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-900/30">
+                <div className="p-3 bg-slate-50 dark:bg-slate-900/70 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
+                  <span className="font-semibold text-slate-700 dark:text-slate-300">
                     Pratinjau Data (Menampilkan {Math.min(5, validItems.length)} dari {validItems.length} baris valid)
                   </span>
-                  <span className="text-[11px] text-zinc-500 font-mono">Format Siap Impor</span>
+                  <span className="text-[11px] text-slate-500 font-mono">Format Siap Impor</span>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-zinc-900/40 text-[11px] text-zinc-400 font-mono border-b border-white/5">
+                    <thead className="bg-slate-50 dark:bg-slate-900/50 text-[11px] text-slate-500 dark:text-slate-400 font-medium border-b border-slate-200 dark:border-slate-800">
                       <tr>
                         <th className="py-2.5 px-4">Nama Laptop</th>
                         <th className="py-2.5 px-3">Brand</th>
@@ -449,32 +447,32 @@ export default function ImportLaptopModal({
                         <th className="py-2.5 px-3">Kategori</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/5 text-zinc-300">
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
                       {validItems.slice(0, 5).map((l, i) => (
-                        <tr key={i} className="hover:bg-white/[0.02]">
-                          <td className="py-2.5 px-4 font-bold text-white max-w-[200px] truncate">{l.name}</td>
+                        <tr key={i} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40">
+                          <td className="py-2.5 px-4 font-semibold text-slate-900 dark:text-white max-w-[200px] truncate">{l.name}</td>
                           <td className="py-2.5 px-3">{l.brand}</td>
-                          <td className="py-2.5 px-3 font-mono text-emerald-400 font-semibold">
+                          <td className="py-2.5 px-3 font-semibold text-emerald-600 dark:text-emerald-400">
                             {formatRupiah(l.price)}
                           </td>
                           <td className="py-2.5 px-3">
                             <span
-                              className={`px-2 py-0.5 rounded-full text-[10px] font-mono capitalize font-bold ${
+                              className={`px-2 py-0.5 rounded-full text-[10px] capitalize font-medium ${
                                 l.condition === 'second'
-                                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                                  : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                  ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/40'
+                                  : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40'
                               }`}
                             >
                               {l.condition}
                             </span>
                           </td>
-                          <td className="py-2.5 px-3 font-mono text-[11px]">
+                          <td className="py-2.5 px-3 text-[11px]">
                             {l.ramGb ?? '-'}GB / {l.storageGb ?? '-'}GB
                           </td>
-                          <td className="py-2.5 px-3 font-mono font-bold text-cyan-300">
+                          <td className="py-2.5 px-3 font-semibold text-blue-600 dark:text-blue-400">
                             {l.performaKomposit ?? '-'}
                           </td>
-                          <td className="py-2.5 px-3 text-zinc-400">{l.category || 'Kuliah'}</td>
+                          <td className="py-2.5 px-3 text-slate-500 dark:text-slate-400">{l.category || 'Kuliah'}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -484,10 +482,10 @@ export default function ImportLaptopModal({
 
               {/* Warning for invalid rows */}
               {invalidItems.length > 0 && (
-                <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-800/40 text-xs text-amber-300 flex items-start gap-2">
+                <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2">
                   <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold">Perhatian:</span> Terdapat {invalidItems.length} baris yang dilewati karena nama, brand, atau harga tidak lengkap. Baris tersebut tidak akan disimpan ke database.
+                    <span className="font-semibold">Perhatian:</span> Terdapat {invalidItems.length} baris yang dilewati karena nama, brand, atau harga tidak lengkap. Baris tersebut tidak akan disimpan ke database.
                   </div>
                 </div>
               )}
@@ -496,11 +494,11 @@ export default function ImportLaptopModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="pt-4 border-t border-white/10 flex items-center justify-between shrink-0">
+        <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2.5 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800 text-xs font-semibold transition cursor-pointer"
+            className="px-4 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-medium transition cursor-pointer"
           >
             Batal
           </button>
@@ -509,7 +507,7 @@ export default function ImportLaptopModal({
             type="button"
             disabled={validItems.length === 0 || isSubmitting}
             onClick={handleSubmitImport}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm transition shadow-lg shadow-emerald-600/25 disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs sm:text-sm transition shadow-sm disabled:opacity-50 cursor-pointer active:scale-[0.98]"
           >
             {isSubmitting ? (
               <>
