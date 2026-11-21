@@ -3,7 +3,7 @@ import prisma from '@/lib/prisma';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import LaptopCatalog from './LaptopCatalog';
+import LaptopCatalog from '@/components/catalog/LaptopCatalog';
 import LandingPage from '@/components/LandingPage';
 import { getLaptopImageUrl, formatRupiah, isNewLaptopArrival } from '@/lib/laptop-utils';
 import { ClipboardList, ArrowRight, Clock, Wrench } from 'lucide-react';

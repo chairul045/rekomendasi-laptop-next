@@ -1,7 +1,7 @@
 // src/app/admin/page.tsx - Halaman Dashboard Admin Terpusat Lapmatch
 import prisma from '@/lib/prisma';
 import { redirect } from 'next/navigation';
-import AdminDashboardLayout from './AdminDashboardLayout';
+import AdminDashboardLayout from '@/components/dashboard/AdminDashboardLayout';
 import { checkAdminAuth } from '@/lib/admin-auth';
 
 export const dynamic = 'force-dynamic';

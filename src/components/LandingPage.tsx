@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import Navbar from './Navbar';
 import Footer from './Footer';
-import LaptopCatalog, { LaptopCatalogItem } from '@/app/LaptopCatalog';
+import LaptopCatalog, { LaptopCatalogItem } from '@/components/catalog/LaptopCatalog';
 import FeaturedLaptopAdBanner from '@/components/FeaturedLaptopAdBanner';
 import { BannerAd } from '@/lib/banner-store';
 import dynamic from 'next/dynamic';
