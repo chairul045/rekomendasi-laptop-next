@@ -39,13 +39,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="id" className={`light h-full ${plusJakartaSans.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
-      <body className="min-h-full flex flex-col bg-white text-zinc-900 dark:bg-[#09090d] dark:text-zinc-100 antialiased selection:bg-violet-500 selection:text-white relative font-sans transition-colors duration-200">
+      <body className="min-h-full flex flex-col bg-[#f8fafc] text-slate-900 dark:bg-[#0a0f1d] dark:text-slate-100 antialiased selection:bg-blue-600 selection:text-white relative font-sans transition-colors duration-200">
         <ThemeProvider>
-          {/* Ambient background decoration - only visible in dark mode to keep light mode completely clean & pure white */}
-          <div className="fixed inset-0 pointer-events-none bg-grid-pattern opacity-0 dark:opacity-80 z-0 transition-opacity" />
-          <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[850px] h-[400px] bg-gradient-to-b from-violet-600/15 via-indigo-600/10 to-transparent blur-[120px] pointer-events-none z-0 opacity-0 dark:opacity-100 transition-opacity" />
-          <div className="fixed top-20 right-0 w-[500px] h-[350px] bg-gradient-to-bl from-cyan-500/15 via-blue-600/10 to-transparent blur-[110px] pointer-events-none z-0 opacity-0 dark:opacity-100 transition-opacity" />
-          <div className="fixed top-60 left-0 w-[450px] h-[350px] bg-gradient-to-tr from-pink-500/10 via-purple-600/10 to-transparent blur-[110px] pointer-events-none z-0 opacity-0 dark:opacity-100 transition-opacity" />
+          {/* Subtle ambient lighting - calm navy, indigo, and soft blue tones */}
+          <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[360px] bg-gradient-to-b from-blue-600/10 via-indigo-600/5 to-transparent blur-[120px] pointer-events-none z-0 opacity-40 dark:opacity-70 transition-opacity" />
+          <div className="fixed top-32 right-0 w-[450px] h-[300px] bg-gradient-to-bl from-indigo-500/10 via-blue-500/5 to-transparent blur-[100px] pointer-events-none z-0 opacity-30 dark:opacity-60 transition-opacity" />
+          <div className="fixed top-64 left-0 w-[400px] h-[300px] bg-gradient-to-tr from-slate-500/5 via-blue-600/5 to-transparent blur-[100px] pointer-events-none z-0 opacity-20 dark:opacity-50 transition-opacity" />
 
           <div className="relative z-10 flex flex-col min-h-screen">
             <ShopAdBanner />
@@ -59,13 +58,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             toastOptions={{
               duration: 4000,
               style: {
-                background: '#0e0e15',
-                color: '#f4f4f5',
+                background: '#0f172a',
+                color: '#f8fafc',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '16px',
+                borderRadius: '12px',
                 fontSize: '13px',
                 backdropFilter: 'blur(16px)',
-                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
+                boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.4), 0 4px 6px -2px rgba(15, 23, 42, 0.2)',
               },
             }}
           />

@@ -1,4 +1,4 @@
-// components/auth/AuthButton.tsx - Tombol Utama Auth dengan Spinner & Tap Target >= 44px
+// components/auth/AuthButton.tsx - Tombol Utama Auth Konsisten & Jelas (>= 44px Tap Target)
 'use client';
 
 import React from 'react';
@@ -21,15 +21,15 @@ export default function AuthButton({
   ...props
 }: AuthButtonProps) {
   const baseStyles =
-    'w-full min-h-[44px] py-3 px-5 rounded-xl font-bold text-sm tracking-wide transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0e0e15] disabled:opacity-60 disabled:cursor-not-allowed select-none active:scale-[0.99]';
+    'w-full min-h-[44px] py-3 px-5 rounded-xl font-bold text-sm tracking-wide transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900 disabled:opacity-60 disabled:cursor-not-allowed select-none active:scale-[0.99]';
 
   const variants = {
     primary:
-      'bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white shadow-[0_0_25px_rgba(124,58,237,0.4)] hover:shadow-[0_0_35px_rgba(124,58,237,0.6)] focus:ring-violet-500',
+      'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white shadow-xs hover:shadow-sm focus:ring-blue-500',
     secondary:
-      'bg-zinc-900 hover:bg-zinc-800 text-zinc-100 border border-white/10 hover:border-white/20 focus:ring-zinc-500',
+      'bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 focus:ring-slate-400',
     ghost:
-      'bg-transparent hover:bg-white/5 text-zinc-300 hover:text-white border border-transparent focus:ring-zinc-500',
+      'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-transparent focus:ring-slate-400',
   }[variant];
 
   return (

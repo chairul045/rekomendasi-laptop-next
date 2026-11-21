@@ -10,25 +10,25 @@ export default function Footer() {
 
   return (
     <>
-      <footer className="relative z-10 border-t border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#09090d]/80 backdrop-blur-xl py-6 text-xs text-zinc-600 dark:text-zinc-400 mt-auto transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+      <footer className="relative z-10 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0a0f1d] py-8 text-xs text-slate-600 dark:text-slate-400 mt-auto transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             {/* Branding & Deskripsi */}
             <div className="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
               <div className="flex items-center gap-2.5">
-                <div className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-white/10 p-0.5 flex items-center justify-center">
+                <div className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-slate-800 border border-blue-200 dark:border-slate-700 p-1 flex items-center justify-center">
                   <img
                     src="/logo.svg"
                     alt="Lapmatch Logo"
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <span className="font-semibold text-zinc-800 dark:text-zinc-200">
+                <span className="font-bold text-slate-900 dark:text-slate-200">
                   Lapmatch &bull; Smart Laptop Matching
                 </span>
               </div>
-              <span className="hidden sm:inline text-zinc-400 dark:text-zinc-600">|</span>
-              <span className="text-zinc-500 dark:text-zinc-400">
+              <span className="hidden sm:inline text-slate-300 dark:text-slate-700">|</span>
+              <span className="text-slate-500 dark:text-slate-400 font-medium">
                 Sistem Pendukung Keputusan Pemilihan Laptop Mahasiswa Berbasis Multi-Kriteria
               </span>
             </div>
@@ -38,16 +38,16 @@ export default function Footer() {
               <button
                 type="button"
                 onClick={() => setModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/25 transition shadow-sm min-h-[44px] cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition shadow-xs min-h-[40px] cursor-pointer"
               >
-                <HelpCircle className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
-                <span>Pusat Bantuan & Kontak</span>
+                <HelpCircle className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                <span>Pusat Bantuan &amp; Kontak</span>
               </button>
             </div>
           </div>
 
           {/* Navigasi Footer Legal & Hak Cipta */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-white/[0.05] text-[11px] text-zinc-400">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80 text-[11px] text-slate-500">
             <p>
               &copy; {new Date().getFullYear()} Lapmatch. Dikembangkan untuk mahasiswa Indonesia.
             </p>
@@ -55,28 +55,28 @@ export default function Footer() {
             <nav className="flex items-center gap-4 flex-wrap" aria-label="Footer Navigasi">
               <Link
                 href="/service-laptop"
-                className="hover:text-white transition py-2 px-1 min-h-[44px] inline-flex items-center text-emerald-400/90 hover:text-emerald-300"
+                className="hover:text-blue-600 dark:hover:text-blue-400 transition py-1 text-emerald-600 dark:text-emerald-400 font-medium"
               >
                 Toko Servis Laptop
               </Link>
-              <span className="text-zinc-600">&bull;</span>
+              <span className="text-slate-300 dark:text-slate-700">&bull;</span>
               <Link
                 href="/tentang"
-                className="hover:text-white transition py-2 px-1 min-h-[44px] inline-flex items-center"
+                className="hover:text-blue-600 dark:hover:text-blue-400 transition py-1 font-medium"
               >
                 Tentang
               </Link>
-              <span className="text-zinc-600">&bull;</span>
+              <span className="text-slate-300 dark:text-slate-700">&bull;</span>
               <Link
                 href="/kebijakan-privasi"
-                className="hover:text-white transition py-2 px-1 min-h-[44px] inline-flex items-center"
+                className="hover:text-blue-600 dark:hover:text-blue-400 transition py-1 font-medium"
               >
                 Kebijakan Privasi
               </Link>
-              <span className="text-zinc-600">&bull;</span>
+              <span className="text-slate-300 dark:text-slate-700">&bull;</span>
               <Link
                 href="/syarat-penggunaan"
-                className="hover:text-white transition py-2 px-1 min-h-[44px] inline-flex items-center"
+                className="hover:text-blue-600 dark:hover:text-blue-400 transition py-1 font-medium"
               >
                 Syarat Penggunaan
               </Link>
@@ -90,25 +90,25 @@ export default function Footer() {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in"
         >
-          <div className="relative w-full max-w-md p-6 rounded-2xl bg-[#0e0e15] border border-white/10 shadow-2xl text-left">
+          <div className="relative w-full max-w-md p-6 rounded-2xl bg-white dark:bg-[#0d1527] border border-slate-200 dark:border-slate-800 shadow-xl text-left">
             <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2 text-white font-bold text-sm">
-                <MessageSquare className="w-4 h-4 text-cyan-400" />
+              <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-sm">
+                <MessageSquare className="w-4 h-4 text-blue-600" />
                 <span>Hubungi Tim Lapmatch</span>
               </div>
               <button
                 type="button"
                 onClick={() => setModalOpen(false)}
-                className="text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-white/5 min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer"
+                className="text-slate-400 hover:text-slate-700 dark:hover:text-white p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 min-w-[36px] min-h-[36px] flex items-center justify-center cursor-pointer"
                 aria-label="Tutup dialog"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <p className="text-xs text-zinc-300 mb-5 leading-relaxed">
+            <p className="text-xs text-slate-600 dark:text-slate-300 mb-5 leading-relaxed">
               Memiliki pertanyaan mengenai rekomendasi laptop atau masukan untuk Lapmatch? Kami siap membantu melalui kontak resmi berikut:
             </p>
 
@@ -117,32 +117,32 @@ export default function Footer() {
                 href="https://wa.me/6287851164239?text=Halo%20Tim%20Lapmatch,%20saya%20ingin%20bertanya%20mengenai%20layanan"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-800/40 hover:border-emerald-600 text-emerald-200 text-xs font-semibold transition min-h-[44px]"
+                className="flex items-center justify-between p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 hover:border-emerald-500 text-emerald-800 dark:text-emerald-200 text-xs font-semibold transition min-h-[44px]"
               >
                 <div className="flex items-center gap-2.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                   <span>Konsultasi Cepat via WhatsApp</span>
                 </div>
-                <span className="text-emerald-400 font-mono text-[11px]">Chat Tim Kami →</span>
+                <span className="text-emerald-600 dark:text-emerald-400 font-mono text-[11px]">Chat WhatsApp →</span>
               </a>
 
               <a
                 href="mailto:support@lapmatch.com?subject=Pertanyaan%20Layanan%20Lapmatch"
-                className="flex items-center justify-between p-3.5 rounded-xl bg-zinc-900 border border-white/10 hover:border-white/20 text-zinc-200 text-xs font-semibold transition min-h-[44px]"
+                className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-blue-400 text-slate-800 dark:text-slate-200 text-xs font-semibold transition min-h-[44px]"
               >
                 <div className="flex items-center gap-2.5">
-                  <Mail className="w-4 h-4 text-cyan-400" />
+                  <Mail className="w-4 h-4 text-blue-600" />
                   <span>Email Dukungan Resmi</span>
                 </div>
-                <span className="text-cyan-400 font-mono text-[11px]">support@lapmatch.com →</span>
+                <span className="text-blue-600 dark:text-blue-400 font-mono text-[11px]">support@lapmatch.com →</span>
               </a>
             </div>
 
-            <div className="mt-5 pt-4 border-t border-white/10 text-right">
+            <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800 text-right">
               <button
                 type="button"
                 onClick={() => setModalOpen(false)}
-                className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold text-zinc-200 min-h-[44px] cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 min-h-[38px] cursor-pointer"
               >
                 Tutup
               </button>

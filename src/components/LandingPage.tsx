@@ -30,9 +30,9 @@ const PerspectiveTunnelHero = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="h-[400px] w-full rounded-3xl bg-zinc-950/50 border border-white/5 flex items-center justify-center">
-        <div className="flex items-center gap-2 text-xs font-mono text-zinc-500">
-          <span className="w-3 h-3 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
+      <div className="h-[380px] w-full rounded-2xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex items-center justify-center">
+        <div className="flex items-center gap-2 text-xs font-mono text-slate-500">
+          <span className="w-3.5 h-3.5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
           <span>Memuat 3D Visualizer...</span>
         </div>
       </div>
@@ -45,29 +45,29 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.12,
-      delayChildren: 0.1,
+      staggerChildren: 0.1,
+      delayChildren: 0.05,
     },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 16 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const },
+    transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as const },
   },
 };
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 20 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
     transition: {
-      delay: i * 0.15,
-      duration: 0.6,
+      delay: i * 0.1,
+      duration: 0.4,
       ease: [0.16, 1, 0.3, 1] as const,
     },
   }),
@@ -106,14 +106,14 @@ export default function LandingPage({
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-[#09090d] text-zinc-900 dark:text-zinc-100 overflow-x-hidden transition-colors">
+    <div className="min-h-screen flex flex-col bg-[#f8fafc] dark:bg-[#0a0f1d] text-slate-900 dark:text-slate-100 overflow-x-hidden transition-colors">
       <Navbar user={null} />
 
-      <main className="flex-grow space-y-28 pb-20">
+      <main className="flex-grow space-y-20 sm:space-y-28 pb-20">
         {/* HERO SECTION */}
-        <section className="relative pt-12 sm:pt-24 pb-12 overflow-hidden px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full text-center">
-          {/* Ambient decorative glow with fluid breathing animation */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[380px] bg-gradient-to-tr from-violet-600/25 via-cyan-500/20 to-indigo-600/10 blur-[130px] pointer-events-none -z-10 animate-pulse-glow" />
+        <section className="relative pt-12 sm:pt-20 pb-12 overflow-hidden px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full text-center">
+          {/* Subtle Ambient Decorative Glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[340px] bg-gradient-to-tr from-blue-600/15 via-indigo-600/10 to-transparent blur-[120px] pointer-events-none -z-10 animate-pulse-glow" />
 
           <motion.div
             className="max-w-3xl mx-auto space-y-6"
@@ -123,57 +123,58 @@ export default function LandingPage({
           >
             {/* Top Badge */}
             <motion.div variants={itemVariants} className="inline-block">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-mono font-semibold bg-gradient-to-r from-violet-950/70 via-indigo-950/60 to-cyan-950/70 border border-violet-500/30 text-cyan-300 shadow-lg shadow-violet-500/15 backdrop-blur-md">
-                <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-                <span>Sistem Pendukung Keputusan Berbasis TOPSIS, ROC & Gemini AI</span>
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 shadow-xs backdrop-blur-md">
+                <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                <span>Sistem Rekomendasi Cerdas Berbasis TOPSIS, ROC &amp; Gemini AI</span>
               </div>
             </motion.div>
 
             {/* Headline */}
             <motion.h1
               variants={itemVariants}
-              className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.15]"
+              className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.18]"
             >
               Temukan Laptop Kuliah Terbaik Sesuai{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-300 to-cyan-300 animate-gradient-shift">
-                Kebutuhan & Anggaranmu
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700">
+                Kebutuhan &amp; Anggaran
               </span>
             </motion.h1>
 
             {/* Subheadline */}
             <motion.p
               variants={itemVariants}
-              className="text-sm sm:text-base text-zinc-400 max-w-2xl mx-auto leading-relaxed"
+              className="text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed"
             >
-              Bukan sekadar tebak-tebakan. Lapmatch menggunakan metode matematis ilmiah{' '}
-              <strong className="text-zinc-200">ROC</strong> & <strong className="text-zinc-200">TOPSIS</strong>{' '}
-              yang dipadukan dengan analisis cerdas <strong className="text-cyan-300">AI</strong> untuk menghasilkan rekomendasi laptop yang paling presisi untuk perkuliahanmu.
+              Bukan sekadar tebak-tebakan. Lapmatch menggunakan metode ilmiah multi-kriteria{' '}
+              <strong className="text-slate-900 dark:text-slate-200 font-bold">ROC</strong> &amp;{' '}
+              <strong className="text-slate-900 dark:text-slate-200 font-bold">TOPSIS</strong>{' '}
+              yang dipadukan dengan kecerdasan <strong className="text-blue-600 dark:text-blue-400 font-bold">AI</strong> untuk menghasilkan rekomendasi paling tepat untuk kuliah Anda.
             </motion.p>
 
-            {/* Call to Actions */}
+            {/* Call to Actions - Clear, Consistent Buttons */}
             <motion.div
               variants={itemVariants}
-              className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3"
+              className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-4"
             >
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="w-full sm:w-auto">
+              <div className="w-full sm:w-auto">
                 <Link
                   href="/questionnaire"
-                  className="shimmer-button w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-extrabold text-sm transition shadow-xl shadow-violet-600/30"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-sm transition shadow-sm hover:shadow-md cursor-pointer min-h-[46px]"
                 >
-                  <Sparkles className="w-4 h-4 text-cyan-300" />
+                  <Sparkles className="w-4 h-4 text-blue-200" />
                   <span>Mulai Konsultasi Gratis</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
-              </motion.div>
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
+              </div>
+              <div className="w-full sm:w-auto">
                 <a
                   href="#katalog"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/10 font-bold text-sm transition shadow-sm"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 font-semibold text-sm transition shadow-xs cursor-pointer min-h-[46px]"
                 >
-                  <Laptop className="w-4 h-4 text-cyan-400" />
-                  <span>Eksplorasi Katalog</span>
+                  <Laptop className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  <span>Lihat Katalog Laptop</span>
                 </a>
-              </motion.div>
+              </div>
             </motion.div>
 
             {/* Quick Metrics Bar */}
@@ -182,19 +183,18 @@ export default function LandingPage({
               className="pt-8 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto text-center"
             >
               {[
-                { val: '100+', label: 'Database Laptop', color: 'text-cyan-300' },
-                { val: '6 Kriteria', label: 'Pembobotan ROC', color: 'text-violet-300' },
-                { val: 'Baru & 2nd', label: 'Pilihan Fleksibel', color: 'text-emerald-300' },
-                { val: '100%', label: 'Transparan & Objektif', color: 'text-amber-300' },
+                { val: '100+', label: 'Database Laptop', color: 'text-blue-600 dark:text-blue-400' },
+                { val: '6 Kriteria', label: 'Pembobotan ROC', color: 'text-indigo-600 dark:text-indigo-400' },
+                { val: 'Baru & 2nd', label: 'Pilihan Fleksibel', color: 'text-emerald-600 dark:text-emerald-400' },
+                { val: '100%', label: 'Objektif & Ilmiah', color: 'text-amber-600 dark:text-amber-400' },
               ].map((metric, i) => (
-                <motion.div
+                <div
                   key={i}
-                  whileHover={{ y: -3, scale: 1.02 }}
-                  className="p-3.5 rounded-2xl bg-zinc-950/70 border border-white/5 backdrop-blur-sm card-interactive"
+                  className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs"
                 >
                   <div className={`text-xl font-black ${metric.color} font-mono`}>{metric.val}</div>
-                  <div className="text-[11px] text-zinc-400 mt-0.5">{metric.label}</div>
-                </motion.div>
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 font-medium">{metric.label}</div>
+                </div>
               ))}
             </motion.div>
           </motion.div>
@@ -203,20 +203,20 @@ export default function LandingPage({
         {/* 3 LANGKAH MUDAH */}
         <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full space-y-10">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.4 }}
             className="text-center space-y-2 max-w-xl mx-auto"
           >
-            <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">
+            <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
               Alur Rekomendasi
             </span>
-            <h2 className="text-2xl sm:text-3xl font-black text-white">
-              3 Langkah Menemukan Laptop Tepat
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+              3 Langkah Mudah Menemukan Laptop Tepat
             </h2>
-            <p className="text-xs sm:text-sm text-zinc-400">
-              Proses cepat, interaktif, dan langsung memberikan ranking alternatif terbaik.
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+              Proses interaktif dan transparan untuk ranking alternatif terbaik.
             </p>
           </motion.div>
 
@@ -225,23 +225,20 @@ export default function LandingPage({
               {
                 step: '01',
                 title: 'Tentukan Kebutuhan & Budget',
-                desc: 'Pilih bidang studi/kebutuhan utama Anda (Coding, Desain, Gaming, atau Kuliah harian) serta rentang anggaran yang realistis.',
-                color: 'violet',
-                glow: 'from-violet-600/20 text-violet-300 border-violet-500/30',
+                desc: 'Pilih peruntukan utama Anda (Kuliah, Koding, Desain, Gaming) serta tentukan rentang anggaran yang realistis.',
+                badge: 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border-blue-200 dark:border-blue-800',
               },
               {
                 step: '02',
-                title: 'Urutkan Prioritas Kriteria (Drag & Drop)',
-                desc: 'Urutkan kriteria seperti Harga, Kecepatan Prosesor, RAM, SSD, Daya Baterai, atau Bobot Ringan secara interaktif.',
-                color: 'indigo',
-                glow: 'from-indigo-600/20 text-indigo-300 border-indigo-500/30',
+                title: 'Urutkan Prioritas Kriteria',
+                desc: 'Urutkan kriteria seperti Harga, Prosesor, RAM, SSD, Baterai, dan Portabilitas dengan mudah sesuai preferensi pribadi.',
+                badge: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
               },
               {
                 step: '03',
-                title: 'Dapatkan Rekomendasi & Analisis AI',
-                desc: 'Algoritma TOPSIS menghitung nilai preferensi Vi dan Gemini AI menyusun narasi mengapa laptop tersebut paling pas untuk Anda.',
-                color: 'cyan',
-                glow: 'from-cyan-600/20 text-cyan-300 border-cyan-500/30',
+                title: 'Hasil Rekomendasi & Analisis AI',
+                desc: 'Sistem menghitung nilai preferensi TOPSIS secara presisi dan AI menyajikan analisis humanis mengenai kesesuaian unit.',
+                badge: 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border-blue-200 dark:border-blue-800',
               },
             ].map((item, idx) => (
               <motion.div
@@ -251,19 +248,15 @@ export default function LandingPage({
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.2 }}
                 variants={cardVariants}
-                whileHover={{ y: -6 }}
-                className="group p-6 rounded-3xl bg-[#0e0e15]/80 border border-white/10 space-y-4 hover:border-violet-500/40 transition duration-300 shadow-lg relative overflow-hidden"
+                className="group p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-4 hover:border-blue-300 dark:hover:border-blue-700/60 transition-all duration-200 shadow-xs hover:shadow-md"
               >
-                {/* Subtle top light bar on hover */}
-                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-violet-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                
-                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${item.glow} border flex items-center justify-center font-black text-lg font-mono shadow-sm group-hover:scale-110 transition-transform duration-300`}>
+                <div className={`w-12 h-12 rounded-xl border flex items-center justify-center font-black text-lg font-mono shadow-xs ${item.badge}`}>
                   {item.step}
                 </div>
-                <h3 className="text-lg font-bold text-white group-hover:text-cyan-200 transition-colors">
+                <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                   {item.title}
                 </h3>
-                <p className="text-xs text-zinc-400 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                   {item.desc}
                 </p>
               </motion.div>
@@ -274,36 +267,34 @@ export default function LandingPage({
         {/* METODE ILMIAH SPK */}
         <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
           <motion.div
-            initial={{ opacity: 0, scale: 0.98 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="relative rounded-3xl bg-gradient-to-br from-violet-950/40 via-zinc-950 to-cyan-950/30 border border-white/10 p-8 sm:p-12 overflow-hidden shadow-2xl"
+            transition={{ duration: 0.4 }}
+            className="rounded-2xl bg-gradient-to-br from-slate-900 via-[#0f172a] to-[#1e293b] text-white p-8 sm:p-12 shadow-lg relative overflow-hidden"
           >
-            <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-violet-600/10 rounded-full blur-3xl pointer-events-none" />
-            
             <div className="max-w-2xl space-y-4 relative z-10">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-violet-500/20 text-violet-300 border border-violet-500/30">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-300 border border-blue-400/30">
                 <GraduationCap className="w-3.5 h-3.5" />
-                <span>Metodologi Ilmiah & Teruji</span>
+                <span>Metodologi Ilmiah &amp; Teruji</span>
               </div>
-              <h2 className="text-2xl sm:text-4xl font-black text-white leading-tight">
-                Mengapa Menggabungkan ROC + TOPSIS?
+              <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">
+                Mengapa Memadukan ROC + TOPSIS?
               </h2>
-              <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-                <strong>Rank Order Centroid (ROC)</strong> mengubah urutan prioritas subjektif pengguna menjadi bobot matematis yang konsisten dan adil.
-                Kemudian, <strong>TOPSIS</strong> mengukur seberapa dekat setiap alternatif laptop dengan solusi ideal positif (kinerja terbaik) dan seberapa jauh dari solusi ideal negatif (kinerja terburuk).
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                <strong>Rank Order Centroid (ROC)</strong> mengubah urutan prioritas subjektif menjadi bobot numerik yang adil dan konsisten.
+                Selanjutnya, <strong>TOPSIS</strong> mengukur jarak setiap alternatif laptop terhadap solusi ideal positif (kinerja terbaik) dan solusi ideal negatif (kinerja terendah).
               </p>
 
-              <div className="pt-2 flex flex-wrap gap-3">
-                <div className="px-3 py-1.5 rounded-xl bg-zinc-900/80 border border-white/10 text-xs font-mono text-zinc-200 hover:border-violet-500/40 transition">
+              <div className="pt-2 flex flex-wrap gap-2.5">
+                <div className="px-3 py-1.5 rounded-xl bg-slate-800/90 border border-slate-700 text-xs font-medium text-slate-200">
                   ✓ Tanpa Bias Subjektif
                 </div>
-                <div className="px-3 py-1.5 rounded-xl bg-zinc-900/80 border border-white/10 text-xs font-mono text-zinc-200 hover:border-cyan-500/40 transition">
+                <div className="px-3 py-1.5 rounded-xl bg-slate-800/90 border border-slate-700 text-xs font-medium text-slate-200">
                   ✓ Transparansi Langkah Matriks
                 </div>
-                <div className="px-3 py-1.5 rounded-xl bg-zinc-900/80 border border-white/10 text-xs font-mono text-zinc-200 hover:border-indigo-500/40 transition">
-                  ✓ Kompatibel Skripsi / Tugas Akhir
+                <div className="px-3 py-1.5 rounded-xl bg-slate-800/90 border border-slate-700 text-xs font-medium text-slate-200">
+                  ✓ Sesuai Kaidah Akademik &amp; Skripsi
                 </div>
               </div>
             </div>
@@ -313,20 +304,20 @@ export default function LandingPage({
         {/* 3D PERSPECTIVE TUNNEL SHOWCASE */}
         <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full space-y-6">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.4 }}
             className="text-center space-y-2 max-w-xl mx-auto"
           >
-            <span className="text-xs font-mono font-bold text-violet-400 uppercase tracking-widest">
-              3D Spatial Exploration
+            <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+              Eksplorasi Interaktif
             </span>
-            <h2 className="text-2xl sm:text-3xl font-black text-white">
-              Jelajahi Universe Laptop Lapmatch
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+              Visualisasi Laptop 3D Lapmatch
             </h2>
-            <p className="text-xs sm:text-sm text-zinc-400">
-              Gunakan trackpad atau scroll mouse pada area 3D interaktif di bawah untuk terbang melintasi dimensi laptop perkuliahan.
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+              Gunakan trackpad atau scroll mouse pada area 3D interaktif di bawah untuk menjelajah model visual.
             </p>
           </motion.div>
 
@@ -337,23 +328,23 @@ export default function LandingPage({
         {initialBanners && initialBanners.length > 0 && (
           <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full space-y-4">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.4 }}
               className="space-y-1"
             >
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                <span className="text-xs font-mono font-bold text-cyan-500 dark:text-cyan-400 uppercase tracking-widest">
-                  Promo &amp; Rekomendasi Terhangat
+                <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+                <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+                  Rekomendasi Terpilih
                 </span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white">
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
                 Rekomendasi Laptop Pilihan Editor
               </h2>
-              <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
-                Laptop pilihan terbaik dengan harga promo spesial, garansi resmi, dan QC 30+ titik siap pakai.
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+                Laptop pilihan terbaik dengan harga promo spesial dan spesifikasi siap pakai untuk mahasiswa.
               </p>
             </motion.div>
 
@@ -363,24 +354,24 @@ export default function LandingPage({
 
         {/* PREVIEW KATALOG */}
         {previewLaptops.length > 0 && (
-          <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+          <section id="katalog" className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
             <LaptopCatalog laptops={previewLaptops} />
           </section>
         )}
 
-        {/* FAQ SECTION WITH ACCORDION ANIMATION */}
+        {/* FAQ SECTION */}
         <section className="px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full space-y-8">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.4 }}
             className="text-center space-y-2"
           >
-            <span className="text-xs font-mono font-bold text-violet-400 uppercase tracking-widest">
+            <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
               FAQ
             </span>
-            <h2 className="text-2xl sm:text-3xl font-black text-white">
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
               Pertanyaan yang Sering Diajukan
             </h2>
           </motion.div>
@@ -389,23 +380,21 @@ export default function LandingPage({
             {faqItems.map((item, idx) => {
               const isOpen = openFaq === idx;
               return (
-                <motion.div
+                <div
                   key={idx}
-                  initial={{ opacity: 0, y: 15 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1, duration: 0.4 }}
                   className={`rounded-2xl border transition-colors duration-200 overflow-hidden ${
-                    isOpen ? 'bg-[#12121b] border-violet-500/40' : 'bg-[#0e0e15]/80 border-white/10 hover:border-white/20'
+                    isOpen
+                      ? 'bg-blue-50/50 dark:bg-slate-900 border-blue-300 dark:border-blue-700'
+                      : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 hover:border-slate-300'
                   }`}
                 >
                   <button
                     type="button"
                     onClick={() => toggleFaq(idx)}
-                    className="w-full p-5 text-left flex items-center justify-between gap-4 cursor-pointer"
+                    className="w-full p-5 text-left flex items-center justify-between gap-4 cursor-pointer min-h-[48px]"
                   >
-                    <span className="text-sm font-bold text-white flex items-center gap-2.5">
-                      <HelpCircle className="w-4 h-4 text-cyan-400 shrink-0" />
+                    <span className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2.5">
+                      <HelpCircle className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
                       <span>{item.q}</span>
                     </span>
                     <motion.div
@@ -413,7 +402,7 @@ export default function LandingPage({
                       transition={{ duration: 0.2 }}
                       className="shrink-0"
                     >
-                      <ChevronDown className="w-4 h-4 text-zinc-400" />
+                      <ChevronDown className="w-4 h-4 text-slate-500" />
                     </motion.div>
                   </button>
 
@@ -423,15 +412,15 @@ export default function LandingPage({
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] as const }}
+                        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] as const }}
                       >
-                        <div className="px-5 pb-5 pt-0 text-xs text-zinc-400 leading-relaxed border-t border-white/5 pt-3">
+                        <div className="px-5 pb-5 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-200/60 dark:border-slate-800 pt-3">
                           {item.a}
                         </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </motion.div>
+                </div>
               );
             })}
           </div>
@@ -439,36 +428,25 @@ export default function LandingPage({
 
         {/* FINAL CALL TO ACTION */}
         <section className="px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto w-full text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 25 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="p-8 sm:p-12 rounded-3xl bg-gradient-to-r from-violet-900/30 via-indigo-900/20 to-cyan-900/30 border border-white/15 space-y-6 backdrop-blur-xl relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-violet-500/10 rounded-full blur-3xl pointer-events-none" />
-
+          <div className="p-8 sm:p-12 rounded-2xl bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white space-y-6 shadow-md relative overflow-hidden">
             <div className="relative z-10 space-y-4">
               <h2 className="text-2xl sm:text-4xl font-black text-white">
-                Siap Memilih Laptop Terbaik untuk Perkuliahanmu?
+                Siap Memilih Laptop Terbaik untuk Perkuliahan Anda?
               </h2>
-              <p className="text-xs sm:text-sm text-zinc-300 max-w-xl mx-auto">
+              <p className="text-xs sm:text-sm text-blue-100 max-w-xl mx-auto leading-relaxed">
                 Hanya butuh 2 menit untuk mengisi preferensi kriteria dan mendapatkan rekomendasi akurat berbasis data ilmiah.
               </p>
               <div className="pt-2">
-                <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} className="inline-block">
-                  <Link
-                    href="/questionnaire"
-                    className="shimmer-button inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-black text-sm transition shadow-xl shadow-violet-600/30"
-                  >
-                    <span>Mulai Sekarang - Gratis</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </motion.div>
+                <Link
+                  href="/questionnaire"
+                  className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-white text-blue-700 hover:bg-blue-50 font-bold text-sm transition shadow-sm cursor-pointer min-h-[46px]"
+                >
+                  <span>Mulai Sekarang - Gratis</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
               </div>
             </div>
-          </motion.div>
+          </div>
         </section>
       </main>
 

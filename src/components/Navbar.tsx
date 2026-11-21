@@ -13,6 +13,7 @@ import {
   Sparkles,
   Sun,
   Moon,
+  Laptop,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useTheme } from '@/components/ThemeProvider';
@@ -116,7 +117,7 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
 
   const navLinks = [
     { href: '/', label: 'Katalog & Beranda', active: pathname === '/' },
-    { href: '/questionnaire', label: 'Kuisioner', active: pathname === '/questionnaire' },
+    { href: '/questionnaire', label: 'Kuesioner', active: pathname === '/questionnaire' },
     {
       href: '/history',
       label: 'Riwayat',
@@ -127,49 +128,49 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-200 dark:border-white/10 bg-white/95 dark:bg-[#09090d]/90 backdrop-blur-md transition-all shadow-sm">
-      {/* Garis Border Paling Atas */}
-      <div className="w-full h-[3px] bg-gradient-to-r from-violet-500 via-cyan-400 to-indigo-500 shadow-[0_1px_16px_rgba(6,182,212,0.6)]" />
+    <header className="sticky top-0 z-40 w-full border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-[#0a0f1d]/90 backdrop-blur-md transition-all shadow-sm">
+      {/* Top Border Accent Line: Navy & Blue */}
+      <div className="w-full h-[2.5px] bg-gradient-to-r from-blue-700 via-indigo-600 to-blue-500" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         {/* Brand */}
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 via-indigo-600 to-cyan-500 p-0.5 shadow-[0_0_20px_rgba(124,58,237,0.35)] group-hover:shadow-[0_0_30px_rgba(124,58,237,0.6)] transition duration-300 overflow-hidden shrink-0">
-              <div className="w-full h-full bg-white dark:bg-[#09090d] rounded-[9px] overflow-hidden flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 p-0.5 shadow-sm group-hover:shadow-md transition duration-200 overflow-hidden shrink-0">
+              <div className="w-full h-full bg-white dark:bg-[#0f172a] rounded-[10px] overflow-hidden flex items-center justify-center p-1">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/logo.svg"
                   alt="Lapmatch Logo"
-                  className="w-full h-full object-contain p-1 group-hover:scale-110 transition duration-300"
+                  className="w-full h-full object-contain group-hover:scale-105 transition duration-200"
                 />
               </div>
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-sm tracking-tight text-zinc-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-cyan-300 transition">
+                <span className="font-bold text-sm tracking-tight text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
                   Lapmatch
                 </span>
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-mono font-medium bg-violet-500/10 dark:bg-violet-500/20 text-violet-700 dark:text-cyan-300 border border-violet-500/20 dark:border-cyan-500/30">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
                   AI Match
                 </span>
               </div>
-              <span className="text-[10px] text-zinc-500 dark:text-zinc-400 hidden sm:inline">
-                Smart Laptop Matcher &amp; Recommender
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 hidden sm:inline font-medium">
+                Smart Laptop Matching &amp; Recommendation
               </span>
             </div>
           </Link>
 
-          {/* Desktop Nav Links (Bisa dilihat siapa saja, Shopee style) */}
+          {/* Desktop Nav Links */}
           <nav className="hidden md:flex items-center gap-1.5 text-xs font-medium">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 ${
                   link.active
-                    ? 'text-violet-700 dark:text-white bg-violet-50 dark:bg-gradient-to-r dark:from-violet-500/20 dark:to-indigo-500/20 border border-violet-200 dark:border-violet-500/40 shadow-sm font-semibold'
-                    : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-slate-100 dark:hover:bg-white/[0.06]'
+                    ? 'text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 font-semibold shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                 }`}
               >
                 <span>{link.label}</span>
@@ -177,8 +178,8 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
                   <span
                     className={`inline-flex items-center px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
                       link.active
-                        ? 'bg-violet-600 dark:bg-cyan-400 text-white dark:text-zinc-950 font-bold'
-                        : 'bg-slate-100 dark:bg-zinc-800 text-zinc-700 dark:text-cyan-300 border border-slate-200 dark:border-cyan-500/30'
+                        ? 'bg-blue-600 text-white font-bold'
+                        : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700'
                     }`}
                   >
                     {link.badge}
@@ -190,10 +191,10 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
             {currentUser && currentUser.role === 'admin' && currentUser.email?.toLowerCase() === 'chairulanwarr003@gmail.com' && (
               <Link
                 href="/admin"
-                className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 ${
                   pathname.startsWith('/admin')
-                    ? 'text-amber-300 bg-amber-950/40 border border-amber-500/50'
-                    : 'text-amber-400/90 hover:text-amber-300 hover:bg-amber-950/20'
+                    ? 'text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 font-semibold'
+                    : 'text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/20'
                 }`}
               >
                 <Shield className="w-3.5 h-3.5" />
@@ -209,11 +210,11 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
           <button
             type="button"
             onClick={toggleTheme}
-            className="p-2 rounded-xl text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 transition cursor-pointer"
+            className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition cursor-pointer min-h-[40px] min-w-[40px] flex items-center justify-center"
             aria-label={theme === 'dark' ? 'Ganti ke mode terang' : 'Ganti ke mode gelap'}
             title={theme === 'dark' ? 'Mode Terang' : 'Mode Gelap'}
           >
-            {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-violet-400" />}
+            {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-blue-600" />}
           </button>
 
           {currentUser ? (
@@ -221,22 +222,22 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
               {/* Profile Shortcut */}
               <Link
                 href="/profile"
-                className="flex items-center gap-2.5 pl-2 sm:pl-3 border-l border-slate-200 dark:border-white/10 hover:opacity-90 transition group"
+                className="flex items-center gap-2.5 pl-2 sm:pl-3 border-l border-slate-200 dark:border-slate-800 hover:opacity-90 transition group"
                 title="Buka Profil Akun"
               >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-600 p-[1px] shadow-sm shrink-0">
-                  <div className="w-full h-full rounded-full bg-zinc-900 flex items-center justify-center text-xs font-mono font-bold text-violet-300">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 p-[1px] shadow-sm shrink-0">
+                  <div className="w-full h-full rounded-[11px] bg-slate-900 flex items-center justify-center text-xs font-mono font-bold text-blue-200">
                     {currentUser.name ? currentUser.name.substring(0, 2).toUpperCase() : 'U'}
                   </div>
                 </div>
                 <div className="hidden sm:flex flex-col text-left">
-                  <span className="text-xs font-medium text-zinc-200 truncate max-w-[120px] group-hover:text-cyan-300 transition">
+                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[120px] group-hover:text-blue-600 transition">
                     {currentUser.name}
                   </span>
-                  <span className="text-[10px] text-zinc-400 code-font capitalize flex items-center gap-1">
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 capitalize flex items-center gap-1 font-medium">
                     <span
                       className={`w-1.5 h-1.5 rounded-full ${
-                        currentUser.role === 'admin' ? 'bg-amber-400' : 'bg-cyan-400'
+                        currentUser.role === 'admin' ? 'bg-amber-500' : 'bg-blue-500'
                       }`}
                     />
                     {currentUser.role}
@@ -247,25 +248,25 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
               <button
                 onClick={handleSignOut}
                 type="button"
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-zinc-400 hover:text-rose-300 hover:bg-rose-950/30 border border-white/10 hover:border-rose-800/50 transition cursor-pointer"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-slate-200 dark:border-slate-800 transition cursor-pointer min-h-[38px]"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span>Keluar</span>
               </button>
             </>
           ) : isAuthLoading ? (
-            <div className="w-14 h-7 rounded-xl bg-zinc-800/40 animate-pulse" />
+            <div className="w-14 h-7 rounded-xl bg-slate-200 dark:bg-slate-800 animate-pulse" />
           ) : (
-            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <div className="flex items-center gap-2 shrink-0">
               <Link
                 href="/login"
-                className="text-xs font-semibold text-zinc-300 hover:text-white px-2.5 sm:px-3 py-1.5 rounded-xl hover:bg-white/[0.06] border border-white/10 transition whitespace-nowrap"
+                className="text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition whitespace-nowrap min-h-[38px] flex items-center justify-center"
               >
                 Masuk
               </Link>
               <Link
                 href="/register"
-                className="hidden sm:inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white shadow-[0_0_15px_rgba(124,58,237,0.35)] transition active:scale-[0.98] whitespace-nowrap"
+                className="hidden sm:inline-flex items-center gap-1 px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white shadow-sm transition whitespace-nowrap min-h-[38px]"
               >
                 <span>Daftar</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -273,11 +274,11 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
             </div>
           )}
 
-          {/* Mobile Menu Toggle Button (Selalu tampil di mobile) */}
+          {/* Mobile Menu Toggle Button */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800 border border-white/10 transition cursor-pointer"
+            className="md:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition cursor-pointer min-h-[40px] min-w-[40px] flex items-center justify-center"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -292,48 +293,48 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="md:hidden border-t border-slate-200 dark:border-white/10 bg-white/95 dark:bg-[#09090d]/95 backdrop-blur-2xl px-4 py-4 space-y-3 overflow-hidden shadow-2xl"
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="md:hidden border-t border-slate-200 dark:border-slate-800 bg-white/98 dark:bg-[#0a0f1d]/98 backdrop-blur-2xl px-4 py-4 space-y-3 overflow-hidden shadow-xl"
           >
             {/* Header User / Guest Card */}
             {currentUser ? (
               <Link
                 href="/profile"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 p-3 rounded-2xl bg-zinc-900/80 border border-white/10 active:scale-[0.98] transition"
+                className="flex items-center gap-3 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 active:scale-[0.99] transition"
               >
-                <div className="w-9 h-9 rounded-full bg-violet-600/30 border border-violet-500/40 flex items-center justify-center font-bold text-xs text-violet-300">
+                <div className="w-9 h-9 rounded-xl bg-blue-600/10 dark:bg-blue-900/40 border border-blue-500/30 flex items-center justify-center font-bold text-xs text-blue-700 dark:text-blue-300">
                   {currentUser.name ? currentUser.name.substring(0, 2).toUpperCase() : 'U'}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs font-bold text-white truncate">{currentUser.name}</div>
-                  <div className="text-[10px] text-zinc-400 truncate">{currentUser.email}</div>
+                  <div className="text-xs font-bold text-slate-900 dark:text-white truncate">{currentUser.name}</div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{currentUser.email}</div>
                 </div>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30 uppercase">
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 uppercase">
                   {currentUser.role}
                 </span>
               </Link>
             ) : (
-              <div className="p-3.5 rounded-2xl bg-gradient-to-r from-violet-950/40 via-zinc-900 to-cyan-950/40 border border-white/10 space-y-2.5">
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2.5">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-cyan-400" />
-                  <span className="text-xs font-bold text-white">Mode Pengunjung (Guest)</span>
+                  <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  <span className="text-xs font-bold text-slate-900 dark:text-white">Mode Pengunjung (Guest)</span>
                 </div>
-                <p className="text-[11px] text-zinc-400 leading-snug">
-                  Masuk atau buat akun gratis untuk memulai kuesioner dan menyimpan favorit.
+                <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-snug">
+                  Masuk atau buat akun gratis untuk memulai kuesioner dan menyimpan riwayat rekomendasi.
                 </p>
                 <div className="flex items-center gap-2 pt-1">
                   <Link
                     href="/login"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex-1 py-2 rounded-xl text-center text-xs font-bold bg-white/10 hover:bg-white/15 text-white border border-white/10 transition"
+                    className="flex-1 py-2.5 rounded-xl text-center text-xs font-semibold bg-white dark:bg-slate-800 text-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 shadow-xs transition"
                   >
                     Masuk
                   </Link>
                   <Link
                     href="/register"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex-1 py-2 rounded-xl text-center text-xs font-bold bg-gradient-to-r from-violet-600 to-cyan-500 text-white shadow-md transition"
+                    className="flex-1 py-2.5 rounded-xl text-center text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition"
                   >
                     Daftar Akun
                   </Link>
@@ -348,15 +349,15 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl transition ${
+                  className={`flex items-center justify-between px-3.5 py-3 rounded-xl transition ${
                     link.active
-                      ? 'bg-violet-600/20 text-white font-bold border border-violet-500/30'
-                      : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                      ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                   }`}
                 >
                   <span>{link.label}</span>
                   {link.badge !== null && link.badge !== undefined && (
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-400 text-zinc-950 font-bold">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-600 text-white font-bold">
                       {link.badge}
                     </span>
                   )}
@@ -367,10 +368,10 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
                 <Link
                   href="/profile"
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-3.5 py-2.5 rounded-xl transition ${
+                  className={`block px-3.5 py-3 rounded-xl transition ${
                     pathname === '/profile'
-                      ? 'bg-violet-600/20 text-white font-bold border border-violet-500/30'
-                      : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                      ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                   }`}
                 >
                   Profil Saya
@@ -381,7 +382,7 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
                 <Link
                   href="/admin"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3.5 py-2.5 rounded-xl text-amber-300 font-bold bg-amber-950/30 border border-amber-500/30"
+                  className="block px-3.5 py-3 rounded-xl text-indigo-700 dark:text-indigo-300 font-bold bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800"
                 >
                   Admin Control Panel
                 </Link>
@@ -389,12 +390,12 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
             </div>
 
             {/* Theme Switcher in Mobile Menu */}
-            <div className="pt-2 border-t border-slate-200 dark:border-white/10 flex items-center justify-between px-1">
-              <span className="text-xs text-zinc-600 dark:text-zinc-400 font-medium">Tema Tampilan</span>
+            <div className="pt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between px-1">
+              <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">Tema Tampilan</span>
               <button
                 type="button"
                 onClick={toggleTheme}
-                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 text-xs font-semibold text-zinc-700 dark:text-zinc-200 transition cursor-pointer"
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 transition cursor-pointer"
               >
                 {theme === 'dark' ? (
                   <>
@@ -403,7 +404,7 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
                   </>
                 ) : (
                   <>
-                    <Moon className="w-3.5 h-3.5 text-violet-400" />
+                    <Moon className="w-3.5 h-3.5 text-blue-600" />
                     <span>Mode Gelap</span>
                   </>
                 )}
@@ -412,11 +413,11 @@ export default function Navbar({ user: initialUser, historyCount = 0 }: NavbarPr
 
             {/* Logout Button */}
             {currentUser && (
-              <div className="pt-2 border-t border-slate-200 dark:border-white/10">
+              <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={handleSignOut}
-                  className="w-full flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-rose-300 bg-rose-950/30 border border-rose-800/40 hover:bg-rose-900/40 transition cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 px-3.5 py-3 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 hover:bg-rose-100 transition cursor-pointer min-h-[44px]"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Keluar dari Akun</span>
